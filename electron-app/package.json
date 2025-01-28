@@ -1,9 +1,0 @@
-{
-  "devDependencies": {
-    "@electron-forge/plugin-webpack": "^7.6.1",
-    "electron": "^28.0.0"
-  },
-  "scripts": {
-    "start": "npx electron ."
-  }
-}
