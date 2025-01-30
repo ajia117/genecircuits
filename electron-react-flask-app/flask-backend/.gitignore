@@ -1,4 +1,5 @@
 flask-venv
+env
 dist
 build
 __pycache__
