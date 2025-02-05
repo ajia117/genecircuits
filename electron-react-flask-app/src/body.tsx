@@ -1,5 +1,7 @@
 import { useState } from "react"
 import axios from "axios";
+import CircuitBuilder from "./circuit-builder";
+import Toolbox from "./toolbox";
 
 export default function Body() {
     const [message, setMessage] = useState(null)
@@ -31,6 +33,9 @@ export default function Body() {
             <button onClick={testServer}>Get random number!</button>
 
             <p>{message ? message : ""}</p>
+
+            <CircuitBuilder />
+            <Toolbox />
         </>
     )
 }
