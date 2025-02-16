@@ -21,15 +21,15 @@ import Toolbox from "./Toolbox/Toolbox";
 import './index.css';
 
 const initialNodes = [
-    { id: 'node_1', position: { x: 0, y: 0 }, type: "default", data: { label: 'default' } },
-    { id: 'node_2', position: { x: 100, y: 100 }, type: "input", data: { label: 'input' } },
-    { id: 'node_3', position: { x: 100, y: 200 }, type: "output", data: { label: 'output' } },
+    { id: '1', position: { x: 0, y: 0 }, type: "default", data: { label: 'default' } },
+    { id: '2', position: { x: 100, y: 100 }, type: "input", data: { label: 'input' } },
+    { id: '3', position: { x: 100, y: 200 }, type: "output", data: { label: 'output' } },
 ];
 
 const initialEdges: Edge[] = [];
 
 let id = 4
-const getId = () => `node_${id++}`; // creates id for the next node
+const getId = () => `${id++}`; // creates id for the next node
 
 export default function CircuitBuilderFlow() {
     const reactFlowWrapper = useRef(null);
@@ -40,16 +40,6 @@ export default function CircuitBuilderFlow() {
     // const [nodes, setNodes] = useState(initialNodes);
     // const [edges, setEdges] = useState<Edge[]>(initialEdges);
     const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null); // Stores clicked edge ID
-
-    // const onNodesChange = useCallback(
-    //     (changes: any) => setNodes((nds) => applyNodeChanges(changes, nds)),
-    //     []
-    // );
-
-    // const onEdgesChange = useCallback(
-    //     (changes: EdgeChange[]) => setEdges((eds) => applyEdgeChanges(changes, eds)),
-    //     []
-    // );
 
     const onConnect = useCallback(
         (params: Connection) => setEdges((eds) => addEdge(params, eds)),
@@ -67,6 +57,7 @@ export default function CircuitBuilderFlow() {
         event.dataTransfer.dropEffect = 'move';
       }, []);
     
+    // add new node
     const onDrop = useCallback(
         (event: React.DragEvent) => {
             event.preventDefault();
@@ -110,22 +101,11 @@ export default function CircuitBuilderFlow() {
         console.log(edges);
     }, [edges]);
 
-    // Handler to create a new node
-    const createNode = useCallback(() => {
-        setNodes((nodes) => [
-            ...nodes,
-            {
-                id: Math.random().toString(),
-                position: { x: 200, y: 200 },
-                type: "default",
-                data: { label: "new node" }
-            },
-        ]);
-    }, []);
-
     return (
+        <>
         <div className="circuit-builder-flow">
-            <div className="flow-wrapper" ref={reactFlowWrapper} style={{ height: 300}}>
+            <Toolbox/>
+            <div className="flow-wrapper" ref={reactFlowWrapper}>
                 <ReactFlow
                     nodes={nodes}
                     edges={edges}
@@ -142,15 +122,15 @@ export default function CircuitBuilderFlow() {
                     <Controls />
                 </ReactFlow>
             </div>
-            <Toolbox/>
 
             {/* TOOLBAR */}
-            <div>
+            {/* <div>
                 <button onClick={createNode}>Add Node</button>
-            </div>
+            </div> */}
 
-            {/* Marker Selection UI */}
-            {selectedEdgeId && (
+        </div>
+        {/* Marker Selection UI */}
+        {selectedEdgeId && (
                 <div>
                     <p>Change Marker for Edge ID: {selectedEdgeId}</p>
                     <button onClick={() => changeMarkerType(MarkerType.Arrow)}>Promote</button>
@@ -158,6 +138,6 @@ export default function CircuitBuilderFlow() {
                     {/* <button onClick={() => changeMarkerType(MarkerType.Circle)}>Circle</button> */}
                 </div>
             )}
-        </div>
+        </>
     );
 }

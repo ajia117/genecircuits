@@ -4,18 +4,16 @@ body {
   margin: auto;
   max-width: 100vw;
   padding: 0;
-}
-
-#app {
   width: 100vw;
   height: 100vh;
+  box-sizing: border-box;
 }
 
 .circuit-builder-flow {
   flex-direction: column;
   display: flex;
   flex-grow: 1;
-  height: 100%;
+  height: 80%;
 }
 
 .circuit-builder-flow aside {
@@ -27,6 +25,10 @@ body {
 
 .circuit-builder-flow aside .description {
   margin-bottom: 10px;
+}
+
+.circuit-builder-flow .flow-wrapper {
+  flex-grow: 1;
 }
 
 .circuit-builder-flow .dndnode {
@@ -41,7 +43,13 @@ body {
   cursor: grab;
 }
 
-.circuit-builder-flow .flow-wrapper {
-  flex-grow: 1;
-  height: 100%;
+@media screen and (min-width: 768px) {
+  .circuit-builder-flow {
+    flex-direction: row;
+  }
+
+  .circuit-builder-flow aside {
+    width: 20%;
+    max-width: 250px;
+  }
 }
