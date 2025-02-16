@@ -1,7 +1,7 @@
 import { useState } from "react"
 import axios from "axios";
-import CircuitBuilder from "./circuit-builder";
-import Toolbox from "./toolbox";
+import CircuitBuilderFlow from "./CircuitBuilderFlow";
+import { ReactFlowProvider } from "@xyflow/react";
 
 export default function Body() {
     const [message, setMessage] = useState(null)
@@ -34,8 +34,10 @@ export default function Body() {
 
             <p>{message ? message : ""}</p>
 
-            <CircuitBuilder />
-            <Toolbox />
+            <ReactFlowProvider>
+                <CircuitBuilderFlow />
+            </ReactFlowProvider>
+            
         </>
     )
 }
