@@ -19,11 +19,12 @@ import '@xyflow/react/dist/style.css';
 import { useDnD } from "./Toolbox/ToolboxContext";
 import Toolbox from "./Toolbox/Toolbox";
 import './index.css';
+import RepressMarker from "./assets/RepressMarker";
 
 const initialNodes = [
-    { id: '1', position: { x: 0, y: 0 }, type: "default", data: { label: 'default' } },
-    { id: '2', position: { x: 100, y: 100 }, type: "input", data: { label: 'input' } },
-    { id: '3', position: { x: 100, y: 200 }, type: "output", data: { label: 'output' } },
+    { id: '1', position: { x: 0, y: 0 }, type: "default", data: { label: 'A' } },
+    { id: '2', position: { x: 100, y: 100 }, type: "input", data: { label: 'B' } },
+    { id: '3', position: { x: 100, y: 200 }, type: "output", data: { label: 'C' } },
 ];
 
 const initialEdges: Edge[] = [];
@@ -85,13 +86,18 @@ export default function CircuitBuilderFlow() {
     );
 
     // Function to change marker type of the selected edge
-    const changeMarkerType = useCallback((markerType: MarkerType) => {
+    const changeMarkerType = useCallback((markerType: any) => {
         if (!selectedEdgeId) return; // No edge selected
 
         setEdges((eds) =>
             eds.map((edge) =>
                 edge.id === selectedEdgeId
-                    ? { ...edge, markerEnd: { type: markerType, width: 20, height: 20, color: "orange" } }
+                    ? {
+                        ...edge,
+                        markerEnd: markerType === "repress" 
+                            ? 'repress' // type is repress arrow
+                            : { type: markerType, width: 20, height: 20, color: "black" }
+                    }
                     : edge
             )
         );
@@ -106,6 +112,7 @@ export default function CircuitBuilderFlow() {
         <div className="circuit-builder-flow">
             <Toolbox/>
             <div className="flow-wrapper" ref={reactFlowWrapper}>
+                <RepressMarker /> {/* adding custom marker */}
                 <ReactFlow
                     nodes={nodes}
                     edges={edges}
@@ -118,6 +125,7 @@ export default function CircuitBuilderFlow() {
                     fitView
                     style={{ backgroundColor: "#F7F9FB" }}
                 >
+                    
                     <Background />
                     <Controls />
                 </ReactFlow>
@@ -134,7 +142,7 @@ export default function CircuitBuilderFlow() {
                 <div>
                     <p>Change Marker for Edge ID: {selectedEdgeId}</p>
                     <button onClick={() => changeMarkerType(MarkerType.Arrow)}>Promote</button>
-                    <button onClick={() => changeMarkerType(null)}>Repress</button>
+                    <button onClick={() => changeMarkerType("repress")}>Repress</button>
                     {/* <button onClick={() => changeMarkerType(MarkerType.Circle)}>Circle</button> */}
                 </div>
             )}
