@@ -16,6 +16,7 @@ import { useDnD } from "./Toolbox/ToolboxContext";
 import Toolbox from "./Toolbox/Toolbox";
 import './index.css';
 import RepressMarker from "./assets/RepressMarker";
+import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
 const initialNodes = [
     { id: '1', position: { x: 0, y: 0 }, type: "default", data: { label: 'A' } },
@@ -106,27 +107,32 @@ export default function CircuitBuilderFlow() {
     return (
         <>
             <RepressMarker/> {/* import custom edge marker svg */}
-            <div className="circuit-builder-container">
+            <PanelGroup className="circuit-builder-container" direction="horizontal">
             
                 {/* Left Pane (Toolbox + Properties Window) */}
-                <div className="left-pane">
-                    <div className="toolbox-container">
-                        <Toolbox />
-                    </div>
-                    <div className="properties-window">
-                        <p>Properties Window</p>
-                        {selectedEdgeId && (
-                            <>
-                                <p>Change Marker for Edge ID: {selectedEdgeId}</p>
-                                <button onClick={() => changeMarkerType(MarkerType.Arrow)}>Promote</button>
-                                <button onClick={() => changeMarkerType("repress")}>Repress</button>
-                            </>
-                        )}
-                    </div>
-                </div>
+                <Panel className="left-pane" defaultSize={20} minSize={10} maxSize={50}>
+                    <PanelGroup direction="vertical">
+                        <Panel className="toolbox-container" defaultSize={70} minSize={30} maxSize={90}>
+                            <Toolbox />
+                        </Panel>
+                        <PanelResizeHandle className="resize-handle-horizontal" />
+                        <Panel className="properties-window" defaultSize={30} minSize={20} maxSize={90}>
+                            <p>Properties Window</p>
+                            {selectedEdgeId && (
+                                <>
+                                    <p>Change Marker for Edge ID: {selectedEdgeId}</p>
+                                    <button onClick={() => changeMarkerType(MarkerType.Arrow)}>Promote</button>
+                                    <button onClick={() => changeMarkerType("repress")}>Repress</button>
+                                </>
+                            )}
+                        </Panel>
+                    </PanelGroup>
+                </Panel>
+
+                <PanelResizeHandle className="resize-handle-vertical" />
 
                 {/* Right Pane (circuit building workspace area) */}
-                <div className="flow-wrapper" ref={reactFlowWrapper}>
+                <Panel className="flow-wrapper" ref={reactFlowWrapper} defaultSize={80} minSize={50} maxSize={90}>
                     <ReactFlow
                         nodes={nodes}
                         edges={edges}
@@ -141,9 +147,9 @@ export default function CircuitBuilderFlow() {
                         <Background />
                         <Controls />
                     </ReactFlow>
-                </div>
+                </Panel>
 
-            </div>
+            </PanelGroup>
         
             {/* Marker Selection UI */}
             {selectedEdgeId && (

@@ -13,15 +13,30 @@ body {
   flex-direction: column;
   display: flex;
   flex-grow: 1;
-  height: 80%;
   background-color: #F7F9FB;
+  max-height: 90%;
+}
+
+.react-resizable-panel {
+  display: flex;
+}
+
+.resize-handle-vertical {
+  width: 5px;
+  cursor: ew-resize;
+  background: #ccc;
+}
+
+.resize-handle-horizontal {
+  height: 5px;
+  cursor: ns-resize;
+  background: #ccc;
 }
 
 .left-pane {
   display: flex;
   flex-direction: column;
   width: 20%;
-  max-width: 250px;
   background: #fcfcfc;
   border-right: 1px solid #ddd;
   box-sizing: border-box;
@@ -36,7 +51,6 @@ body {
 
 /* Properties Window */
 .properties-window {
-  height: 150px; /* Adjust based on needed size */
   background: #f1f1f1;
   border-top: 1px solid #ddd;
   padding: 10px;
