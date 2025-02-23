@@ -3,11 +3,7 @@ import {
     ReactFlow, 
     Background, 
     Controls, 
-    applyEdgeChanges, 
-    applyNodeChanges, 
     addEdge, 
-    NodeChange, 
-    EdgeChange, 
     Edge, 
     Connection, 
     MarkerType, 
@@ -34,14 +30,13 @@ const getId = () => `${id++}`; // creates id for the next node
 
 export default function CircuitBuilderFlow() {
     const reactFlowWrapper = useRef(null);
-    const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-    const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+    const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes); // List of all nodes in workspace
+    const [edges, setEdges, onEdgesChange] = useEdgesState([]); // List of all edges in workspace
     const { screenToFlowPosition } = useReactFlow();
-    const [type, setType] = useDnD();
-    // const [nodes, setNodes] = useState(initialNodes);
-    // const [edges, setEdges] = useState<Edge[]>(initialEdges);
+    const [type, setType] = useDnD(); // Stores node type that is being dragged and dropped
     const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null); // Stores clicked edge ID
 
+    // Handler for connecting nodes
     const onConnect = useCallback(
         (params: Connection) => setEdges((eds) => addEdge(params, eds)),
         []
@@ -53,27 +48,28 @@ export default function CircuitBuilderFlow() {
         setSelectedEdgeId(edge.id); // Store the clicked edge ID
     }, []);
 
+    // Handler for dragging a component from toolbox to workspace
     const onDragOver = useCallback((event: any) => {
         event.preventDefault();
         event.dataTransfer.dropEffect = 'move';
       }, []);
     
-    // add new node
+    // Add new node
     const onDrop = useCallback(
         (event: React.DragEvent) => {
             event.preventDefault();
     
             const nodeType = event.dataTransfer.getData("application/reactflow") || type;
-            if (!nodeType || typeof nodeType !== "string") {
+            if (!nodeType || typeof nodeType !== "string") { // get the node type
                 console.error("Invalid node type:", nodeType);
                 return;
             }
             
-            const position = screenToFlowPosition({
+            const position = screenToFlowPosition({ // find drop location
                 x: event.clientX,
                 y: event.clientY,
             });
-            const newNode = {
+            const newNode = { // properties of new node being added
                 id: getId(),
                 position,
                 type: nodeType,
@@ -109,41 +105,52 @@ export default function CircuitBuilderFlow() {
 
     return (
         <>
-        <div className="circuit-builder-flow">
-            <Toolbox/>
-            <div className="flow-wrapper" ref={reactFlowWrapper}>
-                <RepressMarker /> {/* adding custom marker */}
-                <ReactFlow
-                    nodes={nodes}
-                    edges={edges}
-                    onNodesChange={onNodesChange}
-                    onEdgesChange={onEdgesChange}
-                    onConnect={onConnect}
-                    onDrop={onDrop}
-                    onDragOver={onDragOver}
-                    onEdgeClick={onEdgeClick} 
-                    fitView
-                    style={{ backgroundColor: "#F7F9FB" }}
-                >
-                    
-                    <Background />
-                    <Controls />
-                </ReactFlow>
+            <RepressMarker/> {/* import custom edge marker svg */}
+            <div className="circuit-builder-container">
+            
+                {/* Left Pane (Toolbox + Properties Window) */}
+                <div className="left-pane">
+                    <div className="toolbox-container">
+                        <Toolbox />
+                    </div>
+                    <div className="properties-window">
+                        <p>Properties Window</p>
+                        {selectedEdgeId && (
+                            <>
+                                <p>Change Marker for Edge ID: {selectedEdgeId}</p>
+                                <button onClick={() => changeMarkerType(MarkerType.Arrow)}>Promote</button>
+                                <button onClick={() => changeMarkerType("repress")}>Repress</button>
+                            </>
+                        )}
+                    </div>
+                </div>
+
+                {/* Right Pane (circuit building workspace area) */}
+                <div className="flow-wrapper" ref={reactFlowWrapper}>
+                    <ReactFlow
+                        nodes={nodes}
+                        edges={edges}
+                        onNodesChange={onNodesChange}
+                        onEdgesChange={onEdgesChange}
+                        onConnect={onConnect}
+                        onDrop={onDrop}
+                        onDragOver={onDragOver}
+                        onEdgeClick={onEdgeClick} 
+                        fitView
+                    >
+                        <Background />
+                        <Controls />
+                    </ReactFlow>
+                </div>
+
             </div>
-
-            {/* TOOLBAR */}
-            {/* <div>
-                <button onClick={createNode}>Add Node</button>
-            </div> */}
-
-        </div>
-        {/* Marker Selection UI */}
-        {selectedEdgeId && (
+        
+            {/* Marker Selection UI */}
+            {selectedEdgeId && (
                 <div>
                     <p>Change Marker for Edge ID: {selectedEdgeId}</p>
                     <button onClick={() => changeMarkerType(MarkerType.Arrow)}>Promote</button>
                     <button onClick={() => changeMarkerType("repress")}>Repress</button>
-                    {/* <button onClick={() => changeMarkerType(MarkerType.Circle)}>Circle</button> */}
                 </div>
             )}
         </>

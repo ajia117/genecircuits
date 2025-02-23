@@ -9,29 +9,51 @@ body {
   box-sizing: border-box;
 }
 
-.circuit-builder-flow {
+.circuit-builder-container {
   flex-direction: column;
   display: flex;
   flex-grow: 1;
   height: 80%;
+  background-color: #F7F9FB;
 }
 
-.circuit-builder-flow aside {
-  border-right: 1px solid #eee;
-  padding: 15px 10px;
-  font-size: 12px;
+.left-pane {
+  display: flex;
+  flex-direction: column;
+  width: 20%;
+  max-width: 250px;
   background: #fcfcfc;
+  border-right: 1px solid #ddd;
+  box-sizing: border-box;
 }
 
-.circuit-builder-flow aside .description {
-  margin-bottom: 10px;
+/* Toolbox Section */
+.toolbox-container {
+  flex-grow: 1; /* Allows Toolbox to expand while leaving space for properties */
+  overflow-y: auto;
+  padding: 10px;
 }
 
-.circuit-builder-flow .flow-wrapper {
+/* Properties Window */
+.properties-window {
+  height: 150px; /* Adjust based on needed size */
+  background: #f1f1f1;
+  border-top: 1px solid #ddd;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+
+/* ------- RIGHT PANE (ReactFlow workspace) ------- */
+
+.circuit-builder-container .flow-wrapper {
   flex-grow: 1;
+  display: flex;
+  position: relative;
+  background-color: #F7F9FB;
 }
 
-.circuit-builder-flow .dndnode {
+.circuit-builder-container .dndnode {
   height: 20px;
   padding: 4px;
   border: 1px solid #1a192b;
@@ -44,11 +66,11 @@ body {
 }
 
 @media screen and (min-width: 768px) {
-  .circuit-builder-flow {
+  .circuit-builder-container {
     flex-direction: row;
   }
 
-  .circuit-builder-flow aside {
+  .circuit-builder-container aside {
     width: 20%;
     max-width: 250px;
   }
