@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useRef } from "react";
+import React, {useCallback, useState, useRef, useMemo} from "react";
 import {
     ReactFlow,
     Background,
@@ -27,7 +27,7 @@ export default function CircuitBuilderFlow() {
     const { screenToFlowPosition } = useReactFlow();
     const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null); // Stores clicked edge ID
     const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null); // Stores clicked node ID
-    const nodeTypes = { custom: CustomNode};
+    const nodeTypes = useMemo(() => ({ custom: CustomNode}), []);
 
     let id = 0;
     const getId = () => `${id++}`; // creates id for the next node
@@ -147,7 +147,7 @@ export default function CircuitBuilderFlow() {
 
     return (
         <>
-            <RepressMarker/> {/* import custom edge marker svg */}
+            <RepressMarker /> {/* TODO: remove this, find a workaround */}
             <PanelGroup className="circuit-builder-container " direction="horizontal">
                 {/* Left Pane (Toolbox + Properties Window) */}
                 <Panel className="left-pane min-w-128" defaultSize={30} maxSize={50}>
