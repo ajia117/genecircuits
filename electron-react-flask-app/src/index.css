@@ -1,3 +1,6 @@
+
+
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
     Arial, sans-serif;
@@ -14,7 +17,6 @@ body {
   display: flex;
   flex-grow: 1;
   background-color: #F7F9FB;
-  max-height: 90%;
 }
 
 .react-resizable-panel {
@@ -40,6 +42,8 @@ body {
   background: #fcfcfc;
   border-right: 1px solid #ddd;
   box-sizing: border-box;
+  min-width: 175px;
+  max-width: 400px;
 }
 
 /* Toolbox Section */
@@ -51,7 +55,6 @@ body {
 
 /* Properties Window */
 .properties-window {
-  background: #f1f1f1;
   border-top: 1px solid #ddd;
   padding: 10px;
   box-sizing: border-box;
@@ -67,8 +70,11 @@ body {
   background-color: #F7F9FB;
 }
 
-.circuit-builder-container .dndnode {
-  height: 20px;
+.dndnode {
+  min-width: 130px;
+  max-width: 300px;
+  margin-left: auto;
+  margin-right: auto;
   padding: 4px;
   border: 1px solid #1a192b;
   border-radius: 2px;
@@ -77,15 +83,4 @@ body {
   justify-content: center;
   align-items: center;
   cursor: grab;
-}
-
-@media screen and (min-width: 768px) {
-  .circuit-builder-container {
-    flex-direction: row;
-  }
-
-  .circuit-builder-container aside {
-    width: 20%;
-    max-width: 250px;
-  }
 }
