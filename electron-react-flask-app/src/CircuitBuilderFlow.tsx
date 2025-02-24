@@ -17,7 +17,7 @@ import './index.css';
 import RepressMarker from "./assets/RepressMarker";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import PropertiesWindow from "./components/PropertiesWindow/PropertiesWindow";
-import NodeData from "./types/NodeData";
+import ComplexNodeData from "./types/NodeData";
 import CustomNode from "./CustomNodes/CustomNode";
 
 export default function CircuitBuilderFlow() {
@@ -50,7 +50,7 @@ export default function CircuitBuilderFlow() {
     }, []);
 
     const getSelectedNode = () => {
-        return nodes.find(node => node.id === selectedNodeId) as Node<NodeData>;
+        return nodes.find(node => node.id === selectedNodeId) as Node<ComplexNodeData>;
     }
 
     const changeNodeData = (name: string, value: string | number) => {
@@ -104,7 +104,10 @@ export default function CircuitBuilderFlow() {
             const baseData = {
                 label: `${nodeType} node`,
                 initialConcentration: 0,
-                hillCoefficient: 0
+                hillCoefficient: 0,
+				threshold: 0,
+				degradationRate: 0,
+				delay: 0,
             };
             if (numInCnx != null && numOutCnx != null) {
                 Object.assign(baseData, {
@@ -134,12 +137,7 @@ export default function CircuitBuilderFlow() {
                     ? {
                         ...edge,
                         markerEnd: markerType === "repress"
-                            ? {
-                                type: 'repress',
-                                svg: RepressMarker, // Set the SVG content
-                                width: 20,
-                                height: 20,
-                            } // type is repress arrow
+                            ? 'repress'
                             : { type: markerType, width: 20, height: 20, color: "black" }
                     }
                     : edge
@@ -149,6 +147,7 @@ export default function CircuitBuilderFlow() {
 
     return (
         <>
+            <RepressMarker/> {/* import custom edge marker svg */}
             <PanelGroup className="circuit-builder-container " direction="horizontal">
                 {/* Left Pane (Toolbox + Properties Window) */}
                 <Panel className="left-pane min-w-128" defaultSize={30} maxSize={50}>

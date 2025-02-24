@@ -15,8 +15,8 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({selectedEdgeId, sele
         if (key === "label") {
             return (
                 <div key={key}>
-                    Name:<br />
-                    <input name="name" type="text" defaultValue={String(value)} /><br />
+                    Label:<br />
+                    <input name="label" type="text" defaultValue={String(value)} /><br />
                 </div>
             );
         }
@@ -52,13 +52,15 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({selectedEdgeId, sele
                         formData.forEach((value, key) => {
                             if(value instanceof File) return;
                             const numValue = Number(value);
+
+							// String if Not a Number
                             changeNodeData(key, isNaN(numValue) ? value : numValue);
                         });
                     }}
                 >
                     {formFields}
                     <button type="submit">Update</button>
-                </form>;
+                </form>
             </>
         )}
         </>

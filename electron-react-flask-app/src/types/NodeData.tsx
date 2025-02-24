@@ -13,6 +13,6 @@ interface ComplexNodeData extends Record<string, unknown>{
     degradationRate: number;
     delay: number;
 }
-type NodeData = SimpleNodeData | ComplexNodeData;
+type NodeData = ComplexNodeData | SimpleNodeData;
 
 export default NodeData;

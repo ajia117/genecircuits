@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Handle as HandleComponent, Position } from '@xyflow/react';
+import { Position } from '@xyflow/react';
 import type { Node, NodeProps } from '@xyflow/react';
 
 interface CustomNodeProps extends Record<string, unknown> {
@@ -21,7 +21,6 @@ const CustomNode = ({ data }: NodeProps<CustomNodeData>) => {
         return {
             left: `${left}%`,
             background: '#555',
-            // Remove absolute positioning that might interfere
             position: 'relative' as const,
             transform: 'translateX(-50%)'
         };
@@ -31,7 +30,7 @@ const CustomNode = ({ data }: NodeProps<CustomNodeData>) => {
     return (
         <div className="px-4 py-2 shadow-md rounded-md bg-white border-2 border-gray-200">
             {/* Input Handles */}
-            {Array.from({ length: data.numInCnx }, (_, i) => (
+            {/* {Array.from({ length: data.numInCnx }, (_, i) => (
                 <HandleComponent
                     key={`input-${i}`}
                     type="target"
@@ -39,9 +38,8 @@ const CustomNode = ({ data }: NodeProps<CustomNodeData>) => {
                     id={`input-${i}`}
                     style={getHandleStyle(i, data.numInCnx)}
                 />
-            ))}
+            ))} */}
 
-            {/* Node Content */}
             <div className="flex justify-center items-center">
                 <label className="text-sm font-medium text-gray-900">
                     {data.label}
@@ -49,7 +47,7 @@ const CustomNode = ({ data }: NodeProps<CustomNodeData>) => {
             </div>
 
             {/* Output Handles */}
-            {Array.from({ length: data.numOutCnx }, (_, i) => (
+            {/* {Array.from({ length: data.numOutCnx }, (_, i) => (
                 <Handle
                     key={`output-${i}`}
                     type="source"
@@ -57,7 +55,7 @@ const CustomNode = ({ data }: NodeProps<CustomNodeData>) => {
                     id={`output-${i}`}
                     style={getHandleStyle(i, data.numOutCnx)}
                 />
-            ))}
+            ))} */}
         </div>
     );
 };
