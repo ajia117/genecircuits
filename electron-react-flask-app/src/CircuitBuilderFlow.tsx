@@ -119,7 +119,9 @@ export default function CircuitBuilderFlow() {
                 id: getId(),
                 position,
                 type: nodeType,
-                data: baseData
+                data: baseData,
+                sourcePosition: 'right',
+                targetPosition: 'left'
             };
 
             setNodes((nds) => [...nds, newNode]);
