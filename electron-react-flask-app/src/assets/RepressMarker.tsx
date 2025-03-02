@@ -1,6 +1,6 @@
 const RepressMarker = () => {
     return (
-        <svg width="0" height="0">
+        <svg width="0" height="0" style={{position: "absolute", top: 0, left: 0, width: 0, height: 0}}>
             <defs>
                 <marker
                     id="repress"
