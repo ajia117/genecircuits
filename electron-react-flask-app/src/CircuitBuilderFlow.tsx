@@ -9,7 +9,8 @@ import {
     Connection,
     useNodesState,
     useEdgesState,
-    useReactFlow
+    useReactFlow,
+    MarkerType
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { Toolbox } from "./components/Toolbox/Toolbox";
@@ -34,9 +35,23 @@ export default function CircuitBuilderFlow() {
 
     // Handler for connecting nodes
     const onConnect = useCallback(
-        (params: Connection) => setEdges((eds) => addEdge(params, eds)),
-        []
+        (params: Connection) => {
+            const newEdge: Edge = {
+                ...params,
+                id: `edge-${params.source}-${params.target}`, // Custom naming convention
+                type: 'default',
+                markerEnd: {
+                    type: MarkerType.Arrow, // Default marker type: Promote (Arrow)
+                    width: 20,
+                    height: 20,
+                    color: "black"
+                }
+            };
+            setEdges((eds) => [...eds, newEdge]);
+        },
+        [setEdges]
     );
+    
     const onPaneClick = useCallback(() => {
         setSelectedNodeId(null);
         setSelectedEdgeId(null);

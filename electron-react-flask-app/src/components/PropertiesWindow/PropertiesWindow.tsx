@@ -37,7 +37,7 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({selectedEdgeId, sele
         <>
         {selectedEdgeId && (
             <>
-                <p>Change Marker for Edge</p>
+                <p>Change Marker for Edge: {selectedEdgeId}</p>
                 <button onClick={() => changeMarkerType(MarkerType.Arrow)}>Promote</button>
                 <button onClick={() => changeMarkerType("repress")}>Repress</button>
             </>
