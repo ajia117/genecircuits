@@ -12,6 +12,24 @@ body {
   box-sizing: border-box;
 }
 
+.top-ribbon-container {
+  background-color: white;
+  border-bottom: 1px solid #ccc;
+  height: 5%;
+  display: flex;
+  justify-content: center;
+  /* padding: 3px; */
+}
+
+.play-button {
+  border: none;
+  background: none;
+  /* height: 2px; */
+}
+
+.bottom-container {
+  height:95%
+}
 .circuit-builder-container {
   flex-direction: column;
   display: flex;

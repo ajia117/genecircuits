@@ -21,6 +21,7 @@ import PropertiesWindow from "./components/PropertiesWindow/PropertiesWindow";
 import ComplexNodeData from "./types/NodeData";
 import CustomNode from "./CustomNodes/CustomNode";
 import OutputWindow from "./components/OutputWindow/OutputWindow";
+import Play from "./assets/Play";
 
 export default function CircuitBuilderFlow() {
     const reactFlowWrapper = useRef(null);
@@ -165,14 +166,6 @@ export default function CircuitBuilderFlow() {
         );
     }, [selectedEdgeId]);
 
-    // handle output window model display
-    // const renderOutputWindow = () => {
-    //     return(
-    //         <>
-    //             <OutputWindow />
-    //         </>
-    //     )
-    // }
     const renderOutputWindow = () => {
         return <OutputWindow onClose={() => setShowOutputWindow(false)} />;
     };
@@ -183,58 +176,59 @@ export default function CircuitBuilderFlow() {
             <RepressMarker />
 
             {/* TOP MENU FUNCTION BUTTONS */}
-            <button 
-                onClick={() => setShowOutputWindow(true)} 
-                className="absolute top-4 right-4 px-4 py-2 bg-blue-500 text-white rounded">
-                Play
-            </button>
+            <div className="top-ribbon-container">
+                <button onClick={() => setShowOutputWindow(true)} className="play-button">
+                    <Play />
+                </button>
+            </div>
+            <div className="bottom-container">
+                <PanelGroup className="circuit-builder-container" direction="horizontal">
+                    {/* Left Pane (Toolbox + Properties Window) */}
+                    <Panel className="left-pane min-w-128" defaultSize={30} maxSize={50}>
+                        <PanelGroup direction="vertical">
+                            <Panel className="toolbox-container" defaultSize={70} minSize={30} maxSize={90}>
+                                <Toolbox />
+                            </Panel>
+                            <PanelResizeHandle className="resize-handle-horizontal" />
+                            <Panel className="properties-window" defaultSize={30} minSize={30} maxSize={90}>
+                                <h1 className={`m-0`}>Properties Window</h1>
+                                {(selectedNodeId || selectedEdgeId) && <PropertiesWindow
+                                    changeMarkerType={changeMarkerType}
+                                    changeNodeData={changeNodeData}
+                                    selectedEdgeId={selectedEdgeId}
+                                    selectedNodeId={selectedNodeId}
+                                    selectedNode={getSelectedNode()}
+                                />}
+                            </Panel>
+                        </PanelGroup>
+                    </Panel>
 
-            <PanelGroup className="circuit-builder-container " direction="horizontal">
-                {/* Left Pane (Toolbox + Properties Window) */}
-                <Panel className="left-pane min-w-128" defaultSize={30} maxSize={50}>
-                    <PanelGroup direction="vertical">
-                        <Panel className="toolbox-container" defaultSize={70} minSize={30} maxSize={90}>
-                            <Toolbox />
-                        </Panel>
-                        <PanelResizeHandle className="resize-handle-horizontal" />
-                        <Panel className="properties-window" defaultSize={30} minSize={30} maxSize={90}>
-                            <h1 className={`m-0`}>Properties Window</h1>
-                            {(selectedNodeId || selectedEdgeId) && <PropertiesWindow
-                                changeMarkerType={changeMarkerType}
-                                changeNodeData={changeNodeData}
-                                selectedEdgeId={selectedEdgeId}
-                                selectedNodeId={selectedNodeId}
-                                selectedNode={getSelectedNode()}
-                            />}
-                        </Panel>
-                    </PanelGroup>
-                </Panel>
+                    <PanelResizeHandle className="resize-handle-vertical"/>
 
-                <PanelResizeHandle className="resize-handle-vertical"/>
-
-                {/* Right Pane (circuit building workspace area) */}
-                <Panel className="flow-wrapper" ref={reactFlowWrapper} defaultSize={80} minSize={50} maxSize={90}>
-                    {showOutputWindow && renderOutputWindow()}
-                    
-                    <ReactFlow
-                        nodes={nodes}
-                        edges={edges}
-                        onConnect={onConnect}
-                        onDrop={onDrop}
-                        onDragOver={onDragOver}
-                        onNodesChange={onNodesChange}
-                        onEdgesChange={onEdgesChange}
-                        onNodeClick={onNodeClick}
-                        onEdgeClick={onEdgeClick}
-                        onPaneClick={onPaneClick}
-                        nodeTypes={nodeTypes}
-                        fitView
-                    >
-                        <Background />
-                        <Controls />
-                    </ReactFlow>
-                </Panel>
-            </PanelGroup>
+                    {/* Right Pane (circuit building workspace area) */}
+                    <Panel className="flow-wrapper" ref={reactFlowWrapper} defaultSize={80} minSize={50} maxSize={90}>
+                        {showOutputWindow && renderOutputWindow()}
+                        
+                        <ReactFlow
+                            nodes={nodes}
+                            edges={edges}
+                            onConnect={onConnect}
+                            onDrop={onDrop}
+                            onDragOver={onDragOver}
+                            onNodesChange={onNodesChange}
+                            onEdgesChange={onEdgesChange}
+                            onNodeClick={onNodeClick}
+                            onEdgeClick={onEdgeClick}
+                            onPaneClick={onPaneClick}
+                            nodeTypes={nodeTypes}
+                            fitView
+                        >
+                            <Background />
+                            <Controls />
+                        </ReactFlow>
+                    </Panel>
+                </PanelGroup>
+            </div>
         </>
     );
 }
