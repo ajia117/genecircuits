@@ -19,7 +19,9 @@ import RepressMarker from "./assets/RepressMarker";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import PropertiesWindow from "./components/PropertiesWindow/PropertiesWindow";
 import ComplexNodeData from "./types/NodeData";
-import CustomNode from "./CustomNodes/CustomNode";
+import CustomNode from "./components/Nodes/CustomNode";
+import AndGateNode from "./components/Nodes/AndGateNode";
+import OrGateNode from "./components/Nodes/OrGateNode";
 
 export default function CircuitBuilderFlow() {
     const reactFlowWrapper = useRef(null);
@@ -28,7 +30,11 @@ export default function CircuitBuilderFlow() {
     const { screenToFlowPosition } = useReactFlow();
     const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null); // Stores clicked edge ID
     const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null); // Stores clicked node ID
-    const nodeTypes = useMemo(() => ({ custom: CustomNode}), []);
+    const nodeTypes = useMemo(() => ({
+        custom: CustomNode,
+        and: AndGateNode,
+        or: OrGateNode
+    }), []);
 
     let id = 0;
     const getId = () => `${id++}`; // creates id for the next node
@@ -164,7 +170,7 @@ export default function CircuitBuilderFlow() {
 
     return (
         <>
-            <RepressMarker /> {/* TODO: remove this, find a workaround */}
+            <RepressMarker />
             <PanelGroup className="circuit-builder-container " direction="horizontal">
                 {/* Left Pane (Toolbox + Properties Window) */}
                 <Panel className="left-pane min-w-128 h-full " defaultSize={30} maxSize={50}>

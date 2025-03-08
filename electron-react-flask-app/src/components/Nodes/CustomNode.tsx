@@ -20,7 +20,7 @@ const CustomNode = memo(({ data }: NodeProps<CustomNodeData>) => {
                 [isInput ? 'left' : 'right']: handleOffset, // Increased offset for output handles
                 top: '50%',
                 transform: 'translateY(-50%)',
-                background: '#555',
+                background: 'black',
                 zIndex: 10 // Ensure handles are above text
             };
         }
@@ -35,7 +35,7 @@ const CustomNode = memo(({ data }: NodeProps<CustomNodeData>) => {
             [isInput ? 'left' : 'right']: handleOffset, // Increased offset for output handles
             top: 'calc(50% + ' + position + 'px)',
             transform: 'translateY(-50%)',
-            background: '#555',
+            background: 'black',
             zIndex: 10 // Ensure handles are above text
         };
     };
