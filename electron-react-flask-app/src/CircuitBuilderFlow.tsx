@@ -167,13 +167,13 @@ export default function CircuitBuilderFlow() {
             <RepressMarker /> {/* TODO: remove this, find a workaround */}
             <PanelGroup className="circuit-builder-container " direction="horizontal">
                 {/* Left Pane (Toolbox + Properties Window) */}
-                <Panel className="left-pane min-w-128" defaultSize={30} maxSize={50}>
+                <Panel className="left-pane min-w-128 h-full " defaultSize={30} maxSize={50}>
                     <PanelGroup direction="vertical">
                         <Panel className="toolbox-container" defaultSize={70} minSize={30} maxSize={90}>
                             <Toolbox />
                         </Panel>
                         <PanelResizeHandle className="resize-handle-horizontal" />
-                        <Panel className="properties-window" defaultSize={30} minSize={30} maxSize={90}>
+                        <Panel className="properties-window h-full overflow-y-auto" defaultSize={30} minSize={30} maxSize={90}>
                             <h1 className={`m-0`}>Properties Window</h1>
                             {(selectedNodeId || selectedEdgeId) && <PropertiesWindow
                                 changeMarkerType={changeMarkerType}
