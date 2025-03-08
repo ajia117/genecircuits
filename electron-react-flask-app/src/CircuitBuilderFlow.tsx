@@ -20,6 +20,7 @@ import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import PropertiesWindow from "./components/PropertiesWindow/PropertiesWindow";
 import ComplexNodeData from "./types/NodeData";
 import CustomNode from "./CustomNodes/CustomNode";
+import OutputWindow from "./components/OutputWindow/OutputWindow";
 
 export default function CircuitBuilderFlow() {
     const reactFlowWrapper = useRef(null);
@@ -29,6 +30,8 @@ export default function CircuitBuilderFlow() {
     const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null); // Stores clicked edge ID
     const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null); // Stores clicked node ID
     const nodeTypes = useMemo(() => ({ custom: CustomNode}), []);
+
+    const [showOutputWindow, setShowOutputWindow] = useState<boolean>(false);
 
     let id = 0;
     const getId = () => `${id++}`; // creates id for the next node
@@ -57,7 +60,7 @@ export default function CircuitBuilderFlow() {
         setSelectedEdgeId(null);
     }, []);
 
-    // Handler for clicking an edge
+    // Handler for clicking a node
     const onNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
         console.log("Clicked node ID:", node.id);
         setSelectedNodeId(node.id); // Store the clicked node ID
@@ -162,9 +165,30 @@ export default function CircuitBuilderFlow() {
         );
     }, [selectedEdgeId]);
 
+    // handle output window model display
+    // const renderOutputWindow = () => {
+    //     return(
+    //         <>
+    //             <OutputWindow />
+    //         </>
+    //     )
+    // }
+    const renderOutputWindow = () => {
+        return <OutputWindow onClose={() => setShowOutputWindow(false)} />;
+    };
+    
+
     return (
         <>
-            <RepressMarker /> {/* TODO: remove this, find a workaround */}
+            <RepressMarker />
+
+            {/* TOP MENU FUNCTION BUTTONS */}
+            <button 
+                onClick={() => setShowOutputWindow(true)} 
+                className="absolute top-4 right-4 px-4 py-2 bg-blue-500 text-white rounded">
+                Play
+            </button>
+
             <PanelGroup className="circuit-builder-container " direction="horizontal">
                 {/* Left Pane (Toolbox + Properties Window) */}
                 <Panel className="left-pane min-w-128" defaultSize={30} maxSize={50}>
@@ -190,6 +214,8 @@ export default function CircuitBuilderFlow() {
 
                 {/* Right Pane (circuit building workspace area) */}
                 <Panel className="flow-wrapper" ref={reactFlowWrapper} defaultSize={80} minSize={50} maxSize={90}>
+                    {showOutputWindow && renderOutputWindow()}
+                    
                     <ReactFlow
                         nodes={nodes}
                         edges={edges}
