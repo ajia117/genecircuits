@@ -78,4 +78,5 @@ class Gate:
             raise ValueError(f"Unknown regulatory function type: {self.mType}")
 
 
-PROTEIN_ARRAY = [Protein(0, "Protein 0", 0.0, 1, 0.05, [], 1.0), Protein(1, "Protein 1", 0.0, 1, 0.05, [], 2.0), Protein(2, "Protein 2", 0.0, 1, 0.05, [Gate("aa_and", 0, 1)]), Protein(3, "Protein 3", 0.0, 1, 0.05, [], 3), Protein(4, "Protein 4", 0.0, 1, 0.05, [Gate("aa_and", 2, 3)])]
+#PROTEIN_ARRAY = [Protein(0, "Protein 0", 0.0, 1, 0.05, [], 1.0), Protein(1, "Protein 1", 0.0, 1, 0.05, [], 2.0), Protein(2, "Protein 2", 0.0, 1, 0.05, [Gate("aa_and", 0, 1)]), Protein(3, "Protein 3", 0.0, 1, 0.05, [], 3), Protein(4, "Protein 4", 0.0, 1, 0.05, [Gate("aa_and", 2, 3)])]
+PROTEIN_ARRAY = [Protein(0, "Protein 0", 0.0, 1, 0.05, [], 1.0), Protein(1, "Protein 1", 0.0, 4, 0.05, [Gate("act_hill", 0, 0)]), Protein(2, "Protein 2", 0.0, 1, 0.05, [Gate("aa_and", 0, 1)])]
