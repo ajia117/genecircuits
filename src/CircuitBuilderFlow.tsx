@@ -64,15 +64,15 @@ export default function CircuitBuilderFlow() {
     }, []);
 
     // Handler for clicking an edge
-    const onNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
+    const onNodeClick = (event: React.MouseEvent, node: Node) => {
         console.log("Clicked node ID:", node.id);
         setSelectedNodeId(node.id); // Store the clicked node ID
         setSelectedEdgeId(null);
-    }, []);
+    };
 
     const getSelectedNode = () => {
         return nodes.find(node => node.id === selectedNodeId) as Node<ComplexNodeData>;
-    }
+    };
 
     const changeNodeData = (name: string, value: string | number) => {
         setNodes((nodes) =>
@@ -182,6 +182,7 @@ export default function CircuitBuilderFlow() {
                         <Panel className="properties-window h-full overflow-y-auto" defaultSize={30} minSize={30} maxSize={90}>
                             <h1 className={`m-0`}>Properties Window</h1>
                             {(selectedNodeId || selectedEdgeId) && <PropertiesWindow
+                                key={`${selectedNodeId || ''}-${selectedEdgeId || ''}`} // force re-render on change
                                 changeMarkerType={changeMarkerType}
                                 changeNodeData={changeNodeData}
                                 selectedEdgeId={selectedEdgeId}
