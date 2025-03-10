@@ -42,38 +42,35 @@ final_concentrations = run_simulation(t, proteinArray)
 # Set up color palette
 colors = bokeh.palettes.d3['Category10'][10]
 
-# Set up plot
 transposed_conc = final_concentrations.transpose()
-plot = bp.figure(width=500,
+# Plot output proteins
+plot_outputs = bp.figure(width=500,
                           height=300,
                           x_axis_label='dimensionless time',
                           y_axis_label='dimensionless concentrations',
                           title='Backend.py: Concentrations')
 
-for i in range(len(proteinArray)):
-    protein = proteinArray[i]
-     # Don't plot if it's not an output of the circuit
-    if protein.mGates == []: 
-        continue
-    conc = transposed_conc[i]
-    plot.line(t, conc, line_width=2, color=colors[i], legend_label=protein.getName())
-
-# Place the legend
-plot.legend.location = 'bottom_right'
-
 # Plot the input proteins
-plot_input = bp.figure(width=500,
+plot_inputs = bp.figure(width=500,
                           height=300,
                           x_axis_label='dimensionless time',
                           y_axis_label='dimensionless x',
                           title='Backend.py: Short input pulse')
 
-# Populate glyphs TODO: loop through all proteins and plot if their external concentration functions aren't None
-plot_input.line(t, x_pulse(t, 3.0, 19.0, 5.0, 2.0, 0.2), line_width=2)
+for i in range(len(proteinArray)):
+    protein = proteinArray[i]
+    if protein.mGates != []: 
+        conc = transposed_conc[i]
+        plot_outputs.line(t, conc, line_width=2, color=colors[i], legend_label=protein.getName())
+    if protein.mExtConcFunc != None:
+        plot_inputs.line(t, protein.mExtConcFunc(t, *protein.mExtConcFuncArgs), line_width=2)
+
+# Place the legend
+plot_outputs.legend.location = 'bottom_right'
 
 #Show plot
 output_file("plots/simulation_results_1.html")
-layout = bokeh.layouts.column(plot, plot_input)
+layout = bokeh.layouts.column(plot_outputs, plot_inputs)
 bokeh.io.show(layout)
 
 # Repeat with long pulse:
@@ -95,34 +92,32 @@ colors = bokeh.palettes.d3['Category10'][10]
 # Pluck out x, y and z
 transposed_conc = final_concentrations.transpose()
 
-# Set up plot
-plot = bp.figure(width=500,
+# Plot output proteins
+plot_outputs = bp.figure(width=500,
                           height=300,
                           x_axis_label='dimensionless time',
                           y_axis_label='dimensionless concentrations',
                           title='Backend.py: Concentrations')
 
-for i in range(len(proteinArray)):
-    protein = proteinArray[i]
-    if protein.mGates == []: 
-        continue
-    conc = transposed_conc[i]
-    plot.line(t, conc, line_width=2, color=colors[i], legend_label=protein.getName())
-
-# Place the legend
-plot.legend.location = 'bottom_right'
-
-# Plot the input proteins
-plot_input = bp.figure(width=500,
+# Plot input proteins
+plot_inputs = bp.figure(width=500,
                           height=300,
                           x_axis_label='dimensionless time',
                           y_axis_label='dimensionless x',
                           title='Backend.py: Long input pulse')
 
-# Populate glyphs
-plot_input.line(t, x_pulse(t, 3.0, 19.0, 5.0, 2.0, 0.5), line_width=2)
+for i in range(len(proteinArray)):
+    protein = proteinArray[i]
+    if protein.mGates != []: 
+        conc = transposed_conc[i]
+        plot_outputs.line(t, conc, line_width=2, color=colors[i], legend_label=protein.getName())
+    if protein.mExtConcFunc != None:
+        plot_inputs.line(t, protein.mExtConcFunc(t, *protein.mExtConcFuncArgs), line_width=2)
+
+# Place the legend
+plot_outputs.legend.location = 'bottom_right'
 
 #Show plot
 output_file("plots/simulation_results_2.html")
-layout = bokeh.layouts.column(plot, plot_input)
+layout = bokeh.layouts.column(plot_outputs, plot_inputs)
 bokeh.io.show(layout)
