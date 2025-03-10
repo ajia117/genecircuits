@@ -71,7 +71,8 @@ y, z = yz_concentrations.transpose()
 p = bp.figure(width=500,
                           height=300,
                           x_axis_label='dimensionless time',
-                          y_axis_label='dimensionless y, z')
+                          y_axis_label='dimensionless y, z',
+                          title='ffl: Short pulse concentrations')
 
 # Populate glyphs
 p.line(t, y, line_width=2, color=colors[1], legend_label='y')
@@ -84,7 +85,8 @@ p.legend.location = 'bottom_right'
 p_x = bp.figure(width=500,
                           height=300,
                           x_axis_label='dimensionless time',
-                          y_axis_label='dimensionless x')
+                          y_axis_label='dimensionless x',
+                          title='ffl: Short pulse input')
 
 # Populate glyphs
 p_x.line(t, x_pulse(t, 3.0, 19.0, 5.0, 2.0, 0.2), line_width=2)
@@ -113,7 +115,8 @@ y, z = yz_concentrations.transpose()
 p = bp.figure(width=500,
                           height=300,
                           x_axis_label='dimensionless time',
-                          y_axis_label='dimensionless y, z')
+                          y_axis_label='dimensionless y, z',
+                          title='ffl: Long pulse concentrations')
 
 # Populate glyphs
 p.line(t, y, line_width=2, color=colors[1], legend_label='y')
@@ -126,7 +129,8 @@ p.legend.location = 'bottom_right'
 p_x = bp.figure(width=500,
                           height=300,
                           x_axis_label='dimensionless time',
-                          y_axis_label='dimensionless x')
+                          y_axis_label='dimensionless x',
+                          title='ffl: Long pulse input')
 
 # Populate glyphs
 p_x.line(t, x_pulse(t, 3.0, 19.0, 5.0, 2.0, 0.5), line_width=2)

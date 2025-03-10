@@ -1,14 +1,15 @@
 import biocircuits
 
 class Protein:
-    def __init__(self, id, name, initConc, hill, degrad, gates, extConc = 0.0):
+    def __init__(self, id, name, initConc, hill, degrad, gates, extConcFunc = None, extConcFuncArgs = None):
         self.mID = id
         self.mName = name
         self.mInternalConc = initConc
-        self.mExternalConc = extConc
         self.mHill = hill
         self.mDegradation = degrad
         self.mGates = gates
+        self.mExtConcFunc = extConcFunc
+        self.mExtConcFuncArgs = extConcFuncArgs
     
     def getHill(self):
         return self.mHill
@@ -23,7 +24,10 @@ class Protein:
         return self.mExternalConc
         
     def setExternalConcentration(self, t):
-        # TODO: implement this
+        if self.mExtConcFunc is not None:
+            self.mExternalConc = self.mExtConcFunc(t, *self.mExtConcFuncArgs)
+        else:
+            self.mExternalConc = 0
         return
     
     def getInternalConcentration(self):
