@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import { Plus } from 'lucide-react';
+import AndGate from "../../assets/AndGate";
 
 export const Toolbox = () => {
 
@@ -30,6 +31,12 @@ export const Toolbox = () => {
         <>
             <h1 className={`text-center`}>Toolbox</h1>
             <div className="components-container">
+                <div className="dndnode and" onDragStart={(event) => onDragStart(event, 'and')} draggable>
+                    AND Node
+                </div>
+                <div className="dndnode or" onDragStart={(event) => onDragStart(event, 'or')} draggable>
+                    OR Node
+                </div>
                 <div className="dndnode input" onDragStart={(event) => onDragStart(event, 'input')} draggable>
                     Input Node
                 </div>
@@ -79,7 +86,7 @@ export const Toolbox = () => {
                                 />
                             </div>
                         </div>
-                        <br />
+                        <br/>
                         <div className="dndnode output" onDragStart={(event) => onDragStart(event, 'custom')} draggable>
                             Custom Node
                         </div>

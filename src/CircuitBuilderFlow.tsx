@@ -19,7 +19,9 @@ import RepressMarker from "./assets/RepressMarker";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import PropertiesWindow from "./components/PropertiesWindow/PropertiesWindow";
 import ComplexNodeData from "./types/NodeData";
-import CustomNode from "./CustomNodes/CustomNode";
+import CustomNode from "./components/Nodes/CustomNode";
+import AndGateNode from "./components/Nodes/AndGateNode";
+import OrGateNode from "./components/Nodes/OrGateNode";
 import OutputWindow from "./components/OutputWindow/OutputWindow";
 import Play from "./assets/Play";
 
@@ -30,9 +32,13 @@ export default function CircuitBuilderFlow() {
     const { screenToFlowPosition } = useReactFlow();
     const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null); // Stores clicked edge ID
     const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null); // Stores clicked node ID
-    const nodeTypes = useMemo(() => ({ custom: CustomNode}), []);
-
     const [showOutputWindow, setShowOutputWindow] = useState<boolean>(false);
+    
+    const nodeTypes = useMemo(() => ({
+        custom: CustomNode,
+        and: AndGateNode,
+        or: OrGateNode
+    }), []);
 
     let id = 0;
     const getId = () => `${id++}`; // creates id for the next node
@@ -61,16 +67,16 @@ export default function CircuitBuilderFlow() {
         setSelectedEdgeId(null);
     }, []);
 
-    // Handler for clicking a node
-    const onNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
+    // Handler for clicking an edge
+    const onNodeClick = (event: React.MouseEvent, node: Node) => {
         console.log("Clicked node ID:", node.id);
         setSelectedNodeId(node.id); // Store the clicked node ID
         setSelectedEdgeId(null);
-    }, []);
+    };
 
     const getSelectedNode = () => {
         return nodes.find(node => node.id === selectedNodeId) as Node<ComplexNodeData>;
-    }
+    };
 
     const changeNodeData = (name: string, value: string | number) => {
         setNodes((nodes) =>
@@ -193,6 +199,7 @@ export default function CircuitBuilderFlow() {
                             <Panel className="properties-window" defaultSize={30} minSize={30} maxSize={90}>
                                 <h1 className={`m-0`}>Properties Window</h1>
                                 {(selectedNodeId || selectedEdgeId) && <PropertiesWindow
+                                    key={`${selectedNodeId || ''}-${selectedEdgeId || ''}`}
                                     changeMarkerType={changeMarkerType}
                                     changeNodeData={changeNodeData}
                                     selectedEdgeId={selectedEdgeId}

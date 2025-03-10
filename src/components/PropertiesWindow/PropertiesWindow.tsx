@@ -34,7 +34,7 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({selectedEdgeId, sele
     }) : null;
 
     return (
-        <>
+        <div className={`h-full overflow-y-auto`}>
         {selectedEdgeId && (
             <>
                 <p>Change Marker for Edge: {selectedEdgeId}</p>
@@ -63,7 +63,7 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({selectedEdgeId, sele
                 </form>
             </>
         )}
-        </>
+        </div>
     )
 }
 
