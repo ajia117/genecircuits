@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 import type { Node, NodeProps } from '@xyflow/react';
 import * as XYFlow from '@xyflow/react';
-import { Handle, Position } from '@xyflow/react';
+import { Position } from '@xyflow/react';
 
 interface CustomNodeProps extends Record<string, unknown> {
     label: string;
@@ -11,17 +11,17 @@ interface CustomNodeProps extends Record<string, unknown> {
 
 type CustomNodeData = Node<CustomNodeProps>;
 
-const CustomNode = memo(({ data }: NodeProps<CustomNodeData>) => {
+const CustomNode = memo(({ id, data }: NodeProps<CustomNodeData>) => {
     // Get position for multiple handles
     const getHandleStyle = (index: number, total: number, isInput: boolean) => {
         const handleOffset = -4;
         if (total <= 1) {
             return {
-                [isInput ? 'left' : 'right']: handleOffset, // Increased offset for output handles
+                [isInput ? 'left' : 'right']: handleOffset,
                 top: '50%',
                 transform: 'translateY(-50%)',
                 background: 'black',
-                zIndex: 10 // Ensure handles are above text
+                zIndex: 10
             };
         }
 
@@ -32,16 +32,16 @@ const CustomNode = memo(({ data }: NodeProps<CustomNodeData>) => {
         const position = startOffset + (index * spacing);
 
         return {
-            [isInput ? 'left' : 'right']: handleOffset, // Increased offset for output handles
+            [isInput ? 'left' : 'right']: handleOffset,
             top: 'calc(50% + ' + position + 'px)',
             transform: 'translateY(-50%)',
             background: 'black',
-            zIndex: 10 // Ensure handles are above text
+            zIndex: 10
         };
     };
 
     return (
-        <div className={`custom-node`}>
+        <div className="custom-node">
             <div className="relative px-6 py-2 shadow-md rounded-md bg-white border-2 border-gray-200 w-40">
                 {/* Input Handles */}
                 {Array.from({length: data.numInCnx}, (_, i) => (
@@ -51,6 +51,9 @@ const CustomNode = memo(({ data }: NodeProps<CustomNodeData>) => {
                         position={Position.Left}
                         id={`input-${i}`}
                         style={getHandleStyle(i, data.numInCnx, true)}
+                        isConnectableStart={true}
+                        isConnectableEnd={true}
+                        isValidConnection={() => true}  // Allow all connections
                     />
                 ))}
 
@@ -69,6 +72,9 @@ const CustomNode = memo(({ data }: NodeProps<CustomNodeData>) => {
                         position={Position.Right}
                         id={`output-${i}`}
                         style={getHandleStyle(i, data.numOutCnx, false)}
+                        isConnectableStart={true}
+                        isConnectableEnd={true}
+                        isValidConnection={() => true}  // Allow all connections
                     />
                 ))}
             </div>
