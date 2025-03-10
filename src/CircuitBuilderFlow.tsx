@@ -22,6 +22,8 @@ import ComplexNodeData from "./types/NodeData";
 import CustomNode from "./components/Nodes/CustomNode";
 import AndGateNode from "./components/Nodes/AndGateNode";
 import OrGateNode from "./components/Nodes/OrGateNode";
+import OutputWindow from "./components/OutputWindow/OutputWindow";
+import Play from "./assets/Play";
 
 export default function CircuitBuilderFlow() {
     const reactFlowWrapper = useRef(null);
@@ -30,6 +32,8 @@ export default function CircuitBuilderFlow() {
     const { screenToFlowPosition } = useReactFlow();
     const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null); // Stores clicked edge ID
     const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null); // Stores clicked node ID
+    const [showOutputWindow, setShowOutputWindow] = useState<boolean>(false);
+    
     const nodeTypes = useMemo(() => ({
         custom: CustomNode,
         and: AndGateNode,
@@ -168,54 +172,70 @@ export default function CircuitBuilderFlow() {
         );
     }, [selectedEdgeId]);
 
+    const renderOutputWindow = () => {
+        return <OutputWindow onClose={() => setShowOutputWindow(false)} />;
+    };
+    
+
     return (
         <>
             <RepressMarker />
-            <PanelGroup className="circuit-builder-container " direction="horizontal">
-                {/* Left Pane (Toolbox + Properties Window) */}
-                <Panel className="left-pane min-w-128 h-full " defaultSize={30} maxSize={50}>
-                    <PanelGroup direction="vertical">
-                        <Panel className="toolbox-container" defaultSize={70} minSize={30} maxSize={90}>
-                            <Toolbox />
-                        </Panel>
-                        <PanelResizeHandle className="resize-handle-horizontal" />
-                        <Panel className="properties-window h-full overflow-y-auto" defaultSize={30} minSize={30} maxSize={90}>
-                            <h1 className={`m-0`}>Properties Window</h1>
-                            {(selectedNodeId || selectedEdgeId) && <PropertiesWindow
-                                key={`${selectedNodeId || ''}-${selectedEdgeId || ''}`} // force re-render on change
-                                changeMarkerType={changeMarkerType}
-                                changeNodeData={changeNodeData}
-                                selectedEdgeId={selectedEdgeId}
-                                selectedNodeId={selectedNodeId}
-                                selectedNode={getSelectedNode()}
-                            />}
-                        </Panel>
-                    </PanelGroup>
-                </Panel>
 
-                <PanelResizeHandle className="resize-handle-vertical"/>
+            {/* TOP MENU FUNCTION BUTTONS */}
+            <div className="top-ribbon-container">
+                <button onClick={() => setShowOutputWindow(true)} className="play-button">
+                    <Play />
+                </button>
+            </div>
+            <div className="bottom-container">
+                <PanelGroup className="circuit-builder-container" direction="horizontal">
+                    {/* Left Pane (Toolbox + Properties Window) */}
+                    <Panel className="left-pane min-w-128" defaultSize={30} maxSize={50}>
+                        <PanelGroup direction="vertical">
+                            <Panel className="toolbox-container" defaultSize={70} minSize={30} maxSize={90}>
+                                <Toolbox />
+                            </Panel>
+                            <PanelResizeHandle className="resize-handle-horizontal" />
+                            <Panel className="properties-window" defaultSize={30} minSize={30} maxSize={90}>
+                                <h1 className={`m-0`}>Properties Window</h1>
+                                {(selectedNodeId || selectedEdgeId) && <PropertiesWindow
+                                    key={`${selectedNodeId || ''}-${selectedEdgeId || ''}`}
+                                    changeMarkerType={changeMarkerType}
+                                    changeNodeData={changeNodeData}
+                                    selectedEdgeId={selectedEdgeId}
+                                    selectedNodeId={selectedNodeId}
+                                    selectedNode={getSelectedNode()}
+                                />}
+                            </Panel>
+                        </PanelGroup>
+                    </Panel>
 
-                {/* Right Pane (circuit building workspace area) */}
-                <Panel className="flow-wrapper" ref={reactFlowWrapper} defaultSize={80} minSize={50} maxSize={90}>
-                    <ReactFlow
-                        nodes={nodes}
-                        edges={edges}
-                        onConnect={onConnect}
-                        onDrop={onDrop}
-                        onDragOver={onDragOver}
-                        onNodesChange={onNodesChange}
-                        onEdgesChange={onEdgesChange}
-                        onNodeClick={onNodeClick}
-                        onEdgeClick={onEdgeClick}
-                        onPaneClick={onPaneClick}
-                        nodeTypes={nodeTypes}
-                        fitView
-                    >
-                        <Background />
-                        <Controls />
-                    </ReactFlow>
-                </Panel>
-            </PanelGroup>
+                    <PanelResizeHandle className="resize-handle-vertical"/>
+
+                    {/* Right Pane (circuit building workspace area) */}
+                    <Panel className="flow-wrapper" ref={reactFlowWrapper} defaultSize={80} minSize={50} maxSize={90}>
+                        {showOutputWindow && renderOutputWindow()}
+                        
+                        <ReactFlow
+                            nodes={nodes}
+                            edges={edges}
+                            onConnect={onConnect}
+                            onDrop={onDrop}
+                            onDragOver={onDragOver}
+                            onNodesChange={onNodesChange}
+                            onEdgesChange={onEdgesChange}
+                            onNodeClick={onNodeClick}
+                            onEdgeClick={onEdgeClick}
+                            onPaneClick={onPaneClick}
+                            nodeTypes={nodeTypes}
+                            fitView
+                        >
+                            <Background />
+                            <Controls />
+                        </ReactFlow>
+                    </Panel>
+                </PanelGroup>
+            </div>
         </>
     );
 }
