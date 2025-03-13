@@ -1,30 +1,17 @@
 
 
 
-body {
+html, body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
     Arial, sans-serif;
-  margin: auto;
-  max-width: 100vw;
+  margin: 0;
   padding: 0;
   width: 100vw;
   height: 100vh;
   box-sizing: border-box;
-}
-
-.top-ribbon-container {
-  background-color: white;
-  border-bottom: 1px solid #ccc;
-  height: 5%;
+  overflow: hidden;
   display: flex;
-  justify-content: center;
-  /* padding: 3px; */
-}
-
-.play-button {
-  border: none;
-  background: none;
-  /* height: 2px; */
+  flex-direction: column;
 }
 
 .bottom-container {

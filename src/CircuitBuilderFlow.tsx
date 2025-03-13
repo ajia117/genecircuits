@@ -17,7 +17,7 @@ import './index.css';
 import RepressMarker from "./assets/RepressMarker";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import ComplexNodeData from "./types/NodeData";
-import Play from "./assets/Play";
+
 import { 
     Toolbox, 
     PropertiesWindow, 
@@ -185,13 +185,14 @@ export default function CircuitBuilderFlow() {
             <RepressMarker />
 
             {/* TOP MENU FUNCTION BUTTONS */}
-            <Ribbon />
-            <div className="top-ribbon-container">
-                <button onClick={() => setShowOutputWindow(true)} className="play-button">
-                    <Play />
-                </button>
-                <button>HIHI</button>
-            </div>
+            <Ribbon 
+                onPlayClick={() => setShowOutputWindow(true)}
+                onPauseClick={() => {}}
+                onSaveClick={() => {}}
+                onClearClick={() => {}}
+                onToggleOutputWindow={() => setShowOutputWindow(!showOutputWindow)}
+            />
+            
             <div className="bottom-container">
                 <PanelGroup className="circuit-builder-container" direction="horizontal">
                     {/* Left Pane (Toolbox + Properties Window) */}
