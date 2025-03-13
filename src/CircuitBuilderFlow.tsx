@@ -13,17 +13,20 @@ import {
     MarkerType
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { Toolbox } from "./components/Toolbox/Toolbox";
 import './index.css';
 import RepressMarker from "./assets/RepressMarker";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
-import PropertiesWindow from "./components/PropertiesWindow/PropertiesWindow";
 import ComplexNodeData from "./types/NodeData";
-import CustomNode from "./components/Nodes/CustomNode";
-import AndGateNode from "./components/Nodes/AndGateNode";
-import OrGateNode from "./components/Nodes/OrGateNode";
-import OutputWindow from "./components/OutputWindow/OutputWindow";
 import Play from "./assets/Play";
+import { 
+    Toolbox, 
+    PropertiesWindow, 
+    OutputWindow, 
+    Ribbon, 
+    AndGateNode, 
+    OrGateNode, 
+    CustomNode 
+} from './components';
 
 export default function CircuitBuilderFlow() {
     const reactFlowWrapper = useRef(null);
@@ -182,10 +185,12 @@ export default function CircuitBuilderFlow() {
             <RepressMarker />
 
             {/* TOP MENU FUNCTION BUTTONS */}
+            <Ribbon />
             <div className="top-ribbon-container">
                 <button onClick={() => setShowOutputWindow(true)} className="play-button">
                     <Play />
                 </button>
+                <button>HIHI</button>
             </div>
             <div className="bottom-container">
                 <PanelGroup className="circuit-builder-container" direction="horizontal">
