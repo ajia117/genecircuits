@@ -6,7 +6,6 @@
     height: 5%;
     background-color: #f8f9fa;
     border-bottom: 1px solid #ccc;
-    padding: 5px 10px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     flex-shrink: 0;
 }
@@ -21,6 +20,7 @@
 .ribbon-left {
     flex: 1;
     justify-content: flex-start;
+    padding-left: 5px;
 }
 
 .ribbon-center {
@@ -32,6 +32,7 @@
 .ribbon-right {
     flex: 1;
     justify-content: flex-end;
+    padding-right: 5px;
 }
 
 button {
@@ -44,23 +45,22 @@ button {
 button svg {
     width: 24px;
     height: 24px;
-    fill: #333;
-    transition: transform 0.2s ease, fill 0.2s ease;
+    stroke-width: 1.5;
+    stroke: #333; /* Ensures consistency */
+    fill: none; /* Keeps icons from being filled */
+    transition: stroke-width 0.2s ease, transform 0.2s ease, stroke 0.2s ease;
 }
 
 button:hover svg {
-    fill: #007bff;
+    stroke: #007bff;
+    stroke-width: 2; /* Slightly thicker on hover */
     transform: scale(1.1);
 }
 
 @media (max-width: 768px) {
-    .top-ribbon-container {
-        height: 40px;
-        padding: 5px;
-    }
-
     button svg {
         width: 20px;
         height: 20px;
+        stroke-width: 1.2;
     }
 }
