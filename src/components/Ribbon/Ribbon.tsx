@@ -1,9 +1,5 @@
 import React from "react";
-import Play from "../../assets/Play";
-import PauseIcon from "../../assets/Pause";
-import SaveIcon from "../../assets/Save";
-import EraserIcon from "../../assets/Eraser";
-import GraphIcon from "../../assets/Graph";
+import { Play, Pause, Save, Eraser, Graph } from "../../assets";
 import './Ribbon.css';
 
 interface TopRibbonProps {
@@ -19,10 +15,10 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ onPlayClick, onPauseClick, onSave
         <div className="top-ribbon-container">
             <div className="ribbon-left">
                 <button onClick={onSaveClick} className="save-button">
-                    <SaveIcon />
+                    <Save />
                 </button>
                 <button onClick={onClearClick} className="clear-button">
-                    <EraserIcon />
+                    <Eraser />
                 </button>
             </div>
             <div className="ribbon-center">
@@ -30,12 +26,12 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ onPlayClick, onPauseClick, onSave
                     <Play />
                 </button>
                 <button onClick={onPauseClick} className="pause-button">
-                    <PauseIcon />
+                    <Pause />
                 </button>
             </div>
             <div className="ribbon-right">
                 <button onClick={onToggleOutputWindow} className="toggle-output-button">
-                    <GraphIcon />
+                    <Graph />
                 </button>
             </div>
         </div>
