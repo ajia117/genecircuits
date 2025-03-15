@@ -1,5 +1,5 @@
 import React from "react";
-import { Play, Pause, Save, Eraser, Graph } from "../../assets";
+import { Play, Pause, Save, Trash, Graph } from "../../assets";
 import './Ribbon.css';
 
 interface TopRibbonProps {
@@ -18,7 +18,7 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ onPlayClick, onPauseClick, onSave
                     <Save />
                 </button>
                 <button onClick={onClearClick} className="clear-button">
-                    <Eraser />
+                    <Trash />
                 </button>
             </div>
             <div className="ribbon-center">

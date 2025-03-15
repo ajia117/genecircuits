@@ -1,7 +1,7 @@
 export { default as RepressMarker } from './RepressMarker'
 export { default as AndGate } from './AndGate'
 export { default as OrGate } from './OrGate'
-export { default as Eraser } from './Eraser'
+export { default as Trash } from './Trash'
 export { default as Graph } from './Graph'
 export { default as Pause } from './Pause'
 export { default as Play } from './Play'
