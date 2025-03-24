@@ -47,7 +47,19 @@ def test_ffl_simulation():
 
 
 def test_xor_simulation():
-    print('hello')
+    # Specify expected results. These are based on the ../biocircuits_experimentation/xor_circuit.py script
+    expected_concentrations = np.loadtxt("../biocircuits_experimentation/tests/xor_results.txt")
+    n = 1000
+    # Time points
+    t = np.linspace(0, 80, n)
+
+    a_args = (0, 40, 30, 2, 0.5)
+    b_args = (15, 50, 20, 2, 1)
+    proteinArray = [Protein(0, "Protein A", 0.0, 1, 0.0, [], x_pulse, a_args), Protein(1, "Protein B", 0.0, 1, 0.00, [],  x_pulse, b_args), Protein(2, "Protein C", 0.0, 2, 0.1, [Gate("aa_and", 0, 1)]), Protein(3, "Protein D", 0.0, 2, 0.1, [Gate("aa_or", 0, 1)]), Protein(4, "Protein E", 0.0, 0, 0.2, [Gate("ar_and", 3, 2)])]
+
+    final_concentrations = run_simulation(t, proteinArray)
+    assert np.allclose(final_concentrations, expected_concentrations, atol=1e-5)
+
 
 # TODO: handle command line args, to run individual tests if desired
 def main():

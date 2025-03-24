@@ -43,13 +43,13 @@ B ---->
 
 """
 
-def xor(cde, t, hill_abcd, loss_cde):
+def xor(abcde, t, hill_abcd, loss_cde):
     # Generate input pulses for a and b
     a = custom_a_func(t)
     b = custom_b_func(t)
    
     # Unpack abcde params
-    c, d, e = cde
+    _, _, c, d, e = abcde
     n_a, n_b, n_c, n_d = hill_abcd
     l_c, l_d, l_e = loss_cde
 
@@ -59,7 +59,7 @@ def xor(cde, t, hill_abcd, loss_cde):
     de_dt = biocircuits.ar_and(d, c, n_d, n_c) - l_e*e
     
     # Return the result as a NumPy array
-    return np.array([dc_dt, dd_dt, de_dt])
+    return np.array([0.0, 0.0, dc_dt, dd_dt, de_dt])
 
 # Number of time points we want for the solutions
 n = 1000
@@ -68,7 +68,7 @@ n = 1000
 t = np.linspace(0, 80, n)
 
 # Initial concentrations of c, d, and e
-cde_0 = np.array([0.0, 0.0, 0.0])
+abcde_0 = np.array([0.0, 0.0, 0.0, 0.0, 0.0])
 
 # Parameters
 # Set hill coefficients to 1
@@ -79,12 +79,15 @@ loss_cde = (0.1, 0.1, 0.2)
 args = (hill_abcd, loss_cde)
 
 # Call solver
-cde_concentrations = scipy.integrate.odeint(xor, cde_0, t, args=args)
+abcde_concentrations = scipy.integrate.odeint(xor, abcde_0, t, args=args)
+# log concentratoins
+with open("tests/xor_results.txt", "w") as f:
+    np.savetxt(f, abcde_concentrations, comments='')
 
 # Set up color palette
 colors = bokeh.palettes.d3['Category10'][10]
 # Pluck out x, y and z
-c, d, e = cde_concentrations.transpose()
+_, _, c, d, e = abcde_concentrations.transpose()
 # Set up plot
 p = bp.figure(width=500,
                           height=300,
