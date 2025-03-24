@@ -1,5 +1,5 @@
 import numpy as np
-from simulate import run_simulation
+from simulate import run_simulation, x_pulse
 from protein import Protein, Gate
 import bokeh.application
 from   bokeh.io import output_file
@@ -12,18 +12,6 @@ bokeh.io.output_notebook()
 Protein 0 AND Protein 1 -> Protein 2
 Protein 2 AND Protein 3 -> Protein 4
 """
-
-def x_pulse(t, t_0, t_f, tau, x_0, duty_cycle):
-    """
-    Returns x value for a pulse beginning at t = t_0 with a period of tau. 
-    duty_cycle is the fraction of the period that the pulse is on. This should be between 0 and 1.
-    x_0 is the amplitude of the pulse.
-    t_f is when the pulse should stop.
-    """
-    # Find how far into the current period we are. Use floor to support floating point values.
-    t_since_period_start = t - t_0 - ((t - t_0) // (tau))*(tau)
-
-    return np.logical_and(t >= t_0, np.logical_and(t <= t_f, t_since_period_start <= tau*duty_cycle)) * x_0
 
 def plot_results(final_concentrations, t, proteinArray, concTitle = "Backend.py Concentrations", inputTitle = "Backend.py Inputs"):
     # Set up color palette
