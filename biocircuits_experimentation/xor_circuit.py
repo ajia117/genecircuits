@@ -81,8 +81,6 @@ args = (hill_abcd, loss_cde)
 # Call solver
 cde_concentrations = scipy.integrate.odeint(xor, cde_0, t, args=args)
 
-cde_concentrations.shape
-
 # Set up color palette
 colors = bokeh.palettes.d3['Category10'][10]
 # Pluck out x, y and z

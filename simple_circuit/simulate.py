@@ -6,7 +6,6 @@ def simulation_iter(concentrations, t, proteinArray):
     # print("Concentrations at time: " + str(t))
     # print(concentrations)
 
-
     # Update external concentrations of each protein. Update concentrations of each protein
     for protein in proteinArray:
         protein.setExternalConcentration(t)
