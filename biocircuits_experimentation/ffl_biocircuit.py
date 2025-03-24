@@ -1,4 +1,5 @@
 # based on code from http://be150.caltech.edu/2019/handouts/02_intro_to_python_for_biological_circuits.html 
+# Results should look similar to the graph here: https://biocircuits.github.io/chapters/04_ffls.html#:~:text=gamma%20%3D%201-,kappa,-%3D%201%0An_xy 
 import numpy as np
 import scipy.integrate
 import biocircuits
