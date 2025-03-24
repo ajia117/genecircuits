@@ -60,10 +60,11 @@ def plot_results(final_concentrations, t, proteinArray, concTitle = "Backend.py 
     layout = bokeh.layouts.column(plot_outputs, plot_inputs)
     bokeh.io.show(layout)
 
-x_args = (3.0, 19.0, 5.0, 2.0, 0.2)
+x_args = (0, 2, 2, 1.0, 0.5)
 
 # Create a list of proteins
-proteinArray = [Protein(0, "Protein 0", 0.0, 1, 0.05, [], x_pulse, x_args), Protein(1, "Protein 1", 0.0, 4, 0.05, [Gate("act_hill", 0, 0)]), Protein(2, "Protein 2", 0.0, 1, 0.05, [Gate("aa_and", 0, 1)])]
+# TODO: change hill coefficients to be dependent on combinations of two proteins
+proteinArray = [Protein(0, "Protein 0", 0.0, 3, 1, [], x_pulse, x_args), Protein(1, "Protein 1", 0.0, 3, 1, [Gate("act_hill", 0, 0)]), Protein(2, "Protein 2", 0.0, 3, 1, [Gate("aa_and", 0, 1)])]
 
 # Run the simulation
 duration = 20
@@ -77,7 +78,7 @@ plot_results(final_concentrations, t, proteinArray, "Backend.py: FFL", "Backend.
 
 # Repeat with long pulse:
 # Set up parameters for the pulse
-x_args = (3.0, 19.0, 5.0, 2.0, 0.5) # the only change is the duty cycle
+x_args = (0, 15, 20, 1.0, 0.5)
 
 # Update input gate's args
 proteinArray[0].mExtConcFuncArgs = x_args
