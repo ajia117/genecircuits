@@ -1,4 +1,4 @@
-import { Node, Edge } from "@xyflow/react"; // Ensure you install @xyflow/react
+import { Node, Edge } from "@xyflow/react";
 
 export const formatCircuitToJson = (nodes: Node[], edges: Edge[]) => {
     return {

@@ -24,7 +24,6 @@ export const Toolbox = () => {
             event.dataTransfer.setData("application/node-out", String(connections.outputs));
         }
         event.dataTransfer.effectAllowed = "move";
-        console.log("Dragging node type:", nodeType);
     };
 
     return (

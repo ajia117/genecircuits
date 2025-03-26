@@ -72,7 +72,7 @@ export default function CircuitBuilderFlow() {
 
     // Handler for clicking an edge
     const onNodeClick = (event: React.MouseEvent, node: Node) => {
-        console.log("Clicked node ID:", node.id);
+        // console.log("Clicked node ID:", node.id);
         setSelectedNodeId(node.id); // Store the clicked node ID
         setSelectedEdgeId(null);
     };
@@ -97,7 +97,7 @@ export default function CircuitBuilderFlow() {
 
     // Handler for clicking an edge
     const onEdgeClick = useCallback((event: React.MouseEvent, edge: Edge) => {
-        console.log("Clicked edge ID:", edge.id);
+        // console.log("Clicked edge ID:", edge.id);
         setSelectedEdgeId(edge.id); // Store the clicked edge ID
         setSelectedNodeId(null);
     }, []);
