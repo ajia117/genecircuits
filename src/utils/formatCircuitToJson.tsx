@@ -10,6 +10,7 @@ export const formatCircuitToJson = (nodes: Node[], edges: Edge[]) => {
         })),
         edges: edges.map((edge: Edge) => ({
             id: edge.id,
+            type: edge.markerEnd, //TODO: make consistent 'arrow' or 'repress'
             source: edge.source,
             target: edge.target,
             label: edge.label || "",

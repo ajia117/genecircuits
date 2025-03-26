@@ -32,6 +32,7 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
 
     const handlePlayClick = () => {
         const circuitJson = formatCircuitToJson(nodes, edges)
+        console.log(edges)
         console.log(circuitJson)
         setShowOutputWindow(true)
     }
