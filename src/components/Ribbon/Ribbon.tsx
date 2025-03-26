@@ -11,11 +11,12 @@ interface TopRibbonProps {
     setEdges: any,
     showOutputWindow: boolean,
     setShowOutputWindow: any,
+    circuitSettings: any
 }
 
-const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges, showOutputWindow, setShowOutputWindow }) => {
+const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges, showOutputWindow, setShowOutputWindow, circuitSettings }) => {
     const [showConfirmation, setShowConfirmation] = useState(false);
-    
+
     const handleClear = () => {
         setShowConfirmation(true);
     };
@@ -31,7 +32,7 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
     };
 
     const handlePlayClick = () => {
-        const circuitJson = formatCircuitToJson(nodes, edges)
+        const circuitJson = formatCircuitToJson(circuitSettings, nodes, edges)
         console.log(edges)
         console.log(circuitJson)
         setShowOutputWindow(true)

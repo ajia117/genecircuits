@@ -1,7 +1,8 @@
 import { Node, Edge } from "@xyflow/react";
 
-export const formatCircuitToJson = (nodes: Node[], edges: Edge[]) => {
+export const formatCircuitToJson = (circuitSettings: any, nodes: Node[], edges: Edge[]) => {
     return {
+        circuitSettings,
         nodes: nodes.map((node: Node) => ({
             id: node.id,
             type: node.type || "default",
@@ -10,10 +11,9 @@ export const formatCircuitToJson = (nodes: Node[], edges: Edge[]) => {
         })),
         edges: edges.map((edge: Edge) => ({
             id: edge.id,
-            type: edge.markerEnd, //TODO: make consistent 'arrow' or 'repress'
+            type: edge.markerEnd,
             source: edge.source,
             target: edge.target,
-            label: edge.label || "",
         }))
     };
 };

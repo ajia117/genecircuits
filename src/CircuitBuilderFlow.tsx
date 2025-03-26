@@ -36,7 +36,13 @@ export default function CircuitBuilderFlow() {
     const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null); // Stores clicked edge ID
     const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null); // Stores clicked node ID
     const [showOutputWindow, setShowOutputWindow] = useState<boolean>(false);
-    
+
+    const circuitSettings = {
+        circuitName: "test circuit",
+        simulationDuration: 20,
+        numTimeSlots: 10
+    }
+
     const nodeTypes = useMemo(() => ({
         custom: CustomNode,
         and: AndGateNode,
@@ -186,6 +192,7 @@ export default function CircuitBuilderFlow() {
                 nodes={nodes} setNodes={setNodes}
                 edges={edges} setEdges={setEdges}
                 showOutputWindow={showOutputWindow} setShowOutputWindow={setShowOutputWindow}
+                circuitSettings={circuitSettings}
             />
             
             <div className="bottom-container">
