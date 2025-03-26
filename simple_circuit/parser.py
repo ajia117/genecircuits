@@ -5,9 +5,7 @@ from collections import defaultdict
 # Parser function
 def parse_circuit(json_data):
     nodes = {node['id']: node for node in json_data['nodes']}
-    #print(nodes)
     edges = json_data['edges']
-    #print(edges)
 
     # Build adjacency list for inputs to each node
     inputs = defaultdict(list)
@@ -15,7 +13,6 @@ def parse_circuit(json_data):
         inputs[edge['target']].append(edge['source'])
 
     protein_array = []
-    node_to_protein_idx = {}
     current_protein_id = 0
 
     smush_gates = {}
@@ -38,7 +35,6 @@ def parse_circuit(json_data):
                 else:
                     gates.append(Gate("act_hill", int(src), int(src)))
             protein = Protein(current_protein_id, label, init_conc, hill, degrad, gates)
-            node_to_protein_idx[node_id] = current_protein_id
             protein_array.append(protein)
             current_protein_id += 1
 
@@ -48,15 +44,11 @@ def parse_circuit(json_data):
             if len(input_sources) >= 2:
                 first, second = int(input_sources[0]), int(input_sources[1])
                 smush_gates[node_id] = Gate(gate_type, first, second)
-            # protein = Protein(current_protein_id, label, init_conc, hill, degrad, gates)
-            # node_to_protein_idx[node_id] = current_protein_id
-            # protein_array.append(protein)
             current_protein_id += 1
 
         elif node_type == 'input':
             # External protein
             protein = Protein(current_protein_id, label, init_conc, hill, degrad, [], extConcFunc="x_pulse", extConcFuncArgs="x_args")
-            node_to_protein_idx[node_id] = current_protein_id
             protein_array.append(protein)
             current_protein_id += 1
 
