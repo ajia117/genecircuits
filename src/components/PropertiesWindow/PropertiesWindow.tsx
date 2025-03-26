@@ -6,23 +6,27 @@ interface PropertiesWindowProps {
     selectedEdgeId: string;
     selectedNodeId: string;
     selectedNode: Node<NodeData>;
+    selectedNodeData: NodeData;
     changeMarkerType: (type: string) => void;
+    changeLabelData: (name: string, value: string | number) => void;
     changeNodeData: (name: string, value: string | number) => void;
 }
 const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
            selectedEdgeId,
            selectedNodeId,
            selectedNode,
+           selectedNodeData,
            changeMarkerType,
+           changeLabelData,
            changeNodeData
        }) => {
     // Add local state to store form values
-    const [formValues, setFormValues] = useState<NodeData>(selectedNode.data);
+    const [formValues, setFormValues] = useState<NodeData>(selectedNodeData);
 
     // Update local state when selectedNode changes
     useEffect(() => {
         if (selectedNodeId && selectedNode) {
-            setFormValues(selectedNode.data);
+            setFormValues(selectedNodeData);
         } else {
             setFormValues(null);
         }
@@ -37,7 +41,7 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
     };
 
     // Generate form fields based on selectedNode data
-    const formFields = selectedNodeId && selectedNode ? Object.entries(selectedNode.data).map(([key, value]) => {
+    const formFields = selectedNodeId && selectedNode ? Object.entries(selectedNodeData).map(([key, value]) => {
         if (key === "label") {
             return (
                 <div key={key}>
@@ -46,6 +50,21 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
                         name="label"
                         type="text"
                         value={formValues[key] || ''}
+                        onChange={(e) => handleInputChange(key, e.target.value)}
+                    /><br />
+                </div>
+            );
+        }
+
+        if (key === 'inputs' || key === 'outputs') {
+            return (
+                <div key={key}>
+                    {key.charAt(0).toUpperCase() + key.slice(1)}:<br />
+                    <input
+                        readOnly={true}
+                        name={key}
+                        type="number"
+                        value={formValues[key] as number || ''}
                         onChange={(e) => handleInputChange(key, e.target.value)}
                     /><br />
                 </div>
@@ -88,13 +107,23 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
                             Object.entries(formValues).forEach(([key, value]) => {
                                 if (typeof value === 'string' || typeof value === 'number') {
                                     const numValue = Number(value);
-                                    // String if Not a Number
-                                    changeNodeData(key, isNaN(numValue) ? value : numValue);
+                                    // separate handles from rest of data
+                                    if(key === 'inputs' || key === 'outputs') {
+                                        // String if Not a Number
+                                        changeNodeData(key, isNaN(numValue) ? value : numValue);
+                                    }
+                                    else {
+                                        // String if Not a Number
+                                        changeLabelData(key, isNaN(numValue) ? value : numValue);
+                                    }
                                 }
                             });
                         }}
                     >
-                        {formFields}
+                        {/* Only show form if not a circuit gate */
+                         selectedNode.type !== 'and' &&
+                         selectedNode.type !== 'or'  &&
+                         formFields}
                         <button type="submit">Update</button>
                     </form>
                 </>

@@ -9,9 +9,9 @@ interface ComplexNodeData extends Record<string, unknown>{
     label: string;
     initialConcentration: number;
     hillCoefficient: number;
-    threshold: number;
-    degradationRate: number;
     delay: number;
+    inputs: number;
+    outputs: number;
 }
 type NodeData = ComplexNodeData | SimpleNodeData;
 
