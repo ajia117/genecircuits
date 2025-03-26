@@ -1,17 +1,19 @@
 import React, { useState } from "react";
 import { Play, Pause, Save, Trash, Graph } from "../../assets";
 import "./Ribbon.css";
-import { Panel } from "@xyflow/react";
+import { Node, Edge } from "@xyflow/react";
+import { formatCircuitToJson } from "../../utils/formatCircuitToJson"
 
 interface TopRibbonProps {
-    onPlayClick: () => void;
-    onPauseClick: () => void;
-    onSaveClick: () => void;
-    onClearClick: () => void;
-    onToggleOutputWindow: () => void;
+    nodes: Node[],
+    setNodes: any,
+    edges: Edge[],
+    setEdges: any,
+    showOutputWindow: boolean,
+    setShowOutputWindow: any,
 }
 
-const TopRibbon: React.FC<TopRibbonProps> = ({ onPlayClick, onPauseClick, onSaveClick, onClearClick, onToggleOutputWindow }) => {
+const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges, showOutputWindow, setShowOutputWindow }) => {
     const [showConfirmation, setShowConfirmation] = useState(false);
     
     const handleClear = () => {
@@ -19,7 +21,8 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ onPlayClick, onPauseClick, onSave
     };
 
     const confirmClear = () => {
-        onClearClick();
+        setNodes([])
+        setEdges([])
         setShowConfirmation(false);
     };
 
@@ -27,10 +30,16 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ onPlayClick, onPauseClick, onSave
         setShowConfirmation(false);
     };
 
+    const handlePlayClick = () => {
+        const circuitJson = formatCircuitToJson(nodes, edges)
+        console.log(circuitJson)
+        setShowOutputWindow(true)
+    }
+
     return (
         <div className="top-ribbon-container">
             <div className="ribbon-left">
-                <button onClick={onSaveClick} className="save-button">
+                <button onClick={null} className="save-button">
                     <Save />
                 </button>
                 <button onClick={handleClear} className="clear-button">
@@ -38,15 +47,15 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ onPlayClick, onPauseClick, onSave
                 </button>
             </div>
             <div className="ribbon-center">
-                <button onClick={onPlayClick} className="play-button">
+                <button onClick={handlePlayClick} className="play-button">
                     <Play />
                 </button>
-                <button onClick={onPauseClick} className="pause-button">
+                <button onClick={null} className="pause-button">
                     <Pause />
                 </button>
             </div>
             <div className="ribbon-right">
-                <button onClick={onToggleOutputWindow} className="toggle-output-button">
+                <button onClick={() => setShowOutputWindow(!showOutputWindow)} className="toggle-output-button">
                     <Graph />
                 </button>
             </div>
@@ -67,3 +76,4 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ onPlayClick, onPauseClick, onSave
 };
 
 export default TopRibbon;
+

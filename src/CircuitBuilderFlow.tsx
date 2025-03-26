@@ -186,11 +186,9 @@ export default function CircuitBuilderFlow() {
 
             {/* TOP MENU FUNCTION BUTTONS */}
             <Ribbon 
-                onPlayClick={() => setShowOutputWindow(true)}
-                onPauseClick={() => {}}
-                onSaveClick={() => {}}
-                onClearClick={() => {setNodes([]); setEdges([])}}
-                onToggleOutputWindow={() => setShowOutputWindow(!showOutputWindow)}
+                nodes={nodes} setNodes={setNodes}
+                edges={edges} setEdges={setEdges}
+                showOutputWindow={showOutputWindow} setShowOutputWindow={setShowOutputWindow}
             />
             
             <div className="bottom-container">
