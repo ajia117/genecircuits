@@ -3,7 +3,6 @@ import {
     ReactFlow,
     Background,
     Controls,
-    addEdge,
     Edge,
     Node,
     Connection,
@@ -16,7 +15,6 @@ import '@xyflow/react/dist/style.css';
 import './index.css';
 import RepressMarker from "./assets/RepressMarker";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
-import ComplexNodeData from "./types/NodeData";
 import Play from "./assets/Play";
 import { 
     Toolbox, 
@@ -27,6 +25,7 @@ import {
     OrGateNode, 
     CustomNode 
 } from './components';
+import NodeData from "./types/NodeData";
 
 export default function CircuitBuilderFlow() {
     const reactFlowWrapper = useRef(null);
@@ -36,7 +35,8 @@ export default function CircuitBuilderFlow() {
     const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null); // Stores clicked edge ID
     const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null); // Stores clicked node ID
     const [showOutputWindow, setShowOutputWindow] = useState<boolean>(false);
-    
+    const [labelDataMap, setLabelDataMap] = useState<{[label: string]: NodeData}>({});
+
     const nodeTypes = useMemo(() => ({
         custom: CustomNode,
         and: AndGateNode,
@@ -72,15 +72,28 @@ export default function CircuitBuilderFlow() {
 
     // Handler for clicking an edge
     const onNodeClick = (event: React.MouseEvent, node: Node) => {
-        console.log("Clicked node ID:", node.id);
         setSelectedNodeId(node.id); // Store the clicked node ID
         setSelectedEdgeId(null);
     };
 
     const getSelectedNode = () => {
-        return nodes.find(node => node.id === selectedNodeId) as Node<ComplexNodeData>;
+        return nodes.find(node => node.id === selectedNodeId) as Node<NodeData>;
     };
 
+    const changeLabelData = (name: string, value: string | number) => {
+        // get label for node data you want to change
+        const labelToChange = nodes.find((node) => node.id === selectedNodeId).data.label
+        // only change the name and value of the label
+        setLabelDataMap(prevMap => ({
+            ...prevMap,
+            [labelToChange]: {
+                ...prevMap[labelToChange],
+                [name]: value
+            }
+        }));
+    };
+
+    // change node-specific data, such as input and output handles
     const changeNodeData = (name: string, value: string | number) => {
         setNodes((nodes) =>
             nodes.map((node) =>
@@ -97,7 +110,6 @@ export default function CircuitBuilderFlow() {
 
     // Handler for clicking an edge
     const onEdgeClick = useCallback((event: React.MouseEvent, edge: Edge) => {
-        console.log("Clicked edge ID:", edge.id);
         setSelectedEdgeId(edge.id); // Store the clicked edge ID
         setSelectedNodeId(null);
     }, []);
@@ -112,47 +124,25 @@ export default function CircuitBuilderFlow() {
     const onDrop = useCallback(
         (event: React.DragEvent) => {
             event.preventDefault();
-            let numInCnx;
-            let numOutCnx;
 
             const nodeType = event.dataTransfer.getData("application/reactflow");
-            if (!nodeType || typeof nodeType !== "string") { // get the node type
+            const nodeData = JSON.parse(event.dataTransfer.getData("application/node-data")) as NodeData;
+            if (!nodeType || typeof nodeType !== "string") {
                 console.error("Invalid node type:", nodeType);
                 return;
             }
-            if(nodeType === "custom") {
-                numInCnx = Number(event.dataTransfer.getData("application/node-in"));
-                numOutCnx = Number(event.dataTransfer.getData("application/node-out"));
-            }
-
             const position = screenToFlowPosition({ // find drop location
                 x: event.clientX,
                 y: event.clientY,
             });
-            const baseData = {
-                label: `${nodeType} node`,
-                initialConcentration: 0,
-                hillCoefficient: 0,
-				threshold: 0,
-				degradationRate: 0,
-				delay: 0,
-            };
-            if (numInCnx != null && numOutCnx != null) {
-                Object.assign(baseData, {
-                    numInCnx,
-                    numOutCnx
-                });
-            }
             const newNode = { // properties of new node being added
                 id: getId(),
                 position,
                 type: nodeType,
-                data: baseData,
-                sourcePosition: 'right',
-                targetPosition: 'left'
+                data: nodeData
             };
-
             setNodes((nds) => [...nds, newNode]);
+            setLabelData(nodeData.label, nodeData);
         },
         [screenToFlowPosition],
     );
@@ -175,10 +165,31 @@ export default function CircuitBuilderFlow() {
         );
     }, [selectedEdgeId]);
 
+    // return data if label in labelDataMap
+    const getLabelData = (label: string) => {
+        if(label in labelDataMap) {
+            return labelDataMap[label];
+        }
+        return null;
+    }
+
+    // set label data if exists, or add to nodeLabelData if not
+    const setLabelData = (label: string, data: NodeData) => {
+        setLabelDataMap(prevMap => ({
+            ...prevMap,
+            [label]: data
+        }));
+    }
+
     const renderOutputWindow = () => {
         return <OutputWindow onClose={() => setShowOutputWindow(false)} />;
     };
-    
+
+    const getSelectedNodeLabelData = () => {
+        const node = getSelectedNode();
+        if(node)
+            return getLabelData(node.data.label)
+    }
 
     return (
         <>
@@ -190,7 +201,6 @@ export default function CircuitBuilderFlow() {
                 <button onClick={() => setShowOutputWindow(true)} className="play-button">
                     <Play />
                 </button>
-                <button>HIHI</button>
             </div>
             <div className="bottom-container">
                 <PanelGroup className="circuit-builder-container" direction="horizontal">
@@ -198,7 +208,10 @@ export default function CircuitBuilderFlow() {
                     <Panel className="left-pane min-w-128" defaultSize={30} maxSize={50}>
                         <PanelGroup direction="vertical">
                             <Panel className="toolbox-container" defaultSize={70} minSize={30} maxSize={90}>
-                                <Toolbox />
+                                <Toolbox
+                                    labels={Object.keys(labelDataMap)}
+                                    getLabelData={getLabelData}
+                                />
                             </Panel>
                             <PanelResizeHandle className="resize-handle-horizontal" />
                             <Panel className="properties-window" defaultSize={30} minSize={30} maxSize={90}>
@@ -206,10 +219,12 @@ export default function CircuitBuilderFlow() {
                                 {(selectedNodeId || selectedEdgeId) && <PropertiesWindow
                                     key={`${selectedNodeId || ''}-${selectedEdgeId || ''}`}
                                     changeMarkerType={changeMarkerType}
+                                    changeLabelData={changeLabelData}
                                     changeNodeData={changeNodeData}
                                     selectedEdgeId={selectedEdgeId}
                                     selectedNodeId={selectedNodeId}
                                     selectedNode={getSelectedNode()}
+                                    selectedNodeData={getSelectedNodeLabelData()}
                                 />}
                             </Panel>
                         </PanelGroup>
