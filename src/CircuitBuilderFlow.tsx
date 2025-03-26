@@ -14,7 +14,7 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import './index.css';
-import RepressMarker from "./assets/RepressMarker";
+import { RepressMarker, PromoteMarker } from "./assets";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import ComplexNodeData from "./types/NodeData";
 
@@ -53,12 +53,7 @@ export default function CircuitBuilderFlow() {
                 ...params,
                 id: `edge-${params.source}-${params.target}`, // Custom naming convention
                 type: 'default',
-                markerEnd: {
-                    type: MarkerType.Arrow, // Default marker type: Promote (Arrow)
-                    width: 20,
-                    height: 20,
-                    color: "black"
-                }
+                markerEnd: "promote"
             };
             setEdges((eds) => [...eds, newEdge]);
         },
@@ -167,8 +162,8 @@ export default function CircuitBuilderFlow() {
                     ? {
                         ...edge,
                         markerEnd: markerType === "repress"
-                            ? 'repress'
-                            : { type: markerType, width: 20, height: 20, color: "black" }
+                            ? "repress"
+                            : "promote"
                     }
                     : edge
             )
@@ -182,7 +177,9 @@ export default function CircuitBuilderFlow() {
 
     return (
         <>
+            {/* load marker end svgs */}
             <RepressMarker />
+            <PromoteMarker /> 
 
             {/* TOP MENU FUNCTION BUTTONS */}
             <Ribbon 
