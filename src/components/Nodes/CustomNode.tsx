@@ -39,6 +39,7 @@ const CustomNode = memo(({ id, data }: NodeProps<CustomNodeData>) => {
             zIndex: 10
         };
     };
+    console.log('render', id, data);
 
     return (
         <div className="custom-node">
