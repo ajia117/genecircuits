@@ -189,7 +189,7 @@ export default function CircuitBuilderFlow() {
                 onPlayClick={() => setShowOutputWindow(true)}
                 onPauseClick={() => {}}
                 onSaveClick={() => {}}
-                onClearClick={() => {}}
+                onClearClick={() => {setNodes([]); setEdges([])}}
                 onToggleOutputWindow={() => setShowOutputWindow(!showOutputWindow)}
             />
             
