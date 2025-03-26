@@ -36,6 +36,7 @@ export default function CircuitBuilderFlow() {
     const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null); // Stores clicked edge ID
     const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null); // Stores clicked node ID
     const [showOutputWindow, setShowOutputWindow] = useState<boolean>(false);
+    const [outputWindowSettings, setOutputWindowSettings] = useState({x: 0, y: 0, width: 300, height:200})
 
     const circuitSettings = {
         circuitName: "test circuit",
@@ -177,7 +178,7 @@ export default function CircuitBuilderFlow() {
     }, [selectedEdgeId]);
 
     const renderOutputWindow = () => {
-        return <OutputWindow onClose={() => setShowOutputWindow(false)} />;
+        return <OutputWindow onClose={() => setShowOutputWindow(false)} windowSettings={outputWindowSettings} setWindowSettings={setOutputWindowSettings} />;
     };
     
 
