@@ -14,6 +14,7 @@ type CustomNodeData = Node<CustomNodeProps>;
 const CustomNode = memo(({ id, data }: NodeProps<CustomNodeData>) => {
     // Get position for multiple handles
     const getHandleStyle = (index: number, total: number, isInput: boolean) => {
+        const handleSize = 0;
         const handleOffset = -4;
         if (total <= 1) {
             return {
@@ -21,12 +22,14 @@ const CustomNode = memo(({ id, data }: NodeProps<CustomNodeData>) => {
                 top: '50%',
                 transform: 'translateY(-50%)',
                 background: 'black',
-                zIndex: 10
+                zIndex: 10,
+                height: `${handleSize}px`,
+                width: `${handleSize}px`
             };
         }
 
         // For multiple handles, distribute them vertically
-        const spacing = 10; // pixels between handles
+        const spacing = 7; // pixels between handles
         const totalHeight = (total - 1) * spacing;
         const startOffset = -totalHeight / 2;
         const position = startOffset + (index * spacing);
@@ -36,7 +39,9 @@ const CustomNode = memo(({ id, data }: NodeProps<CustomNodeData>) => {
             top: 'calc(50% + ' + position + 'px)',
             transform: 'translateY(-50%)',
             background: 'black',
-            zIndex: 10
+            zIndex: 10,
+            height: `${handleSize}px`,
+            width: `${handleSize}px`
         };
     };
 
