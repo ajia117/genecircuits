@@ -119,14 +119,28 @@ export const Toolbox: React.FC<ToolboxProps> = ({
 
         return Object.entries(nodeData).map(([key, value]) => {
             if(key === 'label') return;
-            return (
-                <div key={key}>
-                    {key.charAt(0).toUpperCase() + key.slice(1)}:<br />
+            if(key === 'inputs' || key === 'outputs') {
+                return (
+                    <div key={key}>
+                    {key.charAt(0).toUpperCase() + key.slice(1)}:<br/>
                     <input
-                        readOnly={!(key === 'inputs' || key === 'outputs') && (!!dropped || !isNewLabel)}
                         name={key}
                         type="number"
-                        value={value as number || ''}
+                        min = {0}
+                        max = {4}
+                        value={value as number || '0'}
+                        onChange={(e) => handleInputChange(key, Number(e.target.value))}
+                    /><br/>
+                </div>
+            )};
+            return (
+                <div key={key}>
+                    {key.charAt(0).toUpperCase() + key.slice(1)}:<br/>
+                    <input
+                        readOnly={(!!dropped || !isNewLabel)}
+                        name={key}
+                        type="number"
+                        value={value as number || '0'}
                         onChange={(e) => handleInputChange(key, Number(e.target.value))}
                     /><br/>
                 </div>
@@ -158,35 +172,6 @@ export const Toolbox: React.FC<ToolboxProps> = ({
                         />
 
                         {selectedOption && getLabelForm()}
-
-                        {/*<div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Number of Inputs
-                            </label>
-                            <input
-                                type="number"
-                                name="inputs"
-                                min="0"
-                                max="10"
-                                value={connections.inputs}
-                                onChange={handleInputChange}
-                                className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Number of Outputs
-                            </label>
-                            <input
-                                type="number"
-                                name="outputs"
-                                min="0"
-                                max="10"
-                                value={connections.outputs}
-                                onChange={handleInputChange}
-                                className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            />
-                        </div>*/}
                     </div>
                     <br/>
                     <div className="dndnode output" onDragStart={(event) => onDragStart(event, 'custom')} draggable>

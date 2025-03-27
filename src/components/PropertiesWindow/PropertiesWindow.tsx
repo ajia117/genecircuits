@@ -64,7 +64,7 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
                         readOnly={true}
                         name={key}
                         type="number"
-                        value={formValues[key] as number || ''}
+                        value={formValues[key] as number || '0'}
                         onChange={(e) => handleInputChange(key, e.target.value)}
                     /><br />
                 </div>
@@ -78,7 +78,7 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
                     <input
                         name={key}
                         type="number"
-                        value={formValues[key] as number || 0}
+                        value={formValues[key] as number || '0'}
                         onChange={(e) => handleInputChange(key, Number(e.target.value))}
                     /><br />
                 </div>
