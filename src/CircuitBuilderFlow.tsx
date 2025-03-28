@@ -199,12 +199,12 @@ export default function CircuitBuilderFlow() {
             <Ribbon />
             <div className="top-ribbon-container">
                 <button onClick={() => setShowOutputWindow(true)} className="play-button">
-                    <Play />
+                    <Play/>
                 </button>
             </div>
             <div className="bottom-container">
                 <PanelGroup className="circuit-builder-container" direction="horizontal">
-                    {/* Left Pane (Toolbox + Properties Window) */}
+                {/* Left Pane (Toolbox + Properties Window) */}
                     <Panel className="left-pane min-w-128" defaultSize={30} maxSize={50}>
                         <PanelGroup direction="vertical">
                             <Panel className="toolbox-container" defaultSize={70} minSize={30} maxSize={90}>

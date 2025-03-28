@@ -132,7 +132,7 @@ export const Toolbox: React.FC<ToolboxProps> = ({
                         onChange={(e) => handleInputChange(key, Number(e.target.value))}
                     /><br/>
                 </div>
-            )};
+            )}
             return (
                 <div key={key}>
                     {key.charAt(0).toUpperCase() + key.slice(1)}:<br/>
@@ -174,9 +174,11 @@ export const Toolbox: React.FC<ToolboxProps> = ({
                         {selectedOption && getLabelForm()}
                     </div>
                     <br/>
-                    <div className="dndnode output" onDragStart={(event) => onDragStart(event, 'custom')} draggable>
-                        Custom Node
-                    </div>
+                    {selectedOption &&
+                        <div className="dndnode output" onDragStart={(event) => onDragStart(event, 'custom')} draggable>
+                            Drag Node
+                        </div>
+                    }
                 </div>
 
             </div>
