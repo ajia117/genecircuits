@@ -23,6 +23,8 @@ export const Toolbox: React.FC<ToolboxProps> = ({
         label: null,
         initialConcentration: 0,
         hillCoefficient: 0,
+        lossRate: 0,
+        beta: 0,
         delay: 0,
         inputs: 0,
         outputs: 0

@@ -108,6 +108,8 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
                                 if (typeof value === 'string' || typeof value === 'number') {
                                     const numValue = Number(value);
                                     // separate handles from rest of data
+
+                                    //todo: remove, cannot edit here
                                     if(key === 'inputs' || key === 'outputs') {
                                         // String if Not a Number
                                         changeNodeData(key, isNaN(numValue) ? value : numValue);
