@@ -50,7 +50,7 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
                         name="label"
                         type="text"
                         value={formValues[key] || ''}
-                        onChange={(e) => handleInputChange(key, e.target.value)}
+                        readOnly={true}
                     /><br />
                 </div>
             );
