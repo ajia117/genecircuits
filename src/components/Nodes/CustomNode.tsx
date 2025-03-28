@@ -5,8 +5,8 @@ import { Position } from '@xyflow/react';
 
 interface CustomNodeProps extends Record<string, unknown> {
     label: string;
-    numInCnx: number;
-    numOutCnx: number;
+    inputs: number;
+    outputs: number;
 }
 
 type CustomNodeData = Node<CustomNodeProps>;
@@ -14,6 +14,7 @@ type CustomNodeData = Node<CustomNodeProps>;
 const CustomNode = memo(({ id, data }: NodeProps<CustomNodeData>) => {
     // Get position for multiple handles
     const getHandleStyle = (index: number, total: number, isInput: boolean) => {
+        const handleSize = 0;
         const handleOffset = -4;
         if (total <= 1) {
             return {
@@ -21,12 +22,14 @@ const CustomNode = memo(({ id, data }: NodeProps<CustomNodeData>) => {
                 top: '50%',
                 transform: 'translateY(-50%)',
                 background: 'black',
-                zIndex: 10
+                zIndex: 10,
+                height: `${handleSize}px`,
+                width: `${handleSize}px`
             };
         }
 
         // For multiple handles, distribute them vertically
-        const spacing = 10; // pixels between handles
+        const spacing = 7; // pixels between handles
         const totalHeight = (total - 1) * spacing;
         const startOffset = -totalHeight / 2;
         const position = startOffset + (index * spacing);
@@ -36,7 +39,9 @@ const CustomNode = memo(({ id, data }: NodeProps<CustomNodeData>) => {
             top: 'calc(50% + ' + position + 'px)',
             transform: 'translateY(-50%)',
             background: 'black',
-            zIndex: 10
+            zIndex: 10,
+            height: `${handleSize}px`,
+            width: `${handleSize}px`
         };
     };
 
@@ -44,13 +49,13 @@ const CustomNode = memo(({ id, data }: NodeProps<CustomNodeData>) => {
         <div className="custom-node">
             <div className="relative px-6 py-2 shadow-md rounded-md bg-white border-2 border-gray-200 w-40">
                 {/* Input Handles */}
-                {Array.from({length: data.numInCnx}, (_, i) => (
+                {Array.from({length: data.inputs}, (_, i) => (
                     <XYFlow.Handle
                         key={`input-${i}`}
                         type="target"
                         position={Position.Left}
                         id={`input-${i}`}
-                        style={getHandleStyle(i, data.numInCnx, true)}
+                        style={getHandleStyle(i, data.inputs, true)}
                         isConnectableStart={true}
                         isConnectableEnd={true}
                         isValidConnection={() => true}  // Allow all connections
@@ -65,13 +70,13 @@ const CustomNode = memo(({ id, data }: NodeProps<CustomNodeData>) => {
                 </div>
 
                 {/* Output Handles */}
-                {Array.from({length: data.numOutCnx}, (_, i) => (
+                {Array.from({length: data.outputs}, (_, i) => (
                     <XYFlow.Handle
                         key={`output-${i}`}
                         type="source"
                         position={Position.Right}
                         id={`output-${i}`}
-                        style={getHandleStyle(i, data.numOutCnx, false)}
+                        style={getHandleStyle(i, data.outputs, false)}
                         isConnectableStart={true}
                         isConnectableEnd={true}
                         isValidConnection={() => true}  // Allow all connections

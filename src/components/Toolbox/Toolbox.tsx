@@ -1,30 +1,152 @@
 import React, {useState} from 'react';
-import { Plus } from 'lucide-react';
-import AndGate from "../../assets/AndGate";
+import CreatableSelect from "react-select/creatable";
+import NodeData from "../../types/NodeData";
 
-export const Toolbox = () => {
+interface ToolboxProps {
+    labels: string[];
+    getLabelData: (label: string) => NodeData;
+}
 
-    const [showForm, setShowForm] = useState(false);
-    const [connections, setConnections] = useState({
-        inputs: 1,
-        outputs: 1
+interface OptionType {
+    readonly label: string;
+    value: string | number;
+}
+
+export const Toolbox: React.FC<ToolboxProps> = ({
+        labels,
+        getLabelData
+     }) => {
+
+    const [selectedOption, setSelectedOption] = useState<OptionType | null>(null);
+    const [isNewLabel, setIsNewLabel] = useState(false);
+    const genericNodeData: NodeData = {
+        label: null,
+        initialConcentration: 0,
+        hillCoefficient: 0,
+        delay: 0,
+        inputs: 0,
+        outputs: 0
+    };
+    const [nodeData, setNodeData] = useState<NodeData>(genericNodeData);
+
+    const createOption = (label: string): OptionType => ({
+        label,
+        value: label
     });
-    const handleInputChange = (e: { target: { name: any; value: any; }; }) => {
-        const { name, value } = e.target;
-        setConnections(prev => ({
+    const [labelOptions, setLabelOptions] = useState<OptionType[]>(
+        labels.map(createOption)
+    );
+
+    const handleInputChange = (key: string, value: string | number) => {
+        setNodeData(prev => ({
             ...prev,
-            [name]: parseInt(value) || 0
+            [key]: value
         }));
     };
 
+    const handleCreate = (inputValue: string) => {
+        // return if option already exists without trailing/leading whitespace
+        const option = labelOptions.find(option => option.label === inputValue.trim());
+        if(option) {
+            setSelectedOption(option);
+            return;
+        }
+
+        // add new option to list of labels
+        const newOption = createOption(inputValue);
+        setLabelOptions([...labelOptions, newOption]);
+        setSelectedOption(newOption);
+        setIsNewLabel(true);
+        setNodeData({
+            ...genericNodeData,
+            label: inputValue
+        });
+    };
+
+    // don't always allow the create string option to appear
+    const isValidCreateString = (inputValue: string) => {
+        return inputValue !== "" && !labelOptions.find(option => option.label === inputValue.trim());
+    }
+
+    // this is for changing to an already existing label
+    const handleChange = (inputValue: OptionType | null) => {
+        setSelectedOption(inputValue);
+
+        if(!inputValue) {
+            // Reset form when cleared
+            setNodeData(genericNodeData);
+            setIsNewLabel(false);
+            return;
+        }
+        const data = getLabelData(inputValue.label);
+
+        // if someone made a label, but never dropped a node, still allow them to change its values
+        // getLabelData only returns data if a node was dropped
+        if(!data) {
+            setSelectedOption(inputValue);
+            setIsNewLabel(true);
+            setNodeData({
+                ...genericNodeData,
+                label: inputValue.label
+            });
+        }
+        else {
+            setIsNewLabel(false);
+            setNodeData({
+                ...data,
+                label: inputValue.label
+            });
+        }
+
+    };
+
+    // start dragging node, calls to onDrop in CircuitBuilderFlow when done
     const onDragStart = (event: React.DragEvent, nodeType: string) => {
-        event.dataTransfer.setData("application/reactflow", nodeType); // Store type
+        // store type, should always be "custom", "and", or "or"
+        event.dataTransfer.setData("application/reactflow", nodeType);
+        event.dataTransfer.setData("application/node-data", JSON.stringify(nodeData));
         if(nodeType === "custom") {
-            event.dataTransfer.setData("application/node-in", String(connections.inputs));
-            event.dataTransfer.setData("application/node-out", String(connections.outputs));
+            event.dataTransfer.setData("application/node-in", String(nodeData.inputs));
+            event.dataTransfer.setData("application/node-out", String(nodeData.outputs));
         }
         event.dataTransfer.effectAllowed = "move";
     };
+
+    // generate HTML for form
+    const getLabelForm = () => {
+        // make sure that if a node is dropped, you cannot edit the data anymore
+        const dropped = getLabelData(selectedOption.label);
+
+        return Object.entries(nodeData).map(([key, value]) => {
+            if(key === 'label') return;
+            if(key === 'inputs' || key === 'outputs') {
+                return (
+                    <div key={key}>
+                    {key.charAt(0).toUpperCase() + key.slice(1)}:<br/>
+                    <input
+                        name={key}
+                        type="number"
+                        min = {0}
+                        max = {4}
+                        value={value as number || '0'}
+                        onChange={(e) => handleInputChange(key, Number(e.target.value))}
+                    /><br/>
+                </div>
+            )}
+            return (
+                <div key={key}>
+                    {key.charAt(0).toUpperCase() + key.slice(1)}:<br/>
+                    <input
+                        readOnly={(!!dropped || !isNewLabel)}
+                        name={key}
+                        type="number"
+                        value={value as number || '0'}
+                        onChange={(e) => handleInputChange(key, Number(e.target.value))}
+                    /><br/>
+                </div>
+            )
+        });
+    }
 
     return (
         <>
@@ -36,61 +158,29 @@ export const Toolbox = () => {
                 <div className="dndnode or" onDragStart={(event) => onDragStart(event, 'or')} draggable>
                     OR Node
                 </div>
-                <div className="dndnode input" onDragStart={(event) => onDragStart(event, 'input')} draggable>
-                    Input Node
-                </div>
-                <div className="dndnode" onDragStart={(event) => onDragStart(event, 'default')} draggable>
-                    Default Node
-                </div>
-                <div className="dndnode output" onDragStart={(event) => onDragStart(event, 'output')} draggable>
-                    Output Node
-                </div>
-                <div
-                    onClick={() => setShowForm(!showForm)}
-                    className="flex dndnode items-center justify-center w-full transition-colors cursor-pointer"
-                >
-                    <Plus size={20} className={`my-auto`}/>
+                <div className="mt-4 p-4 bg-gray-50 rounded shadow-sm">
+                    <h3 className="text-lg font-medium mb-3">Choose existing Protein or Create New</h3>
+                    <div className="space-y-3">
+                        <CreatableSelect
+                            isClearable
+                            onChange={handleChange}
+                            onCreateOption={handleCreate}
+                            options={labelOptions}
+                            value={selectedOption}
+                            isValidNewOption={isValidCreateString}
+                            formatCreateLabel={(inputValue) => `Create "${inputValue.trim()}"`}
+                        />
+
+                        {selectedOption && getLabelForm()}
+                    </div>
+                    <br/>
+                    {selectedOption &&
+                        <div className="dndnode output" onDragStart={(event) => onDragStart(event, 'custom')} draggable>
+                            Drag Node
+                        </div>
+                    }
                 </div>
 
-                {showForm && (
-                    <div className="mt-4 p-4 bg-gray-50 rounded shadow-sm">
-                        <h3 className="text-lg font-medium mb-3">Connection Settings</h3>
-                        <div className="space-y-3">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Number of Inputs
-                                </label>
-                                <input
-                                    type="number"
-                                    name="inputs"
-                                    min="0"
-                                    max="10"
-                                    value={connections.inputs}
-                                    onChange={handleInputChange}
-                                    className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Number of Outputs
-                                </label>
-                                <input
-                                    type="number"
-                                    name="outputs"
-                                    min="0"
-                                    max="10"
-                                    value={connections.outputs}
-                                    onChange={handleInputChange}
-                                    className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                />
-                            </div>
-                        </div>
-                        <br/>
-                        <div className="dndnode output" onDragStart={(event) => onDragStart(event, 'custom')} draggable>
-                            Custom Node
-                        </div>
-                    </div>
-                )}
             </div>
         </>
     );
