@@ -40,7 +40,7 @@ export default function CircuitBuilderFlow() {
     const circuitSettings = {
         circuitName: "test circuit",
         simulationDuration: 20,
-        numTimeSlots: 10
+        numTimePoints: 10
     }
     const [labelDataMap, setLabelDataMap] = useState<{[label: string]: NodeData}>({});
 
@@ -56,13 +56,18 @@ export default function CircuitBuilderFlow() {
     // Handler for connecting nodes
     const onConnect = useCallback(
         (params: Connection) => {
-            const newEdge: Edge = {
-                ...params,
-                id: `edge-${params.source}-${params.target}`, // Custom naming convention
-                type: 'default',
-                markerEnd: "promote"
-            };
-            setEdges((eds) => [...eds, newEdge]);
+            setEdges((eds) => {
+                const filteredEdges = eds.filter(edge => !(edge.source === params.source && edge.target === params.target));
+                
+                const newEdge: Edge = {
+                    ...params,
+                    id: `edge-${params.source}-${params.target}`,
+                    type: 'default',
+                    markerEnd: "promote"
+                };
+                
+                return [...filteredEdges, newEdge];
+            });
         },
         [setEdges]
     );
