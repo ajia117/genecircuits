@@ -62,6 +62,9 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
                 <button onClick={handleClear} className="clear-button">
                     <Trash />
                 </button>
+                <button onClick={() => setShowOutputWindow(!showOutputWindow)} className="toggle-output-button">
+                    <Graph />
+                </button>
             </div>
             <div className="ribbon-center">
                 <button onClick={handlePlayClick} className="play-button">
@@ -72,9 +75,7 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
                 </button>
             </div>
             <div className="ribbon-right">
-                <button onClick={() => setShowOutputWindow(!showOutputWindow)} className="toggle-output-button">
-                    <Graph />
-                </button>
+                
             </div>
 
             {showConfirmation && (

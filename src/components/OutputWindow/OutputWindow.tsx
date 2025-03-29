@@ -43,7 +43,10 @@ export default function OutputWindow({ onClose, windowSettings, setWindowSetting
                     {/* Output Content */}
                     <div className="flex-1 p-4 overflow-auto">
                         <p>This is where the simulation results will be displayed.</p>
-                        <p>{outputData.message}</p>
+                        {outputData && 
+                            <p>{outputData.message}</p>
+                        }
+                        
                     </div>
                     </div>
                 
