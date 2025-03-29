@@ -36,13 +36,13 @@ export default function CircuitBuilderFlow() {
     const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null); // Stores clicked node ID
     const [showOutputWindow, setShowOutputWindow] = useState<boolean>(false);
     const [outputWindowSettings, setOutputWindowSettings] = useState({x: 0, y: 0, width: 300, height:200})
+    const [labelDataMap, setLabelDataMap] = useState<{[label: string]: NodeData}>({});
 
     const circuitSettings = {
         circuitName: "test circuit",
         simulationDuration: 20,
         numTimePoints: 10
     }
-    const [labelDataMap, setLabelDataMap] = useState<{[label: string]: NodeData}>({});
 
     const nodeTypes = useMemo(() => ({
         custom: CustomNode,
@@ -205,7 +205,8 @@ export default function CircuitBuilderFlow() {
             <PromoteMarker /> 
 
             {/* TOP MENU FUNCTION BUTTONS */}
-            <Ribbon 
+            <Ribbon
+                labelDataMap={labelDataMap}
                 nodes={nodes} setNodes={setNodes}
                 edges={edges} setEdges={setEdges}
                 showOutputWindow={showOutputWindow} setShowOutputWindow={setShowOutputWindow}

@@ -1,6 +1,7 @@
 import { Node, Edge } from "@xyflow/react";
+import CircuitSettingsType from "../types/CircuitSettingsType";
 
-export const formatCircuitToJson = (circuitSettings: any, nodes: Node[], edges: Edge[]) => {
+export const formatCircuitToJson = (circuitSettings: CircuitSettingsType, nodes: Node[], edges: Edge[]) => {
     return {
         circuitSettings,
         nodes: nodes.map((node: Node) => ({
