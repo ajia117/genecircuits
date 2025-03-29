@@ -36,6 +36,7 @@ export default function CircuitBuilderFlow() {
     const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null); // Stores clicked node ID
     const [showOutputWindow, setShowOutputWindow] = useState<boolean>(false);
     const [outputWindowSettings, setOutputWindowSettings] = useState({x: 0, y: 0, width: 300, height:200})
+    const [outputData, setOutputData] = useState(); // Holds data received from backend to be used as graph
 
     const circuitSettings = {
         circuitName: "test circuit",
@@ -189,7 +190,7 @@ export default function CircuitBuilderFlow() {
     }
 
     const renderOutputWindow = () => {
-        return <OutputWindow onClose={() => setShowOutputWindow(false)} windowSettings={outputWindowSettings} setWindowSettings={setOutputWindowSettings} />;
+        return <OutputWindow onClose={() => setShowOutputWindow(false)} outputData={outputData} windowSettings={outputWindowSettings} setWindowSettings={setOutputWindowSettings} />;
     };
 
     const getSelectedNodeLabelData = () => {
@@ -208,8 +209,10 @@ export default function CircuitBuilderFlow() {
             <Ribbon 
                 nodes={nodes} setNodes={setNodes}
                 edges={edges} setEdges={setEdges}
-                showOutputWindow={showOutputWindow} setShowOutputWindow={setShowOutputWindow}
+                showOutputWindow={showOutputWindow} 
+                setShowOutputWindow={setShowOutputWindow}
                 circuitSettings={circuitSettings}
+                setOutputData={setOutputData}
             />
             
             <div className="bottom-container">

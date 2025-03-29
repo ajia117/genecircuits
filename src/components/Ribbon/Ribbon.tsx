@@ -3,6 +3,7 @@ import { Play, Pause, Save, Trash, Graph } from "../../assets";
 import "./Ribbon.css";
 import { Node, Edge } from "@xyflow/react";
 import { formatCircuitToJson } from "../../utils/formatCircuitToJson"
+import { fetchOutput } from "../../utils/fetchOutput";
 
 interface TopRibbonProps {
     nodes: Node[],
@@ -11,11 +12,13 @@ interface TopRibbonProps {
     setEdges: any,
     showOutputWindow: boolean,
     setShowOutputWindow: any,
-    circuitSettings: any
+    circuitSettings: any,
+    setOutputData: (data: any)=>void
 }
 
-const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges, showOutputWindow, setShowOutputWindow, circuitSettings }) => {
+const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges, showOutputWindow, setShowOutputWindow, circuitSettings, setOutputData }) => {
     const [showConfirmation, setShowConfirmation] = useState(false);
+    const [isRunning, setIsRunning] = useState(false)
 
     const handleClear = () => {
         setShowConfirmation(true);
@@ -31,11 +34,23 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
         setShowConfirmation(false);
     };
 
-    const handlePlayClick = () => {
-        const circuitJson = formatCircuitToJson(circuitSettings, nodes, edges)
-        console.log(edges)
-        console.log(circuitJson)
-        setShowOutputWindow(true)
+
+    const handlePlayClick = async () => {
+        const circuitJson = formatCircuitToJson(circuitSettings, nodes, edges);
+        setIsRunning(true);
+        try {
+            const res = await fetchOutput(circuitJson);
+            setOutputData(res);
+            setShowOutputWindow(true);
+        } catch (error) {
+            console.error("Error fetching output:", error);
+        } finally {
+            setIsRunning(false);
+        }
+    };
+
+    const handlePauseClick = () => {
+        setIsRunning(false)
     }
 
     return (
@@ -52,7 +67,7 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
                 <button onClick={handlePlayClick} className="play-button">
                     <Play />
                 </button>
-                <button onClick={null} className="pause-button">
+                <button onClick={handlePauseClick} className="pause-button">
                     <Pause />
                 </button>
             </div>

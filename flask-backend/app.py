@@ -5,7 +5,7 @@ import random
 app = Flask(__name__)
 CORS(app)
 
-@app.route('/test', methods=['GET'])
+@app.route('/test', methods=['POST'])
 def test_server():
     try:
         random_number = random.randint(0, 100)
