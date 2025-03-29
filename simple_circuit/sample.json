@@ -1,7 +1,7 @@
 {
     "nodes": [
         {
-            "id": "0",
+            "id": "g0",
             "type": "and",
             "position": {
                 "x": 595.1678887382717,
@@ -17,7 +17,7 @@
             }
         },
         {
-            "id": "1",
+            "id": "0",
             "type": "input",
             "position": {
                 "x": 213.43565464022015,
@@ -33,7 +33,7 @@
             }
         },
         {
-            "id": "2",
+            "id": "1",
             "type": "default",
             "position": {
                 "x": 395.40111140419214,
@@ -49,7 +49,7 @@
             }
         },
         {
-            "id": "3",
+            "id": "2",
             "type": "default",
             "position": {
                 "x": 380.28430118871955,
@@ -65,7 +65,7 @@
             }
         },
         {
-            "id": "4",
+            "id": "3",
             "type": "default",
             "position": {
                 "x": 729.967251051208,
@@ -81,7 +81,7 @@
             }
         },
         {
-            "id": "5",
+            "id": "g1",
             "type": "or",
             "position": {
                 "x": 930.144463628194,
@@ -97,7 +97,7 @@
             }
         },
         {
-            "id": "6",
+            "id": "4",
             "type": "input",
             "position": {
                 "x": 689.5535449044835,
@@ -113,7 +113,7 @@
             }
         },
         {
-            "id": "7",
+            "id": "5",
             "type": "output",
             "position": {
                 "x": 1061.6018172632425,
@@ -132,44 +132,44 @@
     "edges": [
         {
             "id": "edge-1-2",
-            "source": "1",
-            "target": "2",
+            "source": "0",
+            "target": "1",
             "label": ""
         },
         {
             "id": "edge-2-0",
-            "source": "2",
-            "target": "0",
+            "source": "1",
+            "target": "g0",
             "label": ""
         },
         {
             "id": "edge-3-0",
-            "source": "3",
-            "target": "0",
+            "source": "2",
+            "target": "g0",
             "label": ""
         },
         {
             "id": "edge-0-4",
-            "source": "0",
-            "target": "4",
+            "source": "g0",
+            "target": "3",
             "label": ""
         },
         {
             "id": "edge-4-5",
-            "source": "4",
-            "target": "5",
+            "source": "3",
+            "target": "g1",
             "label": ""
         },
         {
             "id": "edge-6-5",
-            "source": "6",
-            "target": "5",
+            "source": "4",
+            "target": "g1",
             "label": ""
         },
         {
             "id": "edge-5-7",
-            "source": "5",
-            "target": "7",
+            "source": "g1",
+            "target": "5",
             "label": ""
         }
     ]

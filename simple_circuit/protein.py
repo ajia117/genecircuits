@@ -45,7 +45,7 @@ class Protein:
     
     def calcProdRate(self, proteinArray):
         rate = 0.0
-        for gate in self.mGates:
+        for i, gate in enumerate(self.mGates):
             rate += gate.regFunc(proteinArray)
         rate -= self.mDegradation * self.mInternalConc
         return rate

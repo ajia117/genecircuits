@@ -44,22 +44,22 @@ def parse_circuit(json_data):
             if len(input_sources) >= 2:
                 first, second = int(input_sources[0]), int(input_sources[1])
                 smush_gates[node_id] = Gate(gate_type, first, second)
-            current_protein_id += 1
+            # current_protein_id += 1
 
         elif node_type == 'input':
             # External protein
-            protein = Protein(current_protein_id, label, init_conc, hill, degrad, [], extConcFunc="x_pulse", extConcFuncArgs="x_args")
+            protein = Protein(current_protein_id, label, init_conc, hill, degrad, [])
             protein_array.append(protein)
             current_protein_id += 1
 
     return protein_array
 
-# Example usage
-if __name__ == "__main__":
-    with open("sample.json") as f:
-        data = json.load(f)
+# # Example usage
+# if __name__ == "__main__":
+#     with open("sample.json") as f:
+#         data = json.load(f)
 
-    proteins = parse_circuit(data)
-    for p in proteins:
-        print(f"Protein ID: {p.mID}, Name: {p.mName}, {(p.mInternalConc, p.mHill, p.mDegradation)}, Gates: {[ (g.mType, g.mFirstInput, g.mSecondInput) for g in p.mGates ]}")
+#     proteins = parse_circuit(data)
+#     for p in proteins:
+#         print(f"Protein ID: {p.mID}, Name: {p.mName}, {(p.mInternalConc, p.mHill, p.mDegradation)}, Gates: {[ (g.mType, g.mFirstInput, g.mSecondInput) for g in p.mGates ]}")
 
