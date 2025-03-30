@@ -11,7 +11,7 @@ def parse_circuit(json_data):
     nodes = {}
 
     for node in listOfNodes:
-        if (node['type'] in ['default', 'input', 'output']):
+        if (node['type'] in ['default', 'input', 'output', 'custom']):
             nodes[str(currNodeID)] = node
             id_map[node['id']] = currNodeID
             currNodeID += 1
@@ -48,11 +48,11 @@ def parse_circuit(json_data):
         label = node['data']['label']
         init_conc = node['data']['initialConcentration']
         hill = node['data']['hillCoefficient']
-        degrad = node['data']['degradationRate']
+        degrad = node['data']['lossRate']
 
         gates = []
 
-        if node_type in ['default', 'output']:
+        if node_type in ['default', 'output', 'custom']:
             # Determine the input sources to this protein
             input_sources = inputs.get(node_id, [])
             for src in input_sources:
@@ -74,7 +74,7 @@ def parse_circuit(json_data):
 
 #Example usage
 # if __name__ == "__main__":
-#     with open("sample.json") as f:
+#     with open("animals.json") as f:
 #         data = json.load(f)
 
 #     proteins = parse_circuit(data)
