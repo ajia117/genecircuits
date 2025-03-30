@@ -37,6 +37,7 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
 
     const handlePlayClick = async () => {
         const circuitJson = formatCircuitToJson(circuitSettings, nodes, edges);
+        console.log(circuitJson)
         setIsRunning(true);
         try {
             const res = await fetchOutput(circuitJson);
@@ -75,7 +76,7 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
                 </button>
             </div>
             <div className="ribbon-right">
-                
+                <p>{circuitSettings.circuitName}</p>                
             </div>
 
             {showConfirmation && (

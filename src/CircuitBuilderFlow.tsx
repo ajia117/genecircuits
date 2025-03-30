@@ -51,8 +51,15 @@ export default function CircuitBuilderFlow() {
         or: OrGateNode
     }), []);
 
-    let id = 0;
-    const getId = () => `${id++}`; // creates id for the next node
+    let nodeId = 0; // counter for protein nodes
+    let gateId = 0; // counter for gate nodes
+    const getId = (nodeType: string) => { // provide id for nodes
+        if (nodeType == "and" || nodeType == "or") {
+            return `g${gateId++}`
+        } else if (nodeType == "custom") {
+            return `${nodeId++}`
+        }
+    }; // creates id for the next node
 
     // Handler for connecting nodes
     const onConnect = useCallback(
@@ -144,7 +151,7 @@ export default function CircuitBuilderFlow() {
                 y: event.clientY,
             });
             const newNode = { // properties of new node being added
-                id: getId(),
+                id: getId(nodeType),
                 position,
                 type: nodeType,
                 data: nodeData
