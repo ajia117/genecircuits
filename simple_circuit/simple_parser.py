@@ -4,13 +4,30 @@ from collections import defaultdict
 
 # Parser function
 def parse_circuit(json_data):
-    nodes = {node['id']: node for node in json_data['nodes']}
-    edges = json_data['edges']
+    id_map = {}
+    currNodeID = 0
+    currGateID = 0
+    listOfNodes = [node for node in json_data['nodes']]
+    nodes = {}
+    for node in listOfNodes:
+        if (node['type'] in ['default', 'input', 'output']):
+            nodes[str(currNodeID)] = node
+            id_map[node['id']] = currNodeID
+            currNodeID += 1
+        else:
+            nodes["G" + str(currGateID)] = node
+            id_map[node['id']] = "G" + str(currGateID)
+            currGateID += 1
 
+    #nodes = {node['id']: node for node in json_data['nodes']}
+    edges = json_data['edges']
+            
     # Build adjacency list for inputs to each node
     inputs = defaultdict(list)
+
+    
     for edge in edges:
-        inputs[edge['target']].append(edge['source'])
+        inputs[str(id_map[edge['target']])].append(str(id_map[edge['source']]))
 
     protein_array = []
     current_protein_id = 0
@@ -54,12 +71,12 @@ def parse_circuit(json_data):
 
     return protein_array
 
-# # Example usage
-# if __name__ == "__main__":
-#     with open("sample.json") as f:
-#         data = json.load(f)
+#Example usage
+if __name__ == "__main__":
+    with open("sample.json") as f:
+        data = json.load(f)
 
-#     proteins = parse_circuit(data)
-#     for p in proteins:
-#         print(f"Protein ID: {p.mID}, Name: {p.mName}, {(p.mInternalConc, p.mHill, p.mDegradation)}, Gates: {[ (g.mType, g.mFirstInput, g.mSecondInput) for g in p.mGates ]}")
+    proteins = parse_circuit(data)
+    for p in proteins:
+        print(f"Protein ID: {p.mID}, Name: {p.mName}, {(p.mInternalConc, p.mHill, p.mDegradation)}, Gates: {[ (g.mType, g.mFirstInput, g.mSecondInput) for g in p.mGates ]}")
 
