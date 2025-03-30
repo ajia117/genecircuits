@@ -3,7 +3,7 @@ import { Rnd } from "react-rnd";
 import { Panel as ReactFlowPanel } from '@xyflow/react'; 
 import './OutputWindowStyles.css'
 
-export default function OutputWindow({ onClose, windowSettings, setWindowSettings }: { onClose: () => void, windowSettings: any, setWindowSettings: any }) {
+export default function OutputWindow({ onClose, windowSettings, setWindowSettings, outputData }: { onClose: () => void, windowSettings: any, setWindowSettings: any, outputData: any }) {
     return (
         <ReactFlowPanel>
             <Rnd
@@ -43,6 +43,10 @@ export default function OutputWindow({ onClose, windowSettings, setWindowSetting
                     {/* Output Content */}
                     <div className="flex-1 p-4 overflow-auto">
                         <p>This is where the simulation results will be displayed.</p>
+                        {outputData && 
+                            <p>{outputData.message}</p>
+                        }
+                        
                     </div>
                     </div>
                 

@@ -3,6 +3,7 @@ import { Play, Pause, Save, Trash, Graph } from "../../assets";
 import "./Ribbon.css";
 import { Node, Edge } from "@xyflow/react";
 import { formatCircuitToJson } from "../../utils/formatCircuitToJson"
+import { fetchOutput } from "../../utils/fetchOutput";
 import CircuitSettingsType from "../../types/CircuitSettingsType";
 import NodeData from "../../types/NodeData";
 
@@ -14,11 +15,13 @@ interface TopRibbonProps {
     setEdges: (edges: Edge[]) => void,
     showOutputWindow: boolean,
     setShowOutputWindow: (show: boolean) => void,
-    circuitSettings: CircuitSettingsType
+    circuitSettings: CircuitSettingsType,
+    setOutputData: (data: any)=>void
 }
 
-const TopRibbon: React.FC<TopRibbonProps> = ({ labelDataMap, nodes, setNodes, edges, setEdges, showOutputWindow, setShowOutputWindow, circuitSettings }) => {
+const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges, showOutputWindow, setShowOutputWindow, circuitSettings, setOutputData }) => {
     const [showConfirmation, setShowConfirmation] = useState(false);
+    const [isRunning, setIsRunning] = useState(false)
 
     const handleClear = () => {
         setShowConfirmation(true);
@@ -46,11 +49,27 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ labelDataMap, nodes, setNodes, ed
         });
     }
 
-    const handlePlayClick = () => {
+
+    const handlePlayClick = async () => {
         nodes = updateNodesWithLabels();
         setNodes(nodes); // see above comment for why this is unnecessary, but can be improved
-        const circuitJson = formatCircuitToJson(circuitSettings, nodes, edges)
-        setShowOutputWindow(true);
+        
+        const circuitJson = formatCircuitToJson(circuitSettings, nodes, edges);
+        console.log(circuitJson)
+        setIsRunning(true);
+        try {
+            const res = await fetchOutput(circuitJson);
+            setOutputData(res);
+            setShowOutputWindow(true);
+        } catch (error) {
+            console.error("Error fetching output:", error);
+        } finally {
+            setIsRunning(false);
+        }
+    };
+
+    const handlePauseClick = () => {
+        setIsRunning(false)
     }
 
     return (
@@ -62,19 +81,20 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ labelDataMap, nodes, setNodes, ed
                 <button onClick={handleClear} className="clear-button">
                     <Trash />
                 </button>
+                <button onClick={() => setShowOutputWindow(!showOutputWindow)} className="toggle-output-button">
+                    <Graph />
+                </button>
             </div>
             <div className="ribbon-center">
                 <button onClick={handlePlayClick} className="play-button">
                     <Play />
                 </button>
-                <button onClick={null} className="pause-button">
+                <button onClick={handlePauseClick} className="pause-button">
                     <Pause />
                 </button>
             </div>
             <div className="ribbon-right">
-                <button onClick={() => setShowOutputWindow(!showOutputWindow)} className="toggle-output-button">
-                    <Graph />
-                </button>
+                <p>{circuitSettings.circuitName}</p>                
             </div>
 
             {showConfirmation && (

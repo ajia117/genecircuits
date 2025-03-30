@@ -36,6 +36,7 @@ export default function CircuitBuilderFlow() {
     const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null); // Stores clicked node ID
     const [showOutputWindow, setShowOutputWindow] = useState<boolean>(false);
     const [outputWindowSettings, setOutputWindowSettings] = useState({x: 0, y: 0, width: 300, height:200})
+    const [outputData, setOutputData] = useState(); // Holds data received from backend to be used as graph
     const [labelDataMap, setLabelDataMap] = useState<{[label: string]: NodeData}>({});
 
     const circuitSettings = {
@@ -50,8 +51,15 @@ export default function CircuitBuilderFlow() {
         or: OrGateNode
     }), []);
 
-    let id = 0;
-    const getId = () => `${id++}`; // creates id for the next node
+    let nodeId = 0; // counter for protein nodes
+    let gateId = 0; // counter for gate nodes
+    const getId = (nodeType: string) => { // provide id for nodes
+        if (nodeType == "and" || nodeType == "or") {
+            return `g${gateId++}`
+        } else if (nodeType == "custom") {
+            return `${nodeId++}`
+        }
+    }; // creates id for the next node
 
     // Handler for connecting nodes
     const onConnect = useCallback(
@@ -143,7 +151,7 @@ export default function CircuitBuilderFlow() {
                 y: event.clientY,
             });
             const newNode = { // properties of new node being added
-                id: getId(),
+                id: getId(nodeType),
                 position,
                 type: nodeType,
                 data: nodeData
@@ -189,7 +197,7 @@ export default function CircuitBuilderFlow() {
     }
 
     const renderOutputWindow = () => {
-        return <OutputWindow onClose={() => setShowOutputWindow(false)} windowSettings={outputWindowSettings} setWindowSettings={setOutputWindowSettings} />;
+        return <OutputWindow onClose={() => setShowOutputWindow(false)} outputData={outputData} windowSettings={outputWindowSettings} setWindowSettings={setOutputWindowSettings} />;
     };
 
     const getSelectedNodeLabelData = () => {
@@ -209,8 +217,10 @@ export default function CircuitBuilderFlow() {
                 labelDataMap={labelDataMap}
                 nodes={nodes} setNodes={setNodes}
                 edges={edges} setEdges={setEdges}
-                showOutputWindow={showOutputWindow} setShowOutputWindow={setShowOutputWindow}
+                showOutputWindow={showOutputWindow} 
+                setShowOutputWindow={setShowOutputWindow}
                 circuitSettings={circuitSettings}
+                setOutputData={setOutputData}
             />
             
             <div className="bottom-container">
