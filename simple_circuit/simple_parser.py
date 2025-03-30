@@ -73,11 +73,11 @@ def parse_circuit(json_data):
     return protein_array
 
 #Example usage
-if __name__ == "__main__":
-    with open("sample.json") as f:
-        data = json.load(f)
+# if __name__ == "__main__":
+#     with open("sample.json") as f:
+#         data = json.load(f)
 
-    proteins = parse_circuit(data)
-    for p in proteins:
-        print(f"Protein ID: {p.mID}, Name: {p.mName}, {(p.mInternalConc, p.mHill, p.mDegradation)}, Gates: {[ (g.mType, g.mFirstInput, g.mSecondInput) for g in p.mGates ]}")
+#     proteins = parse_circuit(data)
+#     for p in proteins:
+#         print(f"Protein ID: {p.mID}, Name: {p.mName}, {(p.mInternalConc, p.mHill, p.mDegradation)}, Gates: {[ (g.mType, g.mFirstInput, g.mSecondInput) for g in p.mGates ]}")
 
