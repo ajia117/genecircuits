@@ -19,7 +19,7 @@ interface TopRibbonProps {
     setOutputData: (data: any)=>void
 }
 
-const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges, showOutputWindow, setShowOutputWindow, circuitSettings, setOutputData }) => {
+const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges, showOutputWindow, setShowOutputWindow, circuitSettings, setOutputData, labelDataMap }) => {
     const [showConfirmation, setShowConfirmation] = useState(false);
     const [isRunning, setIsRunning] = useState(false)
 
