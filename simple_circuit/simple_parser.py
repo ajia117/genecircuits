@@ -11,7 +11,7 @@ def parse_circuit(json_data):
     nodes = {}
 
     for node in listOfNodes:
-        if (node['type'] in ['default', 'input', 'output', 'custom']):
+        if (node['type'] in ['input', 'output', 'custom']):
             nodes[str(currNodeID)] = node
             id_map[node['id']] = currNodeID
             currNodeID += 1
@@ -52,7 +52,7 @@ def parse_circuit(json_data):
 
         gates = []
 
-        if node_type in ['default', 'output', 'custom']:
+        if node_type in ['output', 'custom']:
             # Determine the input sources to this protein
             input_sources = inputs.get(node_id, [])
             for src in input_sources:
@@ -73,11 +73,11 @@ def parse_circuit(json_data):
     return protein_array
 
 #Example usage
-# if __name__ == "__main__":
-#     with open("animals.json") as f:
-#         data = json.load(f)
+if __name__ == "__main__":
+    with open("animals.json") as f:
+        data = json.load(f)
 
-#     proteins = parse_circuit(data)
-#     for p in proteins:
-#         print(f"Protein ID: {p.mID}, Name: {p.mName}, {(p.mInternalConc, p.mHill, p.mDegradation)}, Gates: {[ (g.mType, g.mFirstInput, g.mSecondInput) for g in p.mGates ]}")
+    proteins = parse_circuit(data)
+    for p in proteins:
+        print(f"Protein ID: {p.mID}, Name: {p.mName}, {(p.mInternalConc, p.mHill, p.mDegradation)}, Gates: {[ (g.mType, g.mFirstInput, g.mSecondInput) for g in p.mGates ]}")
 
