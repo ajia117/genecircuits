@@ -9,6 +9,7 @@ def parse_circuit(json_data):
     currGateID = 0
     listOfNodes = [node for node in json_data['nodes']]
     nodes = {}
+
     for node in listOfNodes:
         if (node['type'] in ['default', 'input', 'output']):
             nodes[str(currNodeID)] = node
@@ -33,6 +34,14 @@ def parse_circuit(json_data):
     current_protein_id = 0
 
     smush_gates = {}
+    # set smush gates, which takes care of A --> gate --> B and makes it into A --> B
+    for node_id, node in nodes.items():
+        if node['type'] in ['and', 'or']:
+            gate_type = 'aa_and' if node['type'] == 'and' else 'aa_or'
+            input_sources = inputs.get(node_id, [])
+            if len(input_sources) >= 2:
+                first, second = int(input_sources[0]), int(input_sources[1])
+                smush_gates[node_id] = Gate(gate_type, first, second)
 
     for node_id, node in nodes.items():
         node_type = node['type']
@@ -54,14 +63,6 @@ def parse_circuit(json_data):
             protein = Protein(current_protein_id, label, init_conc, hill, degrad, gates)
             protein_array.append(protein)
             current_protein_id += 1
-
-        elif node_type in ['and', 'or']:
-            gate_type = 'aa_and' if node_type == 'and' else 'aa_or'
-            input_sources = inputs.get(node_id, [])
-            if len(input_sources) >= 2:
-                first, second = int(input_sources[0]), int(input_sources[1])
-                smush_gates[node_id] = Gate(gate_type, first, second)
-            # current_protein_id += 1
 
         elif node_type == 'input':
             # External protein
