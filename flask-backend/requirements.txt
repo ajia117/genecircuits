@@ -1,0 +1,7 @@
+flask
+python-dotenv
+pyinstaller
+flask-cors
+numpy
+biocircuits
+ipython

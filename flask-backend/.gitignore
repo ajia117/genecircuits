@@ -1,0 +1,7 @@
+flask-venv
+env
+dist
+build
+__pycache__
+# removes any env the user creates
+*env
