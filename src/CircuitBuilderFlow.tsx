@@ -26,6 +26,7 @@ import {
     CustomNode 
 } from './components';
 import NodeData from "./types/NodeData";
+import SelfConnectingEdge from "./components/Edges/SelfConnectingEdge";
 
 export default function CircuitBuilderFlow() {
     const reactFlowWrapper = useRef(null);
@@ -50,6 +51,9 @@ export default function CircuitBuilderFlow() {
         and: AndGateNode,
         or: OrGateNode
     }), []);
+    const edgeTypes = useMemo(() => ({
+        selfConnecting: SelfConnectingEdge,
+    }), []);
 
     let nodeId = 0; // counter for protein nodes
     let gateId = 0; // counter for gate nodes
@@ -66,13 +70,13 @@ export default function CircuitBuilderFlow() {
         (params: Connection) => {
             setEdges((eds) => {
                 const filteredEdges = eds.filter(edge => !(edge.source === params.source && edge.target === params.target));
-                
+                const selfConnection = params.source === params.target;
                 const newEdge: Edge = {
-                    ...params,
-                    id: `edge-${params.source}-${params.target}`,
-                    type: 'default',
-                    markerEnd: "promote"
-                };
+                        ...params,
+                        id: `edge-${params.source}-${params.target}`,
+                        type: `${selfConnection ? 'selfConnecting' : 'default'}`,
+                        markerEnd: "promote"
+                    };
                 
                 return [...filteredEdges, newEdge];
             });
@@ -269,6 +273,7 @@ export default function CircuitBuilderFlow() {
                             onEdgeClick={onEdgeClick}
                             onPaneClick={onPaneClick}
                             nodeTypes={nodeTypes}
+                            edgeTypes={edgeTypes}
                             fitView
                         >
                             <Background />
