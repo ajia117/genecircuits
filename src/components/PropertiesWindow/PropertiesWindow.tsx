@@ -22,6 +22,7 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
        }) => {
     // Add local state to store form values
     const [formValues, setFormValues] = useState<NodeData>(selectedNodeData);
+    const isGate = selectedNode && (selectedNode.type === 'and' || selectedNode.type === 'or');
 
     // Update local state when selectedNode changes
     useEffect(() => {
@@ -90,6 +91,12 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
 
     return (
         <div className={`h-full overflow-y-auto`}>
+            <h1>
+                Properties Window
+            </h1>
+            {(!(selectedNode || selectedEdgeId) || isGate) &&
+                <div>Select a Node or Edge to view properties </div>
+            }
             {selectedEdgeId && (
                 <>
                     <p>Change Marker for Edge: {selectedEdgeId}</p>
@@ -97,7 +104,7 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
                     <button onClick={() => changeMarkerType("repress")}>Repress</button>
                 </>
             )}
-            {selectedNodeId && selectedNode && (
+            {selectedNodeId && selectedNode && !isGate && (
                 <>
                     <p>Change Node Properties</p>
                     <form
@@ -122,10 +129,7 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
                             });
                         }}
                     >
-                        {/* Only show form if not a circuit gate */
-                         selectedNode.type !== 'and' &&
-                         selectedNode.type !== 'or'  &&
-                         formFields}
+                        {formFields}
                         <button type="submit">Update</button>
                     </form>
                 </>

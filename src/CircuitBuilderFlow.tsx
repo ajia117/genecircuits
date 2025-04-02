@@ -30,15 +30,20 @@ import SelfConnectingEdge from "./components/Edges/SelfConnectingEdge";
 
 export default function CircuitBuilderFlow() {
     const reactFlowWrapper = useRef(null);
+    const { screenToFlowPosition } = useReactFlow();
+
     const [nodes, setNodes, onNodesChange] = useNodesState([]); // List of all nodes in workspace
     const [edges, setEdges, onEdgesChange] = useEdgesState([]); // List of all edges in workspace
-    const { screenToFlowPosition } = useReactFlow();
     const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null); // Stores clicked edge ID
     const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null); // Stores clicked node ID
+
     const [showOutputWindow, setShowOutputWindow] = useState<boolean>(false);
     const [outputWindowSettings, setOutputWindowSettings] = useState({x: 0, y: 0, width: 300, height:200})
+
     const [outputData, setOutputData] = useState(); // Holds data received from backend to be used as graph
     const [labelDataMap, setLabelDataMap] = useState<{[label: string]: NodeData}>({});
+
+    const [activeTab, setActiveTab] = useState('toolbox');
 
     const circuitSettings = {
         circuitName: "test circuit",
@@ -231,28 +236,57 @@ export default function CircuitBuilderFlow() {
                 <PanelGroup className="circuit-builder-container" direction="horizontal">
                 {/* Left Pane (Toolbox + Properties Window) */}
                     <Panel className="left-pane min-w-128" defaultSize={30} maxSize={50}>
-                        <PanelGroup direction="vertical">
-                            <Panel className="toolbox-container" defaultSize={70} minSize={30} maxSize={90}>
-                                <Toolbox
-                                    labels={Object.keys(labelDataMap)}
-                                    getLabelData={getLabelData}
-                                />
-                            </Panel>
-                            <PanelResizeHandle className="resize-handle-horizontal" />
-                            <Panel className="properties-window" defaultSize={30} minSize={30} maxSize={90}>
-                                <h1 className={`m-0`}>Properties Window</h1>
-                                {(selectedNodeId || selectedEdgeId) && <PropertiesWindow
-                                    key={`${selectedNodeId || ''}-${selectedEdgeId || ''}`}
-                                    changeMarkerType={changeMarkerType}
-                                    changeLabelData={changeLabelData}
-                                    changeNodeData={changeNodeData}
-                                    selectedEdgeId={selectedEdgeId}
-                                    selectedNodeId={selectedNodeId}
-                                    selectedNode={getSelectedNode()}
-                                    selectedNodeData={getSelectedNodeLabelData()}
-                                />}
-                            </Panel>
-                        </PanelGroup>
+                        <div className="flex flex-col h-full">
+                            {/* Tab Navigation */}
+                            <div className="tab-navigation">
+                                <button
+                                    className={`tab-button ${activeTab === 'toolbox' ? 'tab-active' : ''}`}
+                                    onClick={() => setActiveTab('toolbox')}
+                                >
+                                    Toolbox
+                                </button>
+                                <button
+                                    className={`tab-button ${activeTab === 'properties' ? 'tab-active' : ''}`}
+                                    onClick={() => setActiveTab('properties')}
+                                >
+                                    Properties
+                                </button>
+                                <button
+                                    className={`tab-button ${activeTab === 'circuits' ? 'tab-active' : ''}`}
+                                    onClick={() => setActiveTab('circuits')}
+                                >
+                                    Circuits
+                                </button>
+                            </div>
+
+                            {/* Tab Content */}
+                            <div className="flex-grow overflow-auto">
+                                {/* Toolbox Tab */}
+                                <div className={`h-full`}>
+                                    {activeTab === 'toolbox' &&
+                                        <Toolbox
+                                            labels={Object.keys(labelDataMap)}
+                                            getLabelData={getLabelData}
+                                        />
+                                    }
+                                    {activeTab==='properties' &&
+                                        <PropertiesWindow
+                                            key={`${selectedNodeId || ''}-${selectedEdgeId || ''}`}
+                                            changeMarkerType={changeMarkerType}
+                                            changeLabelData={changeLabelData}
+                                            changeNodeData={changeNodeData}
+                                            selectedEdgeId={selectedEdgeId}
+                                            selectedNodeId={selectedNodeId}
+                                            selectedNode={getSelectedNode()}
+                                            selectedNodeData={getSelectedNodeLabelData()}
+                                        />
+                                    }
+                                    {activeTab==='circuits' &&
+                                        <h1>Prebuilt Circuits</h1>
+                                    }
+                                </div>
+                            </div>
+                        </div>
                     </Panel>
 
                     <PanelResizeHandle className="resize-handle-vertical"/>
