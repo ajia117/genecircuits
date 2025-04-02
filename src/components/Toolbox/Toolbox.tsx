@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import CreatableSelect from "react-select/creatable";
 import NodeData from "../../types/NodeData";
+import '../../index.css';
 
 interface ToolboxProps {
     labels: string[];
@@ -21,13 +22,13 @@ export const Toolbox: React.FC<ToolboxProps> = ({
     const [isNewLabel, setIsNewLabel] = useState(false);
     const genericNodeData: NodeData = {
         label: null,
-        initialConcentration: 0,
-        hillCoefficient: 0,
-        lossRate: 0,
-        beta: 0,
+        initialConcentration: 1,
+        hillCoefficient: 1,
+        lossRate: 1,
+        beta: 1,
         delay: 0,
-        inputs: 0,
-        outputs: 0
+        inputs: 1,
+        outputs: 1
     };
     const [nodeData, setNodeData] = useState<NodeData>(genericNodeData);
 
@@ -135,15 +136,31 @@ export const Toolbox: React.FC<ToolboxProps> = ({
                     /><br/>
                 </div>
             )}
+            const isReadOnly = (!!dropped || !isNewLabel);
             return (
                 <div key={key}>
                     {key.charAt(0).toUpperCase() + key.slice(1)}:<br/>
                     <input
-                        readOnly={(!!dropped || !isNewLabel)}
+                        readOnly={isReadOnly}
+                        name={key}
+                        type="range"
+                        min={0}
+                        max={1}
+                        step={.01}
+                        value={value as number || '0'}
+                        onChange={(e) => handleInputChange(key, isReadOnly ? value as number : Number(e.target.value))}
+                        style={{ cursor: isReadOnly ? "not-allowed" : "grab"}}
+                    />
+                    <input
+                        readOnly={isReadOnly}
                         name={key}
                         type="number"
+                        min={0}
+                        max={1}
+                        step={.01}
                         value={value as number || '0'}
                         onChange={(e) => handleInputChange(key, Number(e.target.value))}
+                        style={{ cursor: isReadOnly ? "not-allowed" : ""}}
                     /><br/>
                 </div>
             )
@@ -158,7 +175,7 @@ export const Toolbox: React.FC<ToolboxProps> = ({
                     AND Node
                 </div>
                 <div className="dndnode or" onDragStart={(event) => onDragStart(event, 'or')} draggable>
-                    OR Node
+                OR Node
                 </div>
                 <div className="mt-4 p-4 bg-gray-50 rounded shadow-sm">
                     <h3 className="text-lg font-medium mb-3">Choose existing Protein or Create New</h3>
