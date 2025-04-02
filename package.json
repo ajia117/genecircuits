@@ -7,7 +7,7 @@
   "scripts": {
     "start": "concurrently \"npm run start:frontend\" \"npm run start:backend\"",
     "start:frontend": "electron-forge start",
-    "start:backend": "cd flask-backend && flask run",
+    "start:backend": "cd flask-backend/dist/ && ./app",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
