@@ -1,18 +1,20 @@
 ## Getting Started
 1. Clone repo
-   1. If not integrating with the backend, skip to `6`
-2. cd into the flask-backend folder
-3. Setup a virtual environment
-   - `python3 -m venv env`
-   - `source env/bin/activate`
-4. Install requirements: `pip3 install -r requirements.txt`
-5. cd back to electron-react-flask-app directory
-6. Check you are using the correct versions of `node` and `npm`
-   - Use `node` version 18 and `npm` version 10
-   - To check your versions, run `node -v` or `npm -v`
-   - To change your version, run `nvm use 18`
-7. Run: `npm i`
-8. Start app: `npm run start`
+2. Setup Backend
+   1. Go to backend folder `cd react-flask-test/flask-backend`
+   2. Create a python environment of your choosing (must be `>=python3.10`, though in prod I will probably use python3.12)
+      1. For this, I recommend virtualenv.
+      2. Run `python3.xx -m venv flask-env`
+   3. `pip install -r requirements.txt`
+   4. `pyinstaller app.spec`
+3. Setup Frontend
+   1. Go back to top directory: `cd electron-react-flask-app` 
+   2. Check you are using the correct versions of `node` and `npm`
+      - Use `node` version 18 and `npm` version 10
+      - To check your versions, run `node -v` or `npm -v`
+      - To change your version, run `nvm use 18`
+   3. Run: `npm i`
+4. Start app: `npm run start`
 
 ## Setup Resources
 - Setup Electron app with React TypeScript: https://www.electronforge.io/guides/framework-integration/react-with-typescript

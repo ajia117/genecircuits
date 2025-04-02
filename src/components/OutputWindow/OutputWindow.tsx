@@ -1,9 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Rnd } from "react-rnd";
 import { Panel as ReactFlowPanel } from '@xyflow/react'; 
 import './OutputWindowStyles.css'
 
 export default function OutputWindow({ onClose, windowSettings, setWindowSettings, outputData }: { onClose: () => void, windowSettings: any, setWindowSettings: any, outputData: any }) {
+    const [dimensions, setDimensions] = useState({ width: windowSettings.width, height: windowSettings.height });
+
+    useEffect(() => {
+        setDimensions({ width: windowSettings.width, height: windowSettings.height });
+    }, [windowSettings.width, windowSettings.height]);
+
     return (
         <ReactFlowPanel>
             <Rnd
@@ -43,9 +49,24 @@ export default function OutputWindow({ onClose, windowSettings, setWindowSetting
                     {/* Output Content */}
                     <div className="flex-1 p-4 overflow-auto">
                         <p>This is where the simulation results will be displayed.</p>
-                        {outputData && 
-                            <p>{outputData.message}</p>
-                        }
+                        {/* {outputData &&
+                            <p>{JSON.stringify(outputData)}</p>
+                        } */}
+                        {outputData ? (
+                            <img
+                                src={outputData.data}
+                                alt="Simulation Output"
+                                className="object-contain"
+                                style={{
+                                    maxWidth: "100%",
+                                    maxHeight: "100%",
+                                    width: dimensions.width - 20,
+                                    height: dimensions.height - 50
+                                }}
+                            />
+                        ) : (
+                            <p className="text-center text-gray-400">No simulation output available.</p>
+                        )}
                         
                     </div>
                     </div>
