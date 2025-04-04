@@ -14,9 +14,9 @@
             },
             "data": {
                 "label": "red",
-                "initialConcentration": 0,
+                "initialConcentration": 2.5,
                 "hillCoefficient": 0,
-                "lossRate": 0,
+                "lossRate": 1,
                 "beta": 0,
                 "delay": 0,
                 "inputs": 1,

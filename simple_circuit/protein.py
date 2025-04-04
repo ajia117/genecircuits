@@ -43,6 +43,18 @@ class Protein:
             rate += gate.regFunc(proteinArray)
         rate -= self.mDegradation * self.mInternalConc
         return rate
+    
+    def __eq__(self, other):
+        return (
+            isinstance(other, Protein) and
+            self.mID == other.mID and
+            self.mName == other.mName and
+            self.mInternalConc == other.mInternalConc and
+            self.mDegradation == other.mDegradation and
+            self.mGates == other.mGates and
+            self.mExtConcFunc == other.mExtConcFunc and
+            self.mExtConcFuncArgs == other.mExtConcFuncArgs
+        )
 
 class Gate:
     def __init__(self, type, *, firstInput, secondInput = None, firstHill = 1, secondHill = 1):
@@ -83,3 +95,13 @@ class Gate:
         
     def regFunc(self, proteinArray):
         return self.regFuncLambda(proteinArray)
+    
+    def __eq__(self, other):
+        return (
+            isinstance(other, Gate) and
+            self.mType == other.mType and
+            self.mFirstInput == other.mFirstInput and
+            self.mSecondInput == other.mSecondInput and 
+            self.mFirstHill == other.mFirstHill and
+            self.mSecondHill == other.mSecondHill
+        )
