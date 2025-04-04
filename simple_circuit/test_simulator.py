@@ -16,8 +16,7 @@ def test_ffl_simulation():
     x_args = (0, 2, 2, 1.0, 0.5)
 
     # Create a list of proteins
-    # TODO: change hill coefficients to be dependent on combinations of two proteins
-    proteinArray = [Protein(0, "Protein 0", 0.0, 3, 1, [], x_pulse, x_args), Protein(1, "Protein 1", 0.0, 3, 1, [Gate("act_hill", 0, 0)]), Protein(2, "Protein 2", 0.0, 3, 1, [Gate("aa_and", 0, 1)])]
+    proteinArray = [Protein(0, "Protein 0", 0.0, 1, [], x_pulse, x_args), Protein(1, "Protein 1", 0.0, 1, [Gate("act_hill", firstInput=0)]), Protein(2, "Protein 2", 0.0, 1, [Gate("aa_and", firstInput=0, secondInput=1, firstHill=3, secondHill=3)])]
 
     # Run the simulation
     duration = 20
@@ -55,7 +54,7 @@ def test_xor_simulation():
 
     a_args = (0, 40, 30, 2, 0.5)
     b_args = (15, 50, 20, 2, 1)
-    proteinArray = [Protein(0, "Protein A", 0.0, 1, 0.0, [], x_pulse, a_args), Protein(1, "Protein B", 0.0, 1, 0.00, [],  x_pulse, b_args), Protein(2, "Protein C", 0.0, 2, 0.1, [Gate("aa_and", 0, 1)]), Protein(3, "Protein D", 0.0, 2, 0.1, [Gate("aa_or", 0, 1)]), Protein(4, "Protein E", 0.0, 0, 0.2, [Gate("ar_and", 3, 2)])]
+    proteinArray = [Protein(0, "Protein A", 0.0, 0.0, [], x_pulse, a_args), Protein(1, "Protein B", 0.0, 0.00, [],  x_pulse, b_args), Protein(2, "Protein C", 0.0, 0.1, [Gate("aa_and", firstInput=0, secondInput=1)]), Protein(3, "Protein D", 0.0, 0.1, [Gate("aa_or", firstInput=0, secondInput=1)]), Protein(4, "Protein E", 0.0, 0.2, [Gate("ar_and", firstInput=3, secondInput=2, firstHill=2, secondHill=2)])]
 
     final_concentrations = run_simulation(t, proteinArray)
     assert np.allclose(final_concentrations, expected_concentrations, atol=1e-5)
