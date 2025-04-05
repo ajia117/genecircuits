@@ -3,7 +3,7 @@ import { Play, Pause, Save, Trash, Graph, SettingsSlider } from "../../assets";
 import "./Ribbon.css";
 import { Node, Edge } from "@xyflow/react";
 import { formatCircuitToJson } from "../../utils/formatCircuitToJson"
-import { fetchOutput } from "../../utils/fetchOutput";
+import { fetchOutput, abortFetch } from "../../utils/fetchOutput";
 import CircuitSettingsType from "../../types/CircuitSettingsType";
 import NodeData from "../../types/NodeData";
 import useClickOutside from "../../utils/hooks/useClickOutside";
@@ -77,6 +77,7 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
     };
 
     const handlePauseClick = () => {
+        abortFetch()
         setIsRunning(false)
     }
 
@@ -94,12 +95,16 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
                 </button>
             </div>
             <div className="ribbon-center">
-                <button onClick={handlePlayClick} className="play-button">
-                    <Play />
-                </button>
-                <button onClick={handlePauseClick} className="pause-button">
-                    <Pause />
-                </button>
+                {isRunning ? 
+                    <button onClick={handlePauseClick} className="pause-button">
+                        <Pause />
+                    </button>
+                    :
+                    <button onClick={handlePlayClick} className="play-button">
+                        <Play />
+                    </button>
+                }
+                
                 <button onClick={() => setShowSettingsWindow(prev => !prev)} className="circuitSettings-button">
                     <SettingsSlider />
                 </button>
@@ -108,10 +113,11 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
                 <p>{circuitSettings.projectName}</p>                
             </div>
 
+            {/* CONFIRMATION WINDOW */}
             {showConfirmation && (
                 <div className="ribbon-overlay">
                     <div className="confirmation-window" ref={confirmationRef}>
-                        <button className="close-button" onClick={() => setShowSettingsWindow(false)}>×</button>
+                        <button className="close-button" onClick={cancelClear}>×</button>
                         <h2>Are you sure you want to clear the screen?</h2>
                         <div className="confirmation-buttons">
                             <button onClick={confirmClear} className="confirm">Clear</button>
@@ -121,10 +127,11 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
                 </div>
             )}
 
+            {/* SETTINGS WINDOW */}
             {showSettingsWindow && (
                 <div className="settings-popup-container">
                     <div className="settings-window">
-                        <button className="close-button" onClick={cancelClear}>×</button>
+                        <button className="close-button" onClick={() => setShowSettingsWindow(false)}>×</button>
                         <h2>Circuit Settings</h2>
                         <label>
                             Project Name:
