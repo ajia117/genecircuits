@@ -2,11 +2,11 @@
 
 
 a = Analysis(
-    ['app.py'],
+    ['app.py', 'simulate.py'],
     pathex=[],
     binaries=[],
     datas=[],
-    hiddenimports=[],
+    hiddenimports=['IPython', 'IPython.display'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],

@@ -4,3 +4,4 @@ pyinstaller
 flask-cors
 numpy
 biocircuits
+ipython
