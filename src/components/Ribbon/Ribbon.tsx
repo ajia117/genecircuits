@@ -105,7 +105,7 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
                 </button>
             </div>
             <div className="ribbon-right">
-                <p>{circuitSettings.circuitName}</p>                
+                <p>{circuitSettings.projectName}</p>                
             </div>
 
             {showConfirmation && (
@@ -127,12 +127,12 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
                         <button className="close-button" onClick={cancelClear}>×</button>
                         <h2>Circuit Settings</h2>
                         <label>
-                            Circuit Name:
+                            Project Name:
                             <input
                                 type="text"
-                                value={circuitSettings.circuitName}
+                                value={circuitSettings.projectName}
                                 onChange={(e) =>
-                                    setCircuitSettings({ ...circuitSettings, circuitName: e.target.value })
+                                    setCircuitSettings({ ...circuitSettings, projectName: e.target.value })
                                 }
                             />
                         </label>

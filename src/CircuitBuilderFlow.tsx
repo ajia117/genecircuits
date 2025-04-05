@@ -46,7 +46,7 @@ export default function CircuitBuilderFlow() {
     const [activeTab, setActiveTab] = useState('toolbox');
 
     const [circuitSettings, setCircuitSettings] = useState({
-        circuitName: "test circuit",
+        projectName: "Untitled Project",
         simulationDuration: 20,
         numTimePoints: 10
     });
