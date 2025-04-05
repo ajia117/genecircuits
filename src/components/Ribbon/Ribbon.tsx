@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Play, Pause, Save, Trash, Graph } from "../../assets";
+import { Play, Pause, Save, Trash, Graph, SettingsSlider } from "../../assets";
 import "./Ribbon.css";
 import { Node, Edge } from "@xyflow/react";
 import { formatCircuitToJson } from "../../utils/formatCircuitToJson"
@@ -16,12 +16,16 @@ interface TopRibbonProps {
     showOutputWindow: boolean,
     setShowOutputWindow: (show: boolean) => void,
     circuitSettings: CircuitSettingsType,
+    setCircuitSettings: (settings: CircuitSettingsType) => void,
     setOutputData: (data: any)=>void
 }
 
-const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges, showOutputWindow, setShowOutputWindow, circuitSettings, setOutputData, labelDataMap }) => {
+const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges, showOutputWindow, setShowOutputWindow, circuitSettings, setCircuitSettings, setOutputData, labelDataMap }) => {
     const [showConfirmation, setShowConfirmation] = useState(false);
     const [isRunning, setIsRunning] = useState(false)
+    const [showSettingsWindow, setShowSettingsWindow] = useState(false);
+
+
 
     const handleClear = () => {
         setShowConfirmation(true);
@@ -92,6 +96,9 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
                 <button onClick={handlePauseClick} className="pause-button">
                     <Pause />
                 </button>
+                <button onClick={() => setShowSettingsWindow(true)} className="circuitSettings-button">
+                    <SettingsSlider />
+                </button>
             </div>
             <div className="ribbon-right">
                 <p>{circuitSettings.circuitName}</p>                
@@ -108,6 +115,49 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
                     </div>
                 </div>
             )}
+
+            {showSettingsWindow && (
+                <div className="ribbon-overlay">
+                    <div className="settings-window">
+                        <h2>Circuit Settings</h2>
+                        <label>
+                            Circuit Name:
+                            <input
+                                type="text"
+                                value={circuitSettings.circuitName}
+                                onChange={(e) =>
+                                    setCircuitSettings({ ...circuitSettings, circuitName: e.target.value })
+                                }
+                            />
+                        </label>
+                        <label>
+                            Simulation Duration:
+                            <input
+                                type="number"
+                                value={circuitSettings.simulationDuration}
+                                onChange={(e) =>
+                                    setCircuitSettings({ ...circuitSettings, simulationDuration: parseInt(e.target.value) })
+                                }
+                            />
+                        </label>
+                        <label>
+                            Number of Time Points:
+                            <input
+                                type="number"
+                                value={circuitSettings.numTimePoints}
+                                onChange={(e) =>
+                                    setCircuitSettings({ ...circuitSettings, numTimePoints: parseInt(e.target.value) })
+                                }
+                            />
+                        </label>
+                        <div className="confirmation-buttons">
+                            <button className="confirm" onClick={() => setShowSettingsWindow(false)}>Save</button>
+                            <button className="cancel" onClick={() => setShowSettingsWindow(false)}>Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 };

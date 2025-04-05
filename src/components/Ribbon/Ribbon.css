@@ -107,3 +107,26 @@ button:hover svg {
     background: #5bc0de;
     color: white;
 }
+
+/* CIRCUIT SETTINGS WINDOW */
+.settings-window {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    width: 300px;
+    text-align: left;
+}
+
+.settings-window label {
+    display: block;
+    margin: 10px 0;
+}
+
+.settings-window input {
+    width: 100%;
+    padding: 6px;
+    margin-top: 4px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}

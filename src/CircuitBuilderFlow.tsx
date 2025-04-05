@@ -45,11 +45,12 @@ export default function CircuitBuilderFlow() {
 
     const [activeTab, setActiveTab] = useState('toolbox');
 
-    const circuitSettings = {
+    const [circuitSettings, setCircuitSettings] = useState({
         circuitName: "test circuit",
         simulationDuration: 20,
         numTimePoints: 10
-    }
+    });
+    
 
     const nodeTypes = useMemo(() => ({
         custom: CustomNode,
@@ -229,6 +230,7 @@ export default function CircuitBuilderFlow() {
                 showOutputWindow={showOutputWindow} 
                 setShowOutputWindow={setShowOutputWindow}
                 circuitSettings={circuitSettings}
+                setCircuitSettings={setCircuitSettings}
                 setOutputData={setOutputData}
             />
             
