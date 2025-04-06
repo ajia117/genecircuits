@@ -2,10 +2,34 @@ import numpy as np
 import pytest
 from simulate import run_simulation, x_pulse
 from protein import Protein, Gate
+import bokeh.plotting as bp
+from   bokeh.io import output_file
+import bokeh.application
 
 def runAllTests():
     test_ffl_simulation()
     test_xor_simulation()
+
+def plot_results(t, final_concentrations, title):
+    # Create a plot for the results
+    p = bp.figure(width=500,
+                  height=300,
+                  x_axis_label='dimensionless time',
+                  y_axis_label='dimensionless concentrations',
+                  title=title)
+
+    # Populate glyphs
+    colors = bokeh.palettes.d3['Category10'][10]
+    for i in range(final_concentrations.shape[1]):
+        p.line(t, final_concentrations[:, i], line_width=2, color=colors[i], legend_label=f'Protein {i}')
+
+    # Place the legend
+    p.legend.location = 'bottom_right'
+
+    # Show plot
+    output_file(f"{title}.html")
+    layout = bokeh.layouts.column(p)
+    bokeh.io.show(layout)
 
 def test_ffl_simulation():
     # Specify expected results. These are based on the ../biocircuits_experimentation/ffl_biocircuit.py script
@@ -27,7 +51,7 @@ def test_ffl_simulation():
     final_concentrations = run_simulation(t, proteinArray)
 
     # write results to file
-    with open("simulation_test_data/ffl_short_actual_results.txt", "w") as f:
+    with open("simulation_test_data/ffl_short_actual_results.log", "w") as f:
         np.savetxt(f, final_concentrations, comments='')
 
     # compare results to expected
@@ -46,7 +70,7 @@ def test_ffl_simulation():
 
     final_concentrations = run_simulation(t, proteinArray)
     # write results to file
-    with open("simulation_test_data/ffl_long_actual_results.txt", "w") as f:
+    with open("simulation_test_data/ffl_long_actual_results.log", "w") as f:
         np.savetxt(f, final_concentrations, comments='')
      # compare results to expected
     assert np.allclose(final_concentrations, expected_long_concentrations, atol=1e-5)
@@ -66,16 +90,39 @@ def test_xor_simulation():
     final_concentrations = run_simulation(t, proteinArray)
     
     # write results to file
-    with open("simulation_test_data/xor_actual_results.txt", "w") as f:
+    with open("simulation_test_data/xor_actual_results.log", "w") as f:
         np.savetxt(f, final_concentrations, comments='')
     
     assert np.allclose(final_concentrations, expected_concentrations, atol=1e-5)
+
+def test_i1_ffl_simulation():
+    # Specify expected results. These are based on the ../biocircuits_experimentation/xor_circuit.py script
+    expected_concentrations = np.loadtxt("simulation_test_data/i1_ffl_results.txt")
+    n = 200
+    gamma = 1
+    n_xy, n_yz = 3, 3
+    n_xz = 5
+    t_stepdown = np.inf
+    duration = 10
+    x_0 = 1.0
+    t = np.linspace(0, duration, n)
+    x_args = (0.04, t_stepdown,duration, x_0, 1)
+
+    proteinArray = [Protein(0, "Protein X", 0.0, 0.0, [], x_pulse, x_args), Protein(1, "Protein Y", 0.0, gamma, [Gate("act_hill", firstInput=0, firstHill=n_xy)], None, None), Protein(2, "Protein Z", 0.0, gamma, [Gate("ar_and", firstInput=0, secondInput=1, firstHill=n_xz, secondHill=n_yz)])]
+
+    final_concentrations = run_simulation(t, proteinArray)
+    plot_results(t, final_concentrations, "I1 FFL Simulation Results")
+
+    # write out to file
+    with open("simulation_test_data/i1_ffl_actual_results.log", "w") as f:
+        np.savetxt(f, final_concentrations, comments='')
+    assert np.allclose(final_concentrations, expected_concentrations, atol=1e-1) # Tolerance is 0.1
 
 
 # TODO: handle command line args, to run individual tests if desired
 def main():
     print("Running all test cases...")
-    pytest.main(["-v", "test_simulator.py::test_ffl_simulation", "test_simulator.py::test_xor_simulation"])
+    pytest.main(["-v", "test_simulator.py::test_ffl_simulation", "test_simulator.py::test_xor_simulation", "test_simulator.py::test_i1_ffl_simulation"])
 
 # Run the script
 if __name__ == '__main__':

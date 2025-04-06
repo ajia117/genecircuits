@@ -6,3 +6,6 @@ python ffl.py
 
 echo "Running xor.py..."
 python xor.py
+
+echo "Running i1_ffl.py..."
+python i1_ffl.py
