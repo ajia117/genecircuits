@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Play, Pause, Save, Trash, Graph, SettingsSlider } from "../../assets";
+// import { Play, Pause, Save, Trash, Graph, SettingsSlider } from "../../assets";
 import "./Ribbon.css";
 import { Node, Edge } from "@xyflow/react";
 import { formatCircuitToJson } from "../../utils/formatCircuitToJson"
@@ -7,7 +7,18 @@ import { fetchOutput, abortFetch } from "../../utils/fetchOutput";
 import CircuitSettingsType from "../../types/CircuitSettingsType";
 import NodeData from "../../types/NodeData";
 import useClickOutside from "../../utils/hooks/useClickOutside";
-
+import {
+    Play,
+    Pause,
+    Save,
+    Trash2,
+    ChartArea,
+    Settings,
+    Download,
+    FolderOpen,
+    X,
+    Dna,
+  } from "lucide-react";
 
 interface TopRibbonProps {
     labelDataMap: {[label: string]: NodeData},
@@ -84,33 +95,45 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
     return (
         <div className="top-ribbon-container">
             <div className="ribbon-left">
-                <button onClick={null} className="save-button">
-                    <Save />
+                <Dna className="icon" />
+                <h3 className="app-title">Genetic Circuits Builder</h3>
+                <button className="icon-button" title="Open/Import">
+                    <FolderOpen className="icon" />
                 </button>
-                <button onClick={handleClear} className="clear-button">
-                    <Trash />
+                <button className="icon-button" title="Save">
+                    <Save className="icon" />
                 </button>
-                <button onClick={() => setShowOutputWindow(!showOutputWindow)} className="toggle-output-button">
-                    <Graph />
+                <button className="icon-button" title="Export">
+                    <Download className="icon" />
                 </button>
             </div>
             <div className="ribbon-center">
-                {isRunning ? 
-                    <button onClick={handlePauseClick} className="pause-button">
-                        <Pause />
-                    </button>
-                    :
-                    <button onClick={handlePlayClick} className="play-button">
-                        <Play />
-                    </button>
-                }
-                
-                <button onClick={() => setShowSettingsWindow(prev => !prev)} className="circuitSettings-button">
-                    <SettingsSlider />
-                </button>
+                <input
+                type="text"
+                className="project-input"
+                value={circuitSettings.projectName}
+                onChange={(e) => setCircuitSettings({ ...circuitSettings, projectName: e.target.value })}
+                />
             </div>
             <div className="ribbon-right">
-                <p>{circuitSettings.projectName}</p>                
+                {isRunning ? 
+                    <button onClick={handlePauseClick} className="pause-button">
+                        <Pause className="icon" /> Pause
+                    </button>
+                    :
+                    <button onClick={handlePlayClick} className="run-button">
+                        <Play className="icon" /> Run Simulation
+                    </button>
+                }
+                <button className="icon-button" onClick={() => setShowOutputWindow(!showOutputWindow)} title="Toggle Output">
+                    {showOutputWindow ? <X className="icon" /> : <ChartArea className="icon" />}
+                </button>
+                <button className="icon-button" onClick={handleClear} title="Clear Canvas">
+                    <Trash2 className="icon" />
+                </button>
+                <button className="icon-button" onClick={() => setShowSettingsWindow(!showSettingsWindow)} title="Settings">
+                    <Settings className="icon" />
+                </button>
             </div>
 
             {/* CONFIRMATION WINDOW */}

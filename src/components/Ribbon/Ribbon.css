@@ -42,30 +42,6 @@ button {
     padding: 5px;
 }
 
-button svg {
-    width: 24px;
-    height: 24px;
-    stroke-width: 1.5;
-    stroke: #333; /* Ensures consistency */
-    fill: none; /* Keeps icons from being filled */
-    transition: stroke-width 0.2s ease, transform 0.2s ease, stroke 0.2s ease;
-}
-
-button:hover svg {
-    stroke: #007bff;
-    stroke-width: 2; /* Slightly thicker on hover */
-    transform: scale(1.1);
-}
-
-@media (max-width: 768px) {
-    button svg {
-        width: 20px;
-        height: 20px;
-        stroke-width: 1.2;
-    }
-}
-
-
 .ribbon-overlay {
     position: fixed;
     top: 0;
