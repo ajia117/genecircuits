@@ -18,7 +18,17 @@ import {
     FolderOpen,
     X,
     Dna,
-  } from "lucide-react";
+} from "lucide-react";
+import {
+    Flex,
+    Box,
+    Text,
+    TextField,
+    IconButton,
+    Button,
+    Tooltip,
+    Dialog,
+} from "@radix-ui/themes";
 
 interface TopRibbonProps {
     labelDataMap: {[label: string]: NodeData},
@@ -97,7 +107,7 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
             <div className="ribbon-left">
                 <Dna className="icon" />
                 <h3 className="app-title">Genetic Circuits Builder</h3>
-                <button className="icon-button" title="Open/Import">
+                {/* <button className="icon-button" title="Open/Import">
                     <FolderOpen className="icon" />
                 </button>
                 <button className="icon-button" title="Save">
@@ -105,35 +115,63 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
                 </button>
                 <button className="icon-button" title="Export">
                     <Download className="icon" />
-                </button>
+                </button> */}
+                <Tooltip content="Open/Import">
+                    <IconButton variant="outline" size="3" color="gray">
+                    <FolderOpen />
+                    </IconButton>
+                </Tooltip>
+
+                <Tooltip content="Save">
+                    <IconButton variant="outline" size="3" color="gray">
+                    <Save />
+                    </IconButton>
+                </Tooltip>
+
+                <Tooltip content="Export">
+                    <IconButton variant="outline" size="3" color="gray">
+                    <Download />
+                    </IconButton>
+                </Tooltip>
             </div>
             <div className="ribbon-center">
                 <input
                 type="text"
                 className="project-input"
                 value={circuitSettings.projectName}
-                onChange={(e) => setCircuitSettings({ ...circuitSettings, projectName: e.target.value })}
+                onChange={(e: any) => setCircuitSettings({ ...circuitSettings, projectName: e.target.value })}
                 />
             </div>
             <div className="ribbon-right">
-                {isRunning ? 
-                    <button onClick={handlePauseClick} className="pause-button">
-                        <Pause className="icon" /> Pause
-                    </button>
-                    :
-                    <button onClick={handlePlayClick} className="run-button">
-                        <Play className="icon" /> Run Simulation
-                    </button>
-                }
-                <button className="icon-button" onClick={() => setShowOutputWindow(!showOutputWindow)} title="Toggle Output">
-                    {showOutputWindow ? <X className="icon" /> : <ChartArea className="icon" />}
-                </button>
-                <button className="icon-button" onClick={handleClear} title="Clear Canvas">
-                    <Trash2 className="icon" />
-                </button>
-                <button className="icon-button" onClick={() => setShowSettingsWindow(!showSettingsWindow)} title="Settings">
-                    <Settings className="icon" />
-                </button>
+                <Button
+                    variant="solid"
+                    size="3"
+                    className="bg-emerald-600 hover:bg-emerald-700"
+                    onClick={handlePlayClick}
+                >
+                    <Play className="h-4 w-4 mr-2" />
+                    Run Simulation
+                </Button>
+
+
+                <Tooltip content={showOutputWindow ? "Close Output" : "Show Output"}>
+                    <IconButton variant="outline" size="3" color="gray" onClick={() => setShowOutputWindow(!showOutputWindow)}>
+                    {showOutputWindow ? <X /> : <ChartArea />}
+                    </IconButton>
+                </Tooltip>
+
+                <Tooltip content="Clear Canvas">
+                    <IconButton variant="outline" size="3" color="gray" onClick={handleClear}>
+                    <Trash2 />
+                    </IconButton>
+                </Tooltip>
+
+                <Tooltip content="Settings">
+                    <IconButton variant="outline" size="3" color="gray" onClick={() => setShowSettingsWindow(!showSettingsWindow)}>
+                    <Settings />
+                    </IconButton>
+                </Tooltip>
+
             </div>
 
             {/* CONFIRMATION WINDOW */}
