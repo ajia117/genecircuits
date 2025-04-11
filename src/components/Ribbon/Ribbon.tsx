@@ -30,7 +30,8 @@ import {
     Tooltip,
     Dialog,
     Theme,
-    DropdownMenu
+    DropdownMenu,
+    Slider
 } from "@radix-ui/themes";
 
 interface TopRibbonProps {
@@ -190,17 +191,20 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
             {/* CLEAR CONFIRMATION WINDOW */}
             <Dialog.Root open={showClearConfirmation} onOpenChange={setShowClearConfirmation}>
                 <Dialog.Content maxWidth="500px">
-                <Dialog.Title>Are you sure you want to clear the screen?</Dialog.Title>
+                    <Flex justify="between">
+                        <Dialog.Title mt="1">Are you sure you want to clear the screen?</Dialog.Title>
+                        <Dialog.Close><IconButton variant="ghost" color="gray"><X /></IconButton></Dialog.Close>
+                    </Flex>
                 <Dialog.Description mb="4">
                     This action cannot be undone. All unsaved changes will be lost.
                 </Dialog.Description>
 
                 <Flex justify="center" gap="3" mt="3">
                     <Dialog.Close>
-                        <Button color="red" onClick={confirmClear}>Clear</Button>
+                        <Button color="red" size="3" onClick={confirmClear}>Clear</Button>
                     </Dialog.Close>
                     <Dialog.Close>
-                        <Button variant="soft" color="gray" onClick={cancelClear}>Cancel</Button>
+                        <Button variant="soft" color="gray" size="3" onClick={cancelClear}>Cancel</Button>
                     </Dialog.Close>
                 </Flex>
                 </Dialog.Content>
@@ -208,48 +212,77 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
 
 
             {/* SETTINGS WINDOW */}
-            {showSettingsWindow && (
-                <div className="settings-popup-container">
-                    <div className="settings-window">
-                        <button className="close-button" onClick={() => setShowSettingsWindow(false)}>×</button>
-                        <h2>Circuit Settings</h2>
+            <Dialog.Root open={showSettingsWindow} onOpenChange={setShowSettingsWindow}>
+                <Dialog.Content maxWidth="400px">
+                    <Flex justify="between">
+                        <Dialog.Title mt="1">Circuit Settings</Dialog.Title>
+                        <Dialog.Close><IconButton variant="ghost" color="gray"><X /></IconButton></Dialog.Close>
+                    </Flex>
+                    <Dialog.Description mb="3">Make changes to your project settings.</Dialog.Description>
+                
+                    <Flex direction="column" gap="3" mt="4">
                         <label>
-                            Project Name:
-                            <input
-                                type="text"
-                                value={circuitSettings.projectName}
-                                onChange={(e) =>
-                                    setCircuitSettings({ ...circuitSettings, projectName: e.target.value })
-                                }
-                            />
+                            <Text as="div" weight="bold">
+                                Project Name:
+                            </Text>
                         </label>
+                        <TextField.Root
+                            defaultValue="Untitled Project"
+                            placeholder="Enter your full name"
+                            mb="2"
+                            value={circuitSettings.projectName}
+                            onChange={(e) => setCircuitSettings({ ...circuitSettings, projectName: e.target.value })}
+                        />
+                        
+                        {/* simulation duration */}
                         <label>
-                            Simulation Duration:
-                            <input
+                            <Text as="div" size="2" weight="bold">Simulation Duration (seconds):</Text>
+                        </label>
+                        <Flex gap="3" align="center">
+                            <Slider
+                                id="simulation-duration"
+                                min={1}
+                                max={120}
+                                step={1}
+                                value={[circuitSettings.simulationDuration]}
+                                onValueChange={(value) => setCircuitSettings({ ...circuitSettings, simulationDuration: value[0] })}
+                                className="flex-1"
+                            />
+                            <TextField.Root
                                 type="number"
                                 value={circuitSettings.simulationDuration}
-                                onChange={(e) =>
-                                    setCircuitSettings({ ...circuitSettings, simulationDuration: parseInt(e.target.value) })
-                                }
+                                onChange={(e) => setCircuitSettings({ ...circuitSettings, simulationDuration: parseInt(e.target.value) })}
+                                className="w-20"
                             />
-                        </label>
+                        </Flex>
+
+                        {/* num time points */}
                         <label>
-                            Number of Time Points:
-                            <input
+                            <Text as="div" size="2" weight="bold">Number of Time Points:</Text>
+                        </label>
+                        <Flex gap="3" align="center">
+                            <Slider
+                                id="time-points"
+                                min={1}
+                                max={100}
+                                step={1}
+                                value={[circuitSettings.numTimePoints]}
+                                onValueChange={(value) => setCircuitSettings({ ...circuitSettings, numTimePoints: value[0] })}
+                                className="flex-1"
+                            />
+                            <TextField.Root
                                 type="number"
                                 value={circuitSettings.numTimePoints}
-                                onChange={(e) =>
-                                    setCircuitSettings({ ...circuitSettings, numTimePoints: parseInt(e.target.value) })
-                                }
+                                onChange={(e) => setCircuitSettings({ ...circuitSettings, numTimePoints: parseInt(e.target.value) })}
+                                className="w-20"
                             />
-                        </label>
-                        <div className="confirmation-buttons">
-                            <button className="confirm" onClick={() => setShowSettingsWindow(false)}>Save</button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
+                        </Flex>
+                    </Flex>
+                
+                    <Flex justify="end" mt="5"><Dialog.Close><Button size="3">Close</Button></Dialog.Close></Flex>
+                </Dialog.Content>
+            </Dialog.Root>
+            
 
         </Theme>
     );
