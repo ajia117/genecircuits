@@ -33,6 +33,7 @@ import {
     DropdownMenu,
     Slider
 } from "@radix-ui/themes";
+import ImportWindow from "../ImportWindow";
 
 interface TopRibbonProps {
     labelDataMap: {[label: string]: NodeData},
@@ -51,6 +52,7 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
     const [showClearConfirmation, setShowClearConfirmation] = useState(false);
     const [isRunning, setIsRunning] = useState(false)
     const [showSettingsWindow, setShowSettingsWindow] = useState(false);
+    const [showImportWindow, setShowImportWindow] = useState(false);
     const confirmationRef = useRef<HTMLDivElement>(null);
     useClickOutside(confirmationRef, () => setShowClearConfirmation(false));
 
@@ -108,85 +110,85 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
 
     return (
         <Theme>
-        <Flex direction="row" align="center" justify="between" p="3" style={{ borderBottom: '1px solid #ccc' }}>
-            {/* LEFT */}
-            <Flex gap="3" align="center">
-                <Dna color="var(--accent-9)" />
-                <Text weight="bold" size="3">
-                    Genetic Circuits Builder
-                </Text>
+            <Flex direction="row" align="center" justify="between" p="3" style={{ borderBottom: '1px solid #ccc' }}>
+                {/* LEFT */}
+                <Flex gap="3" align="center">
+                    <Dna color="var(--accent-9)" />
+                    <Text weight="bold" size="3">
+                        Genetic Circuits Builder
+                    </Text>
+
+                    <Flex gap="2" align="center">
+                    <Tooltip content="Open File">
+                        <IconButton variant="outline" size="3" color="gray" onClick={() => setShowImportWindow(true)}>
+                        <FolderOpen />
+                        </IconButton>
+                    </Tooltip>
+
+                    <Tooltip content="Save">
+                        <IconButton variant="outline" size="3" color="gray">
+                        <Save />
+                        </IconButton>
+                    </Tooltip>
+
+                    {/* <Tooltip content="Export">
+                        <IconButton variant="outline" size="3" color="gray">
+                        <Download />
+                        </IconButton>
+                    </Tooltip> */}
+                    <DropdownMenu.Root>
+                        <DropdownMenu.Trigger>
+                        <IconButton variant="outline" size="3" color="gray">
+                            <Download />
+                        </IconButton>
+                        </DropdownMenu.Trigger>
+                        <DropdownMenu.Content align="end">
+                            <DropdownMenu.Item>Export as PNG</DropdownMenu.Item>
+                            <DropdownMenu.Item>Export as JPEG</DropdownMenu.Item>
+                            <DropdownMenu.Item>Export as SVG</DropdownMenu.Item>
+                            <DropdownMenu.Item>Export as JSON</DropdownMenu.Item>
+                        </DropdownMenu.Content>
+                    </DropdownMenu.Root>
+                    </Flex>
+                </Flex>
+
+                <Box maxWidth="300px" flexGrow="1" mx="4">  
+                    <input
+                        type="text"
+                        className="project-input"
+                        value={circuitSettings.projectName}
+                        onChange={(e: any) => setCircuitSettings({ ...circuitSettings, projectName: e.target.value })}
+                    />
+                </Box>
 
                 <Flex gap="2" align="center">
-                <Tooltip content="Open File">
-                    <IconButton variant="outline" size="3" color="gray">
-                    <FolderOpen />
-                    </IconButton>
-                </Tooltip>
+                    <Button variant="solid" size="3" onClick={handlePlayClick} disabled={isRunning}>
+                        <Play /> Run Simulation
+                    </Button>
 
-                <Tooltip content="Save">
-                    <IconButton variant="outline" size="3" color="gray">
-                    <Save />
-                    </IconButton>
-                </Tooltip>
+                    <Tooltip content={showOutputWindow ? "Close Output" : "Show Output"}>
+                        <IconButton variant="outline" size="3" color="gray" onClick={() => setShowOutputWindow(!showOutputWindow)}>
+                        {showOutputWindow ? <X /> : <AreaChart />}
+                        </IconButton>
+                    </Tooltip>
 
-                {/* <Tooltip content="Export">
-                    <IconButton variant="outline" size="3" color="gray">
-                    <Download />
-                    </IconButton>
-                </Tooltip> */}
-                <DropdownMenu.Root>
-                    <DropdownMenu.Trigger>
-                    <IconButton variant="outline" size="3" color="gray">
-                        <Download />
-                    </IconButton>
-                    </DropdownMenu.Trigger>
-                    <DropdownMenu.Content align="end">
-                        <DropdownMenu.Item>Export as PNG</DropdownMenu.Item>
-                        <DropdownMenu.Item>Export as JPEG</DropdownMenu.Item>
-                        <DropdownMenu.Item>Export as SVG</DropdownMenu.Item>
-                        <DropdownMenu.Item>Export as JSON</DropdownMenu.Item>
-                    </DropdownMenu.Content>
-                </DropdownMenu.Root>
+                    <Tooltip content="Clear Canvas">
+                        <IconButton variant="outline" size="3" color="gray" onClick={() => setShowClearConfirmation(true)}>
+                        <Trash2 />
+                        </IconButton>
+                    </Tooltip>
+
+                    <Tooltip content="Settings">
+                        <IconButton variant="outline" size="3" color="gray" onClick={() => setShowSettingsWindow(!showSettingsWindow)}>
+                        <Settings />
+                        </IconButton>
+                    </Tooltip>
                 </Flex>
             </Flex>
-
-            <Box maxWidth="300px" flexGrow="1" mx="4">  
-                <input
-                    type="text"
-                    className="project-input"
-                    value={circuitSettings.projectName}
-                    onChange={(e: any) => setCircuitSettings({ ...circuitSettings, projectName: e.target.value })}
-                />
-            </Box>
-
-            <Flex gap="2" align="center">
-                <Button variant="solid" size="3" onClick={handlePlayClick} disabled={isRunning}>
-                    <Play /> Run Simulation
-                </Button>
-
-                <Tooltip content={showOutputWindow ? "Close Output" : "Show Output"}>
-                    <IconButton variant="outline" size="3" color="gray" onClick={() => setShowOutputWindow(!showOutputWindow)}>
-                    {showOutputWindow ? <X /> : <AreaChart />}
-                    </IconButton>
-                </Tooltip>
-
-                <Tooltip content="Clear Canvas">
-                    <IconButton variant="outline" size="3" color="gray" onClick={() => setShowClearConfirmation(true)}>
-                    <Trash2 />
-                    </IconButton>
-                </Tooltip>
-
-                <Tooltip content="Settings">
-                    <IconButton variant="outline" size="3" color="gray" onClick={() => setShowSettingsWindow(!showSettingsWindow)}>
-                    <Settings />
-                    </IconButton>
-                </Tooltip>
-            </Flex>
-        </Flex>
-        {/* <div className="top-ribbon-container"> */}
             
 
-            {/* </div> */}
+            {/* IMPORT WINDOW */}
+            <ImportWindow open={showImportWindow} onOpenChange={setShowImportWindow} />
 
             {/* CLEAR CONFIRMATION WINDOW */}
             <Dialog.Root open={showClearConfirmation} onOpenChange={setShowClearConfirmation}>
@@ -227,10 +229,9 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
                             </Text>
                         </label>
                         <TextField.Root
-                            defaultValue="Untitled Project"
                             placeholder="Enter your full name"
                             mb="2"
-                            value={circuitSettings.projectName}
+                            value={circuitSettings.projectName ?? ""}
                             onChange={(e) => setCircuitSettings({ ...circuitSettings, projectName: e.target.value })}
                         />
                         
@@ -244,13 +245,13 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
                                 min={1}
                                 max={120}
                                 step={1}
-                                value={[circuitSettings.simulationDuration]}
+                                value={[circuitSettings.simulationDuration ?? 10]}
                                 onValueChange={(value) => setCircuitSettings({ ...circuitSettings, simulationDuration: value[0] })}
                                 className="flex-1"
                             />
                             <TextField.Root
                                 type="number"
-                                value={circuitSettings.simulationDuration}
+                                value={circuitSettings.simulationDuration ?? 10}
                                 onChange={(e) => setCircuitSettings({ ...circuitSettings, simulationDuration: parseInt(e.target.value) })}
                                 className="w-20"
                             />
@@ -266,13 +267,13 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
                                 min={1}
                                 max={100}
                                 step={1}
-                                value={[circuitSettings.numTimePoints]}
+                                value={[circuitSettings.numTimePoints ?? 10]}
                                 onValueChange={(value) => setCircuitSettings({ ...circuitSettings, numTimePoints: value[0] })}
                                 className="flex-1"
                             />
                             <TextField.Root
                                 type="number"
-                                value={circuitSettings.numTimePoints}
+                                value={circuitSettings.numTimePoints ?? 10}
                                 onChange={(e) => setCircuitSettings({ ...circuitSettings, numTimePoints: parseInt(e.target.value) })}
                                 className="w-20"
                             />
