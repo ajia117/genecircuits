@@ -47,26 +47,26 @@ interface TopRibbonProps {
 }
 
 const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges, showOutputWindow, setShowOutputWindow, circuitSettings, setCircuitSettings, setOutputData, labelDataMap }) => {
-    const [showConfirmation, setShowConfirmation] = useState(false);
+    const [showClearConfirmation, setShowClearConfirmation] = useState(false);
     const [isRunning, setIsRunning] = useState(false)
     const [showSettingsWindow, setShowSettingsWindow] = useState(false);
     const confirmationRef = useRef<HTMLDivElement>(null);
-    useClickOutside(confirmationRef, () => setShowConfirmation(false));
+    useClickOutside(confirmationRef, () => setShowClearConfirmation(false));
 
 
 
     const handleClear = () => {
-        setShowConfirmation(true);
+        setShowClearConfirmation(true);
     };
 
     const confirmClear = () => {
         setNodes([])
         setEdges([])
-        setShowConfirmation(false);
+        setShowClearConfirmation(false);
     };
 
     const cancelClear = () => {
-        setShowConfirmation(false);
+        setShowClearConfirmation(false);
     };
 
     // make sure all nodes we send back are updated with regards to label
@@ -170,7 +170,7 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
                 </Tooltip>
 
                 <Tooltip content="Clear Canvas">
-                    <IconButton variant="outline" size="3" color="gray" onClick={handleClear}>
+                    <IconButton variant="outline" size="3" color="gray" onClick={() => setShowClearConfirmation(true)}>
                     <Trash2 />
                     </IconButton>
                 </Tooltip>
@@ -187,19 +187,25 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
 
             {/* </div> */}
 
-            {/* CONFIRMATION WINDOW */}
-            {showConfirmation && (
-                <div className="ribbon-overlay">
-                    <div className="confirmation-window" ref={confirmationRef}>
-                        <button className="close-button" onClick={cancelClear}>×</button>
-                        <h2>Are you sure you want to clear the screen?</h2>
-                        <div className="confirmation-buttons">
-                            <button onClick={confirmClear} className="confirm">Clear</button>
-                            <button onClick={cancelClear} className="cancel">Cancel</button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            {/* CLEAR CONFIRMATION WINDOW */}
+            <Dialog.Root open={showClearConfirmation} onOpenChange={setShowClearConfirmation}>
+                <Dialog.Content maxWidth="500px">
+                <Dialog.Title>Are you sure you want to clear the screen?</Dialog.Title>
+                <Dialog.Description mb="4">
+                    This action cannot be undone. All unsaved changes will be lost.
+                </Dialog.Description>
+
+                <Flex justify="center" gap="3" mt="3">
+                    <Dialog.Close>
+                        <Button color="red" onClick={confirmClear}>Clear</Button>
+                    </Dialog.Close>
+                    <Dialog.Close>
+                        <Button variant="soft" color="gray" onClick={cancelClear}>Cancel</Button>
+                    </Dialog.Close>
+                </Flex>
+                </Dialog.Content>
+            </Dialog.Root>
+
 
             {/* SETTINGS WINDOW */}
             {showSettingsWindow && (
