@@ -18,6 +18,7 @@ import {
     FolderOpen,
     X,
     Dna,
+    AreaChart,
 } from "lucide-react";
 import {
     Flex,
@@ -28,6 +29,8 @@ import {
     Button,
     Tooltip,
     Dialog,
+    Theme,
+    DropdownMenu
 } from "@radix-ui/themes";
 
 interface TopRibbonProps {
@@ -103,20 +106,17 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
     }
 
     return (
-        <div className="top-ribbon-container">
-            <div className="ribbon-left">
-                <Dna className="icon" />
-                <h3 className="app-title">Genetic Circuits Builder</h3>
-                {/* <button className="icon-button" title="Open/Import">
-                    <FolderOpen className="icon" />
-                </button>
-                <button className="icon-button" title="Save">
-                    <Save className="icon" />
-                </button>
-                <button className="icon-button" title="Export">
-                    <Download className="icon" />
-                </button> */}
-                <Tooltip content="Open/Import">
+        <Theme>
+        <Flex direction="row" align="center" justify="between" p="3" style={{ borderBottom: '1px solid #ccc' }}>
+            {/* LEFT */}
+            <Flex gap="3" align="center">
+                <Dna color="var(--accent-9)" />
+                <Text weight="bold" size="3">
+                    Genetic Circuits Builder
+                </Text>
+
+                <Flex gap="2" align="center">
+                <Tooltip content="Open File">
                     <IconButton variant="outline" size="3" color="gray">
                     <FolderOpen />
                     </IconButton>
@@ -128,35 +128,44 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
                     </IconButton>
                 </Tooltip>
 
-                <Tooltip content="Export">
+                {/* <Tooltip content="Export">
                     <IconButton variant="outline" size="3" color="gray">
                     <Download />
                     </IconButton>
-                </Tooltip>
-            </div>
-            <div className="ribbon-center">
-                <input
-                type="text"
-                className="project-input"
-                value={circuitSettings.projectName}
-                onChange={(e: any) => setCircuitSettings({ ...circuitSettings, projectName: e.target.value })}
-                />
-            </div>
-            <div className="ribbon-right">
-                <Button
-                    variant="solid"
-                    size="3"
-                    className="bg-emerald-600 hover:bg-emerald-700"
-                    onClick={handlePlayClick}
-                >
-                    <Play className="h-4 w-4 mr-2" />
-                    Run Simulation
-                </Button>
+                </Tooltip> */}
+                <DropdownMenu.Root>
+                    <DropdownMenu.Trigger>
+                    <IconButton variant="outline" size="3" color="gray">
+                        <Download />
+                    </IconButton>
+                    </DropdownMenu.Trigger>
+                    <DropdownMenu.Content align="end">
+                        <DropdownMenu.Item>Export as PNG</DropdownMenu.Item>
+                        <DropdownMenu.Item>Export as JPEG</DropdownMenu.Item>
+                        <DropdownMenu.Item>Export as SVG</DropdownMenu.Item>
+                        <DropdownMenu.Item>Export as JSON</DropdownMenu.Item>
+                    </DropdownMenu.Content>
+                </DropdownMenu.Root>
+                </Flex>
+            </Flex>
 
+            <Box maxWidth="300px" flexGrow="1" mx="4">  
+                <input
+                    type="text"
+                    className="project-input"
+                    value={circuitSettings.projectName}
+                    onChange={(e: any) => setCircuitSettings({ ...circuitSettings, projectName: e.target.value })}
+                />
+            </Box>
+
+            <Flex gap="2" align="center">
+                <Button variant="solid" size="3" onClick={handlePlayClick} disabled={isRunning}>
+                    <Play /> Run Simulation
+                </Button>
 
                 <Tooltip content={showOutputWindow ? "Close Output" : "Show Output"}>
                     <IconButton variant="outline" size="3" color="gray" onClick={() => setShowOutputWindow(!showOutputWindow)}>
-                    {showOutputWindow ? <X /> : <ChartArea />}
+                    {showOutputWindow ? <X /> : <AreaChart />}
                     </IconButton>
                 </Tooltip>
 
@@ -171,8 +180,12 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
                     <Settings />
                     </IconButton>
                 </Tooltip>
+            </Flex>
+        </Flex>
+        {/* <div className="top-ribbon-container"> */}
+            
 
-            </div>
+            {/* </div> */}
 
             {/* CONFIRMATION WINDOW */}
             {showConfirmation && (
@@ -232,7 +245,7 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
             )}
 
 
-        </div>
+        </Theme>
     );
 };
 
