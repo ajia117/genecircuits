@@ -86,6 +86,8 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
 
 
     const handlePlayClick = async () => {
+        console.log("og nodes", nodes)
+        console.log("og edges", edges)
         nodes = updateNodesWithLabels();
         setNodes(nodes); // see above comment for why this is unnecessary, but can be improved
         
@@ -106,6 +108,24 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
     const handlePauseClick = () => {
         abortFetch()
         setIsRunning(false)
+    }
+
+    const handleExport = (e: React.MouseEvent<HTMLDivElement>, type: string) => {
+        e.preventDefault();
+        if(type === "json") {
+            const updatedNodes = updateNodesWithLabels();
+            const circuitJson = {circuitSettings, nodes, edges}
+            const blob = new Blob([JSON.stringify(circuitJson, null, 2)], {
+                type: "application/json",
+            });
+    
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `${circuitSettings.projectName || "circuit"}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
     }
 
     return (
@@ -138,10 +158,9 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
                         </IconButton>
                         </DropdownMenu.Trigger>
                         <DropdownMenu.Content align="end">
-                            <DropdownMenu.Item>Export as PNG</DropdownMenu.Item>
-                            <DropdownMenu.Item>Export as JPEG</DropdownMenu.Item>
-                            <DropdownMenu.Item>Export as SVG</DropdownMenu.Item>
-                            <DropdownMenu.Item>Export as JSON</DropdownMenu.Item>
+                            <DropdownMenu.Item onClick={(e) => handleExport(e, 'png')}>Export as PNG</DropdownMenu.Item>
+                            <DropdownMenu.Item onClick={(e) => handleExport(e, 'jpeg')}>Export as JPEG</DropdownMenu.Item>
+                            <DropdownMenu.Item onClick={(e) => handleExport(e, 'json')}>Export as JSON</DropdownMenu.Item>
                         </DropdownMenu.Content>
                     </DropdownMenu.Root>
                     </Flex>
