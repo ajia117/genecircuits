@@ -56,6 +56,28 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
     const confirmationRef = useRef<HTMLDivElement>(null);
     useClickOutside(confirmationRef, () => setShowClearConfirmation(false));
 
+    // listen for a circuit import
+    useEffect(() => {
+        const handleImportedCircuit = (event: CustomEvent) => {
+            const { circuitSettings, nodes, edges } = event.detail;
+        
+            const safeSettings = {
+                projectName: circuitSettings.projectName ?? "Untitled Project",
+                simulationDuration: circuitSettings.simulationDuration ?? 20,
+                numTimePoints: circuitSettings.numTimePoints ?? 10,
+            };
+        
+            setCircuitSettings(safeSettings);
+            setNodes(nodes ?? []);
+            setEdges(edges ?? []);
+        };
+      
+        window.addEventListener("circuitImport", handleImportedCircuit as EventListener);
+        return () => {
+            window.removeEventListener("circuitImport", handleImportedCircuit as EventListener);
+        };
+      }, []);
+      
 
 
     const handleClear = () => {
@@ -77,12 +99,18 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
     // in future, add new boolean field in NodeData to check if it has changed since last run through
     const updateNodesWithLabels = () => {
         return nodes.map((node) => {
+            const label = node.data?.label;
+            const sharedData = label && labelDataMap[label];
             return {
                 ...node,
-                data: labelDataMap[node.data.label]
-            }
+                data: {
+                    ...sharedData,
+                    label, // ensure label is preserved
+                }
+            };
         });
-    }
+    };
+    
 
 
     const handlePlayClick = async () => {

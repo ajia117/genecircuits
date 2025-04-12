@@ -12,6 +12,12 @@ interface CustomNodeProps extends Record<string, unknown> {
 type CustomNodeData = Node<CustomNodeProps>;
 
 const CustomNode = memo(({ id, data }: NodeProps<CustomNodeData>) => {
+    const nodeData = {
+        label: data?.label ?? "Unnamed",
+        inputs: data?.inputs ?? 1,
+        outputs: data?.outputs ?? 1,
+    };
+    
     // Get position for multiple handles
     const getHandleStyle = (index: number, total: number, isInput: boolean) => {
         const handleSize = 0;
@@ -49,13 +55,13 @@ const CustomNode = memo(({ id, data }: NodeProps<CustomNodeData>) => {
         <div className="custom-node">
             <div className="relative px-6 py-2 shadow-md rounded-md bg-white border-2 border-gray-200 w-40">
                 {/* Input Handles */}
-                {Array.from({length: data.inputs}, (_, i) => (
+                {Array.from({length: nodeData.inputs}, (_, i) => (
                     <XYFlow.Handle
                         key={`input-${i}`}
                         type="target"
                         position={Position.Left}
                         id={`input-${i}`}
-                        style={getHandleStyle(i, data.inputs, true)}
+                        style={getHandleStyle(i, nodeData.inputs, true)}
                         isConnectableStart={true}
                         isConnectableEnd={true}
                         isValidConnection={() => true}  // Allow all connections
@@ -65,18 +71,18 @@ const CustomNode = memo(({ id, data }: NodeProps<CustomNodeData>) => {
                 {/* Label with truncation */}
                 <div className="my-auto h-full">
                     <label className="text-sm font-medium text-gray-900 text-center w-full truncate mx-2">
-                        {data.label}
+                        {nodeData.label}
                     </label>
                 </div>
 
                 {/* Output Handles */}
-                {Array.from({length: data.outputs}, (_, i) => (
+                {Array.from({length: nodeData.outputs}, (_, i) => (
                     <XYFlow.Handle
                         key={`output-${i}`}
                         type="source"
                         position={Position.Right}
                         id={`output-${i}`}
-                        style={getHandleStyle(i, data.outputs, false)}
+                        style={getHandleStyle(i, nodeData.outputs, false)}
                         isConnectableStart={true}
                         isConnectableEnd={true}
                         isValidConnection={() => true}  // Allow all connections

@@ -21,9 +21,36 @@ interface ImportWindowProps {
 
 export default function ImportWindow({ open, onOpenChange }: ImportWindowProps) { 
 
-    const handleImport = (e: any) => {
-        
-    }
+    const handleCircuitImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+      
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            const result = JSON.parse(event.target?.result as string);
+      
+            const { circuitSettings, nodes, edges } = result;
+      
+            if (!circuitSettings || !Array.isArray(nodes) || !Array.isArray(edges)) {
+              alert("Invalid circuit file format.");
+              return;
+            }
+      
+            // Send parsed values to the global handler
+            window.dispatchEvent(
+              new CustomEvent("circuitImport", {
+                detail: { circuitSettings, nodes, edges },
+              })
+            );
+      
+          } catch (err) {
+            console.error("Error parsing file:", err);
+            alert("Failed to parse JSON file.");
+          }
+        };
+        reader.readAsText(file);
+    };
 
     return(
         <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -90,7 +117,7 @@ export default function ImportWindow({ open, onOpenChange }: ImportWindowProps) 
                                         type="file"
                                         className="sr-only hidden"
                                         accept=".json"
-                                        onChange={(e) => {handleImport(e)}}
+                                        onChange={(e) => {handleCircuitImport(e)}}
                                     />
                                 </label>
                                 <Text size="1" color="gray" ml="1">
@@ -103,7 +130,7 @@ export default function ImportWindow({ open, onOpenChange }: ImportWindowProps) 
                             {/* import button */}
                             <Flex justify="end" mb="4">
                                 <Dialog.Close>
-                                <Button variant="solid" size="3" onClick={() => {handleImport}}>
+                                <Button variant="solid" size="3" onClick={() => {handleCircuitImport}}> {/* TODO: make work with multiple files and it only import when button clicked */}
                                     <Import /> Import
                                 </Button>
                                 </Dialog.Close>
