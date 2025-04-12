@@ -237,7 +237,7 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
                         
                         {/* simulation duration */}
                         <label>
-                            <Text as="div" size="2" weight="bold">Simulation Duration (seconds):</Text>
+                            <Text as="div" weight="bold">Simulation Duration (seconds):</Text>
                         </label>
                         <Flex gap="3" align="center">
                             <Slider
@@ -259,7 +259,7 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
 
                         {/* num time points */}
                         <label>
-                            <Text as="div" size="2" weight="bold">Number of Time Points:</Text>
+                            <Text as="div" weight="bold">Number of Time Points:</Text>
                         </label>
                         <Flex gap="3" align="center">
                             <Slider

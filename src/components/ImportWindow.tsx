@@ -17,14 +17,9 @@ import { Node, Edge } from "@xyflow/react";
 interface ImportWindowProps {
     open: boolean
     onOpenChange: (open: boolean) => void,
-    onCircuitImport: (data: {
-        circuitSettings: CircuitSettingsType;
-        nodes: Node[];
-        edges: Edge[];
-      }) => void
 }
 
-export default function ImportWindow({ open, onOpenChange, onCircuitImport }: ImportWindowProps) { 
+export default function ImportWindow({ open, onOpenChange }: ImportWindowProps) { 
 
     const handleImport = (e: any) => {
         
