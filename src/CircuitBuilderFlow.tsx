@@ -27,6 +27,12 @@ import {
 } from './components';
 import NodeData from "./types/NodeData";
 import SelfConnectingEdge from "./components/Edges/SelfConnectingEdge";
+import {
+    Tabs,
+    Box,
+    Text,
+} from '@radix-ui/themes'
+
 
 export default function CircuitBuilderFlow() {
     const reactFlowWrapper = useRef(null);
@@ -236,42 +242,30 @@ export default function CircuitBuilderFlow() {
             
             <div className="bottom-container">
                 <PanelGroup className="circuit-builder-container" direction="horizontal">
-                {/* Left Pane (Toolbox + Properties Window) */}
+                    {/* Left Pane (Toolbox + Properties Window) */}
                     <Panel className="left-pane min-w-128" defaultSize={30} maxSize={50}>
                         <div className="flex flex-col h-full">
                             {/* Tab Navigation */}
-                            <div className="tab-navigation">
-                                <button
-                                    className={`tab-button ${activeTab === 'toolbox' ? 'tab-active' : ''}`}
-                                    onClick={() => setActiveTab('toolbox')}
-                                >
-                                    Toolbox
-                                </button>
-                                <button
-                                    className={`tab-button ${activeTab === 'properties' ? 'tab-active' : ''}`}
-                                    onClick={() => setActiveTab('properties')}
-                                >
-                                    Properties
-                                </button>
-                                <button
-                                    className={`tab-button ${activeTab === 'circuits' ? 'tab-active' : ''}`}
-                                    onClick={() => setActiveTab('circuits')}
-                                >
-                                    Circuits
-                                </button>
-                            </div>
+                            <Tabs.Root defaultValue="toolbox" className="h-full">
+                                <Tabs.List>
+                                    <Tabs.Trigger value="toolbox">Toolbox</Tabs.Trigger>
+                                    <Tabs.Trigger value="properties">Properties</Tabs.Trigger>
+                                    <Tabs.Trigger value="circuits">Circuits</Tabs.Trigger>
+                                </Tabs.List>
+                            
 
-                            {/* Tab Content */}
-                            <div className="flex-grow overflow-auto">
-                                {/* Toolbox Tab */}
-                                <div className={`h-full`}>
-                                    {activeTab === 'toolbox' &&
+                                {/* Tab Content */}
+                                <Box px="3" mt="4" className="h-full overflow-y-auto">
+                                    {/* TOOLBOX */}
+                                    <Tabs.Content value="toolbox">
                                         <Toolbox
                                             labels={Object.keys(labelDataMap)}
                                             getLabelData={getLabelData}
                                         />
-                                    }
-                                    {activeTab==='properties' &&
+                                    </Tabs.Content>
+
+                                    {/* PROPERTIES */}
+                                    <Tabs.Content value="properties">
                                         <PropertiesWindow
                                             key={`${selectedNodeId || ''}-${selectedEdgeId || ''}`}
                                             changeMarkerType={changeMarkerType}
@@ -282,12 +276,16 @@ export default function CircuitBuilderFlow() {
                                             selectedNode={getSelectedNode()}
                                             selectedNodeData={getSelectedNodeLabelData()}
                                         />
-                                    }
-                                    {activeTab==='circuits' &&
-                                        <h1>Prebuilt Circuits</h1>
-                                    }
-                                </div>
-                            </div>
+                                    </Tabs.Content>
+
+                                    {/* CIRCUITS */}
+                                    <Tabs.Content value="circuit">
+                                        <Text size="4" weight="bold">Prebuilt Circuits</Text>
+                                    </Tabs.Content>
+                                </Box>
+                            </Tabs.Root>
+
+                            
                         </div>
                     </Panel>
 
