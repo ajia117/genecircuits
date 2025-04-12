@@ -6,7 +6,6 @@ import { formatCircuitToJson } from "../../utils/formatCircuitToJson"
 import { fetchOutput, abortFetch } from "../../utils/fetchOutput";
 import CircuitSettingsType from "../../types/CircuitSettingsType";
 import NodeData from "../../types/NodeData";
-import useClickOutside from "../../utils/hooks/useClickOutside";
 import {
     Play,
     Pause,
@@ -53,8 +52,6 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
     const [isRunning, setIsRunning] = useState(false)
     const [showSettingsWindow, setShowSettingsWindow] = useState(false);
     const [showImportWindow, setShowImportWindow] = useState(false);
-    const confirmationRef = useRef<HTMLDivElement>(null);
-    useClickOutside(confirmationRef, () => setShowClearConfirmation(false));
 
     // listen for a circuit import
     useEffect(() => {
