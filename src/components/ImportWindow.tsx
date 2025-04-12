@@ -61,7 +61,7 @@ export default function ImportWindow({ open, onOpenChange }: ImportWindowProps) 
                 </Flex>
 
                 <Tabs.Root defaultValue="open">
-                    <Tabs.List justify="center" color="gray" 
+                    <Tabs.List justify="center" 
                         style={{
                             display: 'flex',
                             justifyContent: 'center',
