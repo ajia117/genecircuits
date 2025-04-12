@@ -131,11 +131,6 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
                         </IconButton>
                     </Tooltip>
 
-                    {/* <Tooltip content="Export">
-                        <IconButton variant="outline" size="3" color="gray">
-                        <Download />
-                        </IconButton>
-                    </Tooltip> */}
                     <DropdownMenu.Root>
                         <DropdownMenu.Trigger>
                         <IconButton variant="outline" size="3" color="gray">
@@ -152,10 +147,9 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
                     </Flex>
                 </Flex>
 
-                <Box maxWidth="300px" flexGrow="1" mx="4">  
-                    <input
-                        type="text"
-                        className="project-input"
+                {/* PROJECT NAME FIELD */}
+                <Box maxWidth="400px" flexGrow="1" mx="4">  
+                    <TextField.Root size="2" variant="surface" style={{textAlign: "center"}}
                         value={circuitSettings.projectName}
                         onChange={(e: any) => setCircuitSettings({ ...circuitSettings, projectName: e.target.value })}
                     />

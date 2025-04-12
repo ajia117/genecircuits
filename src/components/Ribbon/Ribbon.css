@@ -35,17 +35,6 @@
     padding-right: 5px;
 }
 
-.project-input {
-    padding: 6px 12px;
-    font-size: 14px;
-    font-weight: 500;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    width: 100%;
-    max-width: 300px;
-    text-align: center;
-  }
-
 /* button {
     background: none;
     border: none;
