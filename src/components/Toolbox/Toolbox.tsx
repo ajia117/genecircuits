@@ -2,6 +2,20 @@ import React, {useState} from 'react';
 import CreatableSelect from "react-select/creatable";
 import NodeData from "../../types/NodeData";
 import '../../index.css';
+import {
+    Box,
+    Text,
+    Flex,
+    Button,
+    Tooltip,
+    IconButton,
+    Card
+} from '@radix-ui/themes'
+import {
+    Code,
+    Ampersands,
+    Tally2
+} from 'lucide-react'
 
 interface ToolboxProps {
     labels: string[];
@@ -168,40 +182,63 @@ export const Toolbox: React.FC<ToolboxProps> = ({
     }
 
     return (
-        <>
-            <h1 className={`text-center`}>Toolbox</h1>
-            <div className="components-container">
-                <div className="dndnode and" onDragStart={(event) => onDragStart(event, 'and')} draggable>
-                    AND Node
-                </div>
-                <div className="dndnode or" onDragStart={(event) => onDragStart(event, 'or')} draggable>
-                OR Node
-                </div>
-                <div className="mt-4 p-4 bg-gray-50 rounded shadow-sm">
-                    <h3 className="text-lg font-medium mb-3">Choose existing Protein or Create New</h3>
-                    <div className="space-y-3">
-                        <CreatableSelect
-                            isClearable
-                            onChange={handleChange}
-                            onCreateOption={handleCreate}
-                            options={labelOptions}
-                            value={selectedOption}
-                            isValidNewOption={isValidCreateString}
-                            formatCreateLabel={(inputValue) => `Create "${inputValue.trim()}"`}
-                        />
+        <Box>
+            <Text size="4" weight="bold">Logic Gates</Text>
+            <Flex direction="column" gap="2" my="4">
+                <Box
+                    className='dndnode'
+                    draggable
+                    onDragStart={(e: React.DragEvent) => onDragStart(e, 'and')}
+                >
+                    <Flex align="center" gap="4">
+                        <Ampersands size={20} className='gate-icon'/> <Text weight="medium" size="3">AND Node</Text>
+                    </Flex>
+                </Box>
+                <Box
+                    className='dndnode'
+                    draggable
+                    onDragStart={(e: React.DragEvent) => onDragStart(e, 'or')}
+                >
+                    <Flex align="center" gap="4">
+                        <Tally2 size={20} className='gate-icon'/> <Text weight="medium" size="3">OR Node</Text>
+                    </Flex>
+                </Box>
+            </Flex>
+        </Box>
+        // <>
+        //     <h1 className={`text-center`}>Toolbox</h1>
+        //     <div className="components-container">
+        //         <div className="dndnode and" onDragStart={(event) => onDragStart(event, 'and')} draggable>
+        //             AND Node
+        //         </div>
+        //         <div className="dndnode or" onDragStart={(event) => onDragStart(event, 'or')} draggable>
+        //         OR Node
+        //         </div>
+        //         <div className="mt-4 p-4 bg-gray-50 rounded shadow-sm">
+        //             <h3 className="text-lg font-medium mb-3">Choose existing Protein or Create New</h3>
+        //             <div className="space-y-3">
+        //                 <CreatableSelect
+        //                     isClearable
+        //                     onChange={handleChange}
+        //                     onCreateOption={handleCreate}
+        //                     options={labelOptions}
+        //                     value={selectedOption}
+        //                     isValidNewOption={isValidCreateString}
+        //                     formatCreateLabel={(inputValue) => `Create "${inputValue.trim()}"`}
+        //                 />
 
-                        {selectedOption && getLabelForm()}
-                    </div>
-                    <br/>
-                    {selectedOption &&
-                        <div className="dndnode output" onDragStart={(event) => onDragStart(event, 'custom')} draggable>
-                            Drag Node
-                        </div>
-                    }
-                </div>
+        //                 {selectedOption && getLabelForm()}
+        //             </div>
+        //             <br/>
+        //             {selectedOption &&
+        //                 <div className="dndnode output" onDragStart={(event) => onDragStart(event, 'custom')} draggable>
+        //                     Drag Node
+        //                 </div>
+        //             }
+        //         </div>
 
-            </div>
-        </>
+        //     </div>
+        // </>
     );
 };
 

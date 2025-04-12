@@ -255,7 +255,7 @@ export default function CircuitBuilderFlow() {
                             
 
                                 {/* Tab Content */}
-                                <Box px="3" mt="4" className="h-full overflow-y-auto">
+                                <Box px="4" mt="6" className="h-full overflow-y-auto">
                                     {/* TOOLBOX */}
                                     <Tabs.Content value="toolbox">
                                         <Toolbox
