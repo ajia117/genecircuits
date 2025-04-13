@@ -7,14 +7,14 @@ import {
     Text,
     Flex,
     Button,
-    Tooltip,
-    IconButton,
-    Card
+    TextField,
+    ScrollArea
 } from '@radix-ui/themes'
 import {
-    Code,
+    Plus,
     Ampersands,
-    Tally2
+    Tally2,
+    Search
 } from 'lucide-react'
 
 interface ToolboxProps {
@@ -182,7 +182,8 @@ export const Toolbox: React.FC<ToolboxProps> = ({
     }
 
     return (
-        <Box>
+        <Flex direction="column">
+            {/* LOGIC GATES */}
             <Text size="4" weight="bold">Logic Gates</Text>
             <Flex direction="column" gap="2" my="4">
                 <Box
@@ -204,7 +205,42 @@ export const Toolbox: React.FC<ToolboxProps> = ({
                     </Flex>
                 </Box>
             </Flex>
-        </Box>
+
+            {/* PROTIEN NODES */}
+            <Flex direction="row" justify="between" mt="5">
+                <Text size="4" weight="bold">Proteins</Text>
+                <Button variant='ghost'
+                    onClick={() => {}}
+                >
+                    <Plus /> <Text size="4" weight="bold">New</Text>
+                </Button>
+            </Flex>
+
+            <Flex direction="column" gap="2" mt="4">
+                <TextField.Root size="3" variant="surface" placeholder="Search proteins...">
+                    <TextField.Slot>
+                        <Search size={20} />
+                    </TextField.Slot>
+                </TextField.Root>
+
+                <ScrollArea type="auto" scrollbars="vertical" 
+                    style={{ 
+                        height: 250, 
+                        border: '1px solid var(--gray-7)',
+                        borderRadius: 'var(--radius-3)',
+                        maxHeight: '300px',
+                        overflowY: 'auto',
+                    }}
+                >
+                    <Box
+
+                    >
+
+                    </Box>
+                </ScrollArea>
+
+            </Flex>
+        </Flex>
         // <>
         //     <h1 className={`text-center`}>Toolbox</h1>
         //     <div className="components-container">
