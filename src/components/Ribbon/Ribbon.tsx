@@ -177,13 +177,13 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
                     </Tooltip>
 
                     <DropdownMenu.Root>
-                        <DropdownMenu.Trigger>
                         <Tooltip content="Export Circuit">
-                        <IconButton variant="outline" size="3" color="gray">
-                            <Download />
-                        </IconButton>
+                            <DropdownMenu.Trigger>
+                            <IconButton variant="outline" size="3" color="gray">
+                                <Download />
+                            </IconButton>
+                            </DropdownMenu.Trigger>
                         </Tooltip>
-                        </DropdownMenu.Trigger>
                         <DropdownMenu.Content align="end">
                             <DropdownMenu.Item onClick={(e) => handleExport(e, 'png')}>Export as PNG</DropdownMenu.Item>
                             <DropdownMenu.Item onClick={(e) => handleExport(e, 'jpeg')}>Export as JPEG</DropdownMenu.Item>
