@@ -297,7 +297,7 @@ export default function CircuitBuilderFlow() {
 
             {/* TOP MENU FUNCTION BUTTONS */}
             <Ribbon
-                labelDataMap={proteins}
+                proteins={proteins}
                 nodes={nodes} setNodes={setNodes}
                 edges={edges} setEdges={setEdges}
                 showOutputWindow={showOutputWindow} 

@@ -35,7 +35,7 @@ import {
 import ImportWindow from "../ImportWindow";
 
 interface TopRibbonProps {
-    labelDataMap: {[label: string]: NodeData},
+    proteins: { [label: string]: NodeData },
     nodes: Node<NodeData>[],
     setNodes: (nodes: Node[]) => void,
     edges: Edge[],
@@ -47,11 +47,11 @@ interface TopRibbonProps {
     setOutputData: (data: any)=>void
 }
 
-const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges, showOutputWindow, setShowOutputWindow, circuitSettings, setCircuitSettings, setOutputData, labelDataMap }) => {
-    const [showClearConfirmation, setShowClearConfirmation] = useState(false);
-    const [isRunning, setIsRunning] = useState(false)
-    const [showSettingsWindow, setShowSettingsWindow] = useState(false);
-    const [showImportWindow, setShowImportWindow] = useState(false);
+const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges, showOutputWindow, setShowOutputWindow, circuitSettings, setCircuitSettings, setOutputData, proteins }) => {
+    const [showClearConfirmation, setShowClearConfirmation] = useState(false); // keep track of whether clear confirmation window is open or not
+    const [isRunning, setIsRunning] = useState(false) // flag to track if simulation is running or not
+    const [showSettingsWindow, setShowSettingsWindow] = useState(false); // keep track of whether settings window is open or not
+    const [showImportWindow, setShowImportWindow] = useState(false); // keep track of whether import window is open or not
 
     // listen for a circuit import
     useEffect(() => {
@@ -73,21 +73,11 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
         return () => {
             window.removeEventListener("circuitImport", handleImportedCircuit as EventListener);
         };
-      }, []);
-      
-
-
-    const handleClear = () => {
-        setShowClearConfirmation(true);
-    };
+    }, []);
 
     const confirmClear = () => {
         setNodes([])
         setEdges([])
-        setShowClearConfirmation(false);
-    };
-
-    const cancelClear = () => {
         setShowClearConfirmation(false);
     };
 
@@ -97,7 +87,7 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
     const updateNodesWithLabels = () => {
         return nodes.map((node) => {
             const label = node.data?.label;
-            const sharedData = label && labelDataMap[label];
+            const sharedData = label && proteins[label];
             return {
                 ...node,
                 data: {
@@ -137,6 +127,7 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
 
     const handleExport = (e: React.MouseEvent<HTMLDivElement>, type: string) => {
         e.preventDefault();
+        if(nodes.length === 0 && edges.length === 0) { alert("Nothing to export."); return; }
         if(type === "json") {
             const updatedNodes = updateNodesWithLabels();
             const circuitJson = {circuitSettings, nodes, edges}
@@ -246,7 +237,7 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
                         <Button color="red" size="3" onClick={confirmClear}>Clear</Button>
                     </Dialog.Close>
                     <Dialog.Close>
-                        <Button variant="soft" color="gray" size="3" onClick={cancelClear}>Cancel</Button>
+                        <Button variant="soft" color="gray" size="3" onClick={() => setShowClearConfirmation(false)}>Cancel</Button>
                     </Dialog.Close>
                 </Flex>
                 </Dialog.Content>
@@ -263,11 +254,7 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
                     <Dialog.Description mb="3">Make changes to your project settings.</Dialog.Description>
                 
                     <Flex direction="column" gap="3" mt="4">
-                        <label>
-                            <Text as="div" weight="bold">
-                                Project Name:
-                            </Text>
-                        </label>
+                        <Text as="div" weight="bold">Project Name</Text>
                         <TextField.Root
                             placeholder="Enter your full name"
                             mb="2"
@@ -276,9 +263,7 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
                         />
                         
                         {/* simulation duration */}
-                        <label>
-                            <Text as="div" weight="bold">Simulation Duration (seconds):</Text>
-                        </label>
+                        <Text as="div" weight="bold">Simulation Duration (seconds)</Text>
                         <Flex gap="3" align="center">
                             <Slider
                                 id="simulation-duration"
@@ -298,9 +283,7 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
                         </Flex>
 
                         {/* num time points */}
-                        <label>
-                            <Text as="div" weight="bold">Number of Time Points:</Text>
-                        </label>
+                        <Text as="div" weight="bold">Number of Time Points</Text>
                         <Flex gap="3" align="center">
                             <Slider
                                 id="time-points"
