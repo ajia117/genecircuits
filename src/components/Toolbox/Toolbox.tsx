@@ -23,6 +23,7 @@ import {
 
 interface ToolboxProps {
     labels: string[];
+    setLabelDataMap: React.Dispatch<React.SetStateAction<{ [label: string]: NodeData }>>;
     getLabelData: (label: string) => NodeData;
 }
 
@@ -33,8 +34,9 @@ interface OptionType {
 
 export const Toolbox: React.FC<ToolboxProps> = ({
         labels,
+        setLabelDataMap,
         getLabelData
-     }) => {
+    }) => {
 
     const [selectedOption, setSelectedOption] = useState<OptionType | null>(null);
     const [isNewLabel, setIsNewLabel] = useState(false);
@@ -68,24 +70,36 @@ export const Toolbox: React.FC<ToolboxProps> = ({
         }));
     };
 
-    const handleCreate = (inputValue: string) => {
-        // return if option already exists without trailing/leading whitespace
-        const option = labelOptions.find(option => option.label === inputValue.trim());
-        if(option) {
-            setSelectedOption(option);
+    // const handleCreate = (inputValue: string) => {
+    //     // return if option already exists without trailing/leading whitespace
+    //     const option = labelOptions.find(option => option.label === inputValue.trim());
+    //     if(option) {
+    //         setSelectedOption(option);
+    //         return;
+    //     }
+
+    //     // add new option to list of labels
+    //     const newOption = createOption(inputValue);
+    //     setLabelOptions([...labelOptions, newOption]);
+    //     setSelectedOption(newOption);
+    //     setIsNewLabel(true);
+    //     setNodeData({
+    //         ...genericNodeData,
+    //         label: inputValue
+    //     });
+    // };
+
+    const handleCreate = (data: NodeData) => {
+        if (labels.includes(data.label.trim())) {
+            alert("That protein already exists!");
             return;
         }
-
-        // add new option to list of labels
-        const newOption = createOption(inputValue);
-        setLabelOptions([...labelOptions, newOption]);
-        setSelectedOption(newOption);
-        setIsNewLabel(true);
-        setNodeData({
-            ...genericNodeData,
-            label: inputValue
-        });
-    };
+        setLabelDataMap(prev => ({
+            ...prev,
+            [data.label]: data
+        }));
+          
+    }
 
     // don't always allow the create string option to appear
     const isValidCreateString = (inputValue: string) => {
@@ -271,7 +285,13 @@ export const Toolbox: React.FC<ToolboxProps> = ({
                         <Box
                             key={protein.id}
                             draggable
-                            onDragStart={(e: React.DragEvent) => onDragStart(e, 'custom')}
+                            onDragStart={(e: React.DragEvent) => {
+                                e.dataTransfer.setData("application/reactflow", "custom");
+                                e.dataTransfer.setData("application/node-data", JSON.stringify(protein)); // ✅ Use actual protein data
+                                e.dataTransfer.setData("application/node-in", String(protein.inputs));
+                                e.dataTransfer.setData("application/node-out", String(protein.outputs));
+                                e.dataTransfer.effectAllowed = "move";
+                            }}
                             style={{
                                 cursor: 'grab',
                                 border: '1px solid var(--gray-a6)',
@@ -304,7 +324,7 @@ export const Toolbox: React.FC<ToolboxProps> = ({
 
             </Flex>
 
-            <CreateProteinWindow open={showCreateProteinWindow} onOpenChange={setShowCreateProteinWindow} />
+            <CreateProteinWindow open={showCreateProteinWindow} onOpenChange={setShowCreateProteinWindow} onCreate={handleCreate}/>
 
         {/* </Flex> */}
         {/* <>

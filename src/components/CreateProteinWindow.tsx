@@ -19,9 +19,10 @@ import { useState } from "react";
 interface ProteinDataProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
+    onCreate: (newData: NodeData) => void;
 }  
 
-export default function CreateProteinWindow({ open, onOpenChange }: ProteinDataProps) {
+export default function CreateProteinWindow({ open, onOpenChange, onCreate }: ProteinDataProps) {
     const genericNodeData: NodeData = {
         label: null,
         initialConcentration: 1,
@@ -47,11 +48,17 @@ export default function CreateProteinWindow({ open, onOpenChange }: ProteinDataP
     }
 
     const handleCreate = () => {
-        
-    }
+        if (!nodeData.label || nodeData.label.trim() === '') {
+            alert("Protein label is required");
+            return;
+        }
+      
+        onCreate(nodeData);
+        setNodeData(genericNodeData); // reset for next time
+    };
 
     return (
-        <Dialog.Root open={open} onOpenChange={onOpenChange}>
+        <Dialog.Root open={open} onOpenChange={onOpenChange} >
             <Dialog.Content maxWidth="600px">
                 <Flex justify="between">
                     <Dialog.Title mt="1">Create New Protein</Dialog.Title>

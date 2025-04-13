@@ -173,7 +173,9 @@ export default function CircuitBuilderFlow() {
                 data: nodeData
             };
             setNodes((nds) => [...nds, newNode]);
-            setLabelData(nodeData.label, nodeData);
+            if (nodeType === "custom" && nodeData.label) {
+                setLabelData(nodeData.label, nodeData);
+            }
         },
         [screenToFlowPosition],
     );
@@ -260,6 +262,7 @@ export default function CircuitBuilderFlow() {
                                     <Tabs.Content value="toolbox">
                                         <Toolbox
                                             labels={Object.keys(labelDataMap)}
+                                            setLabelDataMap={setLabelDataMap}
                                             getLabelData={getLabelData}
                                         />
                                     </Tabs.Content>
