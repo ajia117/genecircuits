@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import CreatableSelect from "react-select/creatable";
 import NodeData from "../../types/NodeData";
 import '../../index.css';
+import CreateProteinWindow from '../CreateProteinWindow';
 import {
     Box,
     Text,
@@ -49,6 +50,8 @@ export const Toolbox: React.FC<ToolboxProps> = ({
     };
     const [nodeData, setNodeData] = useState<NodeData>(genericNodeData);
     const [searchTerm, setSearchTerm] = useState(''); // stores user input for protein search
+    const [showCreateProteinWindow, setShowCreateProteinWindow] = useState(false);
+
 
     const createOption = (label: string): OptionType => ({
         label,
@@ -199,14 +202,6 @@ export const Toolbox: React.FC<ToolboxProps> = ({
         });
     }
 
-    const renderProteinNode = (label: string) => {
-        return (
-            <Flex>
-                <Text>{label}</Text>
-            </Flex>
-        )
-    }
-
     return (
         <Flex direction="column">
             {/* LOGIC GATES */}
@@ -235,8 +230,9 @@ export const Toolbox: React.FC<ToolboxProps> = ({
             {/* PROTIEN NODES */}
             <Flex direction="row" justify="between" mt="5">
                 <Text size="4" weight="bold">Proteins</Text>
+                {/* Create new node button */}
                 <Button variant='ghost'
-                    onClick={() => {}}
+                    onClick={() => setShowCreateProteinWindow(true)}
                 >
                     <Plus /> <Text size="4" weight="bold">New</Text>
                 </Button>
@@ -292,8 +288,12 @@ export const Toolbox: React.FC<ToolboxProps> = ({
                                     <Text size="1" color="gray">{protein.name}</Text> {/* TODO: change to protein type */}
                                 </Flex>
 
-                                <IconButton variant='ghost' color='gray'>
-                                    <Ellipsis size={20}/>
+                                <IconButton
+                                    variant='ghost'
+                                    color='gray'
+                                    onClick={() => {}}
+                                >
+                                    <Ellipsis size={20} />
                                 </IconButton>
                             </Flex>
                         </Box>
@@ -303,6 +303,9 @@ export const Toolbox: React.FC<ToolboxProps> = ({
                 </ScrollArea>
 
             </Flex>
+
+            <CreateProteinWindow open={showCreateProteinWindow} onOpenChange={setShowCreateProteinWindow} />
+
         {/* </Flex> */}
         {/* <>
             <div className="components-container">
