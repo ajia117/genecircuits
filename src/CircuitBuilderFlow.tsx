@@ -47,7 +47,7 @@ export default function CircuitBuilderFlow() {
     const [outputWindowSettings, setOutputWindowSettings] = useState({x: 0, y: 0, width: 300, height:200})
 
     const [outputData, setOutputData] = useState(); // Holds data received from backend to be used as graph
-    const [labelDataMap, setLabelDataMap] = useState<{[label: string]: NodeData}>({});
+    const [proteins, setProteins] = useState<{[label: string]: NodeData}>({});
 
     const [activeTab, setActiveTab] = useState('toolbox');
 
@@ -67,15 +67,27 @@ export default function CircuitBuilderFlow() {
         selfConnecting: SelfConnectingEdge,
     }), []);
 
-    let nodeId = 0; // counter for protein nodes
-    let gateId = 0; // counter for gate nodes
+    // let nodeId = 0; // counter for protein nodes
+    // let gateId = 0; // counter for gate nodes
+    // const getId = (nodeType: string) => { // provide id for nodes
+    //     if (nodeType == "and" || nodeType == "or") {
+    //         return `g${gateId++}`
+    //     } else if (nodeType == "custom") {
+    //         return `${nodeId++}`
+    //     }
+    // }; // creates id for the next node
+
+    const nodeIdRef = useRef(0); // counter for protein nodes
+    const gateIdRef = useRef(0); // counter for gate nodes
+
     const getId = (nodeType: string) => { // provide id for nodes
-        if (nodeType == "and" || nodeType == "or") {
-            return `g${gateId++}`
-        } else if (nodeType == "custom") {
-            return `${nodeId++}`
+        if (nodeType === "and" || nodeType === "or") { 
+            return `g${gateIdRef.current++}`;
+        } else if (nodeType === "custom") {
+            return `${nodeIdRef.current++}`;
         }
-    }; // creates id for the next node
+    };
+
 
     // Handler for connecting nodes
     const onConnect = useCallback(
@@ -101,42 +113,10 @@ export default function CircuitBuilderFlow() {
         setSelectedEdgeId(null);
     }, []);
 
-    // Handler for clicking an edge
+    // Handler for clicking a node
     const onNodeClick = (event: React.MouseEvent, node: Node) => {
         setSelectedNodeId(node.id); // Store the clicked node ID
         setSelectedEdgeId(null);
-    };
-
-    const getSelectedNode = () => {
-        return nodes.find(node => node.id === selectedNodeId) as Node<NodeData>;
-    };
-
-    const changeLabelData = (name: string, value: string | number) => {
-        // get label for node data you want to change
-        const labelToChange = nodes.find((node) => node.id === selectedNodeId).data.label
-        // only change the name and value of the label
-        setLabelDataMap(prevMap => ({
-            ...prevMap,
-            [labelToChange]: {
-                ...prevMap[labelToChange],
-                [name]: value
-            }
-        }));
-    };
-
-    // change node-specific data, such as input and output handles
-    const changeNodeData = (name: string, value: string | number) => {
-        setNodes((nodes) =>
-            nodes.map((node) =>
-                node.id === selectedNodeId ? {
-                    ...node,
-                    data: {
-                        ...node.data,
-                        [name]: value
-                    }
-                } : node
-            )
-        );
     };
 
     // Handler for clicking an edge
@@ -145,42 +125,46 @@ export default function CircuitBuilderFlow() {
         setSelectedNodeId(null);
     }, []);
 
+    const getSelectedNode = () => {
+        return nodes.find(node => node.id === selectedNodeId) as Node<NodeData>;
+    };
+
+    // const changeLabelData = (name: string, value: string | number) => {
+    //     // get label for node data you want to change
+    //     const labelToChange = nodes.find((node) => node.id === selectedNodeId).data.label
+    //     // only change the name and value of the label
+    //     setProteins(prevMap => ({
+    //         ...prevMap,
+    //         [labelToChange]: {
+    //             ...prevMap[labelToChange],
+    //             [name]: value
+    //         }
+    //     }));
+    // };
+
+    // change node-specific data, such as input and output handles
+    // const changeNodeData = (name: string, value: string | number) => {
+    //     setNodes((nodes) =>
+    //         nodes.map((node) =>
+    //             node.id === selectedNodeId ? {
+    //                 ...node,
+    //                 data: {
+    //                     ...node.data,
+    //                     [name]: value
+    //                 }
+    //             } : node
+    //         )
+    //     );
+    // };
+
+
     // Handler for dragging a component from toolbox to workspace
     const onDragOver = useCallback((event: React.DragEvent) => {
         event.preventDefault();
         event.dataTransfer.dropEffect = 'move';
     }, []);
 
-    // Add new node
-    const onDrop = useCallback(
-        (event: React.DragEvent) => {
-            event.preventDefault();
-
-            const nodeType = event.dataTransfer.getData("application/reactflow");
-            const nodeData = JSON.parse(event.dataTransfer.getData("application/node-data")) as NodeData;
-            if (!nodeType || typeof nodeType !== "string") {
-                console.error("Invalid node type:", nodeType);
-                return;
-            }
-            const position = screenToFlowPosition({ // find drop location
-                x: event.clientX,
-                y: event.clientY,
-            });
-            const newNode = { // properties of new node being added
-                id: getId(nodeType),
-                position,
-                type: nodeType,
-                data: nodeData
-            };
-            setNodes((nds) => [...nds, newNode]);
-            if (nodeType === "custom" && nodeData.label) {
-                setLabelData(nodeData.label, nodeData);
-            }
-        },
-        [screenToFlowPosition],
-    );
-
-    // Function to change marker type of the selected edge
+    // Function to change edge type of the selected edge
     const changeMarkerType = useCallback((markerType: string) => {
         if (!selectedEdgeId) return; // No edge selected
 
@@ -198,31 +182,112 @@ export default function CircuitBuilderFlow() {
         );
     }, [selectedEdgeId]);
 
-    // return data if label in labelDataMap
-    const getLabelData = (label: string) => {
-        if(label in labelDataMap) {
-            return labelDataMap[label];
-        }
-        return null;
-    }
+    // return data if label in proteins
+    // const getLabelData = (label: string) => {
+    //     if(label in proteins) {
+    //         return proteins[label];
+    //     }
+    //     return null;
+    // }
+
+    // get all data from a given protein label
+    const getProteinData = (label: string) => proteins[label] ?? null;
 
     // set label data if exists, or add to nodeLabelData if not
-    const setLabelData = (label: string, data: NodeData) => {
-        setLabelDataMap(prevMap => ({
-            ...prevMap,
-            [label]: data
+    // const setLabelData = (label: string, data: NodeData) => {
+    //     setProteins(prevMap => ({
+    //         ...prevMap,
+    //         [label]: data
+    //     }));
+    // }
+    const setProteinData = (label: string, data: NodeData) => {
+        setProteins((prev) => ({
+          ...prev,
+          [label]: data,
         }));
+      };
+
+    // get data from the selected node
+    const getSelectedNodeData = () => {
+        const node = getSelectedNode();
+        if(node)
+            return getProteinData(node.data.label)
     }
 
+
+    // const onDrop = useCallback(
+    //     (event: React.DragEvent) => {
+    //         event.preventDefault();
+
+    //         const nodeType = event.dataTransfer.getData("application/reactflow");
+    //         const nodeData = JSON.parse(event.dataTransfer.getData("application/node-data")) as NodeData;
+    //         if (!nodeType || typeof nodeType !== "string") {
+    //             console.error("Invalid node type:", nodeType);
+    //             return;
+    //         }
+    //         const position = screenToFlowPosition({ // find drop location
+    //             x: event.clientX,
+    //             y: event.clientY,
+    //         });
+    //         const newNode = { // properties of new node being added
+    //             id: getId(nodeType),
+    //             position,
+    //             type: nodeType,
+    //             data: nodeData
+    //         };
+    //         setNodes((nds) => [...nds, newNode]);
+    //         if (nodeType === "custom" && nodeData.label) {
+    //             // setLabelData(nodeData.label, nodeData);
+    //             setProteinData(nodeData.label, nodeData)
+    //         }
+    //     },
+    //     [screenToFlowPosition],
+    // );
+
+    const onDrop = useCallback(
+        (event: React.DragEvent) => {
+            event.preventDefault();
+    
+            const nodeType = event.dataTransfer.getData("application/reactflow");
+            if (!nodeType || typeof nodeType !== "string") {
+                console.error("Invalid node type:", nodeType);
+                return;
+            }
+
+            const position = screenToFlowPosition({
+                x: event.clientX,
+                y: event.clientY,
+            });
+
+            let newNode: Node;
+    
+            if (nodeType === "custom") {
+                const nodeData = JSON.parse(event.dataTransfer.getData("application/node-data")) as NodeData;
+                newNode = {
+                    id: getId(nodeType),
+                    type: nodeType,
+                    position,
+                    data: nodeData,
+                };
+        
+                if (nodeData.label) {
+                    setProteinData(nodeData.label, nodeData);
+                }
+            } else { // if logic gate
+                newNode = {
+                    id: getId(nodeType),
+                    type: nodeType,
+                    position,
+                    data: {},
+                };
+            }
+            setNodes((nds) => [...nds, newNode]);
+        }, [screenToFlowPosition, setNodes, setProteinData]);
+
+    // display output window
     const renderOutputWindow = () => {
         return <OutputWindow onClose={() => setShowOutputWindow(false)} outputData={outputData} windowSettings={outputWindowSettings} setWindowSettings={setOutputWindowSettings} />;
     };
-
-    const getSelectedNodeLabelData = () => {
-        const node = getSelectedNode();
-        if(node)
-            return getLabelData(node.data.label)
-    }
 
     return (
         <>
@@ -232,7 +297,7 @@ export default function CircuitBuilderFlow() {
 
             {/* TOP MENU FUNCTION BUTTONS */}
             <Ribbon
-                labelDataMap={labelDataMap}
+                labelDataMap={proteins}
                 nodes={nodes} setNodes={setNodes}
                 edges={edges} setEdges={setEdges}
                 showOutputWindow={showOutputWindow} 
@@ -261,15 +326,15 @@ export default function CircuitBuilderFlow() {
                                     {/* TOOLBOX */}
                                     <Tabs.Content value="toolbox">
                                         <Toolbox
-                                            labels={Object.keys(labelDataMap)}
-                                            setLabelDataMap={setLabelDataMap}
-                                            getLabelData={getLabelData}
+                                            proteins={proteins}
+                                            setProteinData={setProteinData}
+                                            getProteinData={getProteinData}
                                         />
                                     </Tabs.Content>
 
                                     {/* PROPERTIES */}
                                     <Tabs.Content value="properties">
-                                        <PropertiesWindow
+                                        {/* <PropertiesWindow
                                             key={`${selectedNodeId || ''}-${selectedEdgeId || ''}`}
                                             changeMarkerType={changeMarkerType}
                                             changeLabelData={changeLabelData}
@@ -278,7 +343,7 @@ export default function CircuitBuilderFlow() {
                                             selectedNodeId={selectedNodeId}
                                             selectedNode={getSelectedNode()}
                                             selectedNodeData={getSelectedNodeLabelData()}
-                                        />
+                                        /> */}
                                     </Tabs.Content>
 
                                     {/* CIRCUITS */}

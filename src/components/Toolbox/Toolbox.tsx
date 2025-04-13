@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import CreatableSelect from "react-select/creatable";
 import NodeData from "../../types/NodeData";
 import '../../index.css';
@@ -22,9 +22,9 @@ import {
 } from 'lucide-react'
 
 interface ToolboxProps {
-    labels: string[];
-    setLabelDataMap: React.Dispatch<React.SetStateAction<{ [label: string]: NodeData }>>;
-    getLabelData: (label: string) => NodeData;
+    proteins: { [label: string]: NodeData };
+    setProteinData: (label: string, data: NodeData) => void;
+    getProteinData: (label: string) => NodeData | null;
 }
 
 interface OptionType {
@@ -33,13 +33,13 @@ interface OptionType {
 }
 
 export const Toolbox: React.FC<ToolboxProps> = ({
-        labels,
-        setLabelDataMap,
-        getLabelData
+        proteins,
+        setProteinData,
+        getProteinData
     }) => {
 
-    const [selectedOption, setSelectedOption] = useState<OptionType | null>(null);
-    const [isNewLabel, setIsNewLabel] = useState(false);
+    // const [selectedOption, setSelectedOption] = useState<OptionType | null>(null);
+    // const [isNewLabel, setIsNewLabel] = useState(false);
     const genericNodeData: NodeData = {
         label: null,
         initialConcentration: 1,
@@ -59,9 +59,9 @@ export const Toolbox: React.FC<ToolboxProps> = ({
         label,
         value: label
     });
-    const [labelOptions, setLabelOptions] = useState<OptionType[]>(
-        labels.map(createOption)
-    );
+    // const [labelOptions, setLabelOptions] = useState<OptionType[]>(
+    //     labels.map(createOption)
+    // );
 
     const handleInputChange = (key: string, value: string | number) => {
         setNodeData(prev => ({
@@ -89,132 +89,124 @@ export const Toolbox: React.FC<ToolboxProps> = ({
     //     });
     // };
 
+    // called when new protein is created
     const handleCreate = (data: NodeData) => {
-        if (labels.includes(data.label.trim())) {
+        if (proteins[data.label]) {
             alert("That protein already exists!");
             return;
         }
-        setLabelDataMap(prev => ({
-            ...prev,
-            [data.label]: data
-        }));
-          
-    }
+        setProteinData(data.label, data); // adds new protein to the list
+    };
+    
 
     // don't always allow the create string option to appear
-    const isValidCreateString = (inputValue: string) => {
-        return inputValue !== "" && !labelOptions.find(option => option.label === inputValue.trim());
-    }
+    // const isValidCreateString = (inputValue: string) => {
+    //     return inputValue !== "" && !labelOptions.find(option => option.label === inputValue.trim());
+    // }
 
     // this is for changing to an already existing label
-    const handleChange = (inputValue: OptionType | null) => {
-        setSelectedOption(inputValue);
+    // const handleChange = (inputValue: OptionType | null) => {
+    //     setSelectedOption(inputValue);
 
-        if(!inputValue) {
-            // Reset form when cleared
-            setNodeData(genericNodeData);
-            setIsNewLabel(false);
-            return;
-        }
-        const data = getLabelData(inputValue.label);
+    //     if(!inputValue) {
+    //         // Reset form when cleared
+    //         setNodeData(genericNodeData);
+    //         setIsNewLabel(false);
+    //         return;
+    //     }
+    //     const data = getLabelData(inputValue.label);
 
-        // if someone made a label, but never dropped a node, still allow them to change its values
-        // getLabelData only returns data if a node was dropped
-        if(!data) {
-            setSelectedOption(inputValue);
-            setIsNewLabel(true);
-            setNodeData({
-                ...genericNodeData,
-                label: inputValue.label
-            });
-        }
-        else {
-            setIsNewLabel(false);
-            setNodeData({
-                ...data,
-                label: inputValue.label
-            });
-        }
+    //     // if someone made a label, but never dropped a node, still allow them to change its values
+    //     // getLabelData only returns data if a node was dropped
+    //     if(!data) {
+    //         setSelectedOption(inputValue);
+    //         setIsNewLabel(true);
+    //         setNodeData({
+    //             ...genericNodeData,
+    //             label: inputValue.label
+    //         });
+    //     }
+    //     else {
+    //         setIsNewLabel(false);
+    //         setNodeData({
+    //             ...data,
+    //             label: inputValue.label
+    //         });
+    //     }
 
-    };
+    // };
 
     // start dragging node, calls to onDrop in CircuitBuilderFlow when done
-    const onDragStart = (event: React.DragEvent, nodeType: string) => {
-        // store type, should always be "custom", "and", or "or"
-        event.dataTransfer.setData("application/reactflow", nodeType);
-        event.dataTransfer.setData("application/node-data", JSON.stringify(nodeData));
-        if(nodeType === "custom") {
-            event.dataTransfer.setData("application/node-in", String(nodeData.inputs));
-            event.dataTransfer.setData("application/node-out", String(nodeData.outputs));
+    const onDragStart = (e: React.DragEvent, type: string, data?: NodeData) => {
+        e.dataTransfer.setData("application/reactflow", type);
+        if (type === "custom" && data) {
+            e.dataTransfer.setData("application/node-data", JSON.stringify(data));
+            e.dataTransfer.setData("application/node-in", String(data.inputs));
+            e.dataTransfer.setData("application/node-out", String(data.outputs));
         }
-        event.dataTransfer.effectAllowed = "move";
+        e.dataTransfer.effectAllowed = "move";
     };
+    
 
     // filters the protein list when user searches
-    const filteredProteins = labels
-    .filter((label) =>
-        label.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    .map((label) => {
-        const data = getLabelData(label);
-        return {
-            id: label,
-            name: label,
-            ...data
-        };
-    });
+    const filteredProteins = useMemo(() => {
+        return Object.entries(proteins)
+            .filter(([label]) => label.toLowerCase().includes(searchTerm.toLowerCase()))
+            .map(([label, data]) => ({ id: label, label, ...data }));
+    }, [proteins, searchTerm]);
+    
 
     // generate HTML for form
-    const getLabelForm = () => {
-        // make sure that if a node is dropped, you cannot edit the data anymore
-        const dropped = getLabelData(selectedOption.label);
+    // const getLabelForm = () => {
+    //     // make sure that if a node is dropped, you cannot edit the data anymore
+    //     const dropped = getLabelData(selectedOption.label);
 
-        return Object.entries(nodeData).map(([key, value]) => {
-            if(key === 'label') return;
-            if(key === 'inputs' || key === 'outputs') {
-                return (
-                    <div key={key}>
-                    {key.charAt(0).toUpperCase() + key.slice(1)}:<br/>
-                    <input
-                        name={key}
-                        type="number"
-                        min = {0}
-                        max = {4}
-                        value={value as number || '0'}
-                        onChange={(e) => handleInputChange(key, Number(e.target.value))}
-                    /><br/>
-                </div>
-            )}
-            const isReadOnly = (!!dropped || !isNewLabel);
-            return (
-                <div key={key}>
-                    {key.charAt(0).toUpperCase() + key.slice(1)}:<br/>
-                    <input
-                        readOnly={isReadOnly}
-                        name={key}
-                        type="range"
-                        min={0}
-                        max={1}
-                        step={.01}
-                        value={value as number || '0'}
-                        onChange={(e) => handleInputChange(key, isReadOnly ? value as number : Number(e.target.value))}
-                        style={{ cursor: isReadOnly ? "not-allowed" : "grab"}}
-                    />
-                    <input
-                        readOnly={isReadOnly}
-                        name={key}
-                        type="number"
-                        min={0}
-                        max={1}
-                        step={.01}
-                        value={value as number || '0'}
-                        onChange={(e) => handleInputChange(key, Number(e.target.value))}
-                        style={{ cursor: isReadOnly ? "not-allowed" : ""}}
-                    /><br/>
-                </div>
-            )
-        });
-    }
+    //     return Object.entries(nodeData).map(([key, value]) => {
+    //         if(key === 'label') return;
+    //         if(key === 'inputs' || key === 'outputs') {
+    //             return (
+    //                 <div key={key}>
+    //                 {key.charAt(0).toUpperCase() + key.slice(1)}:<br/>
+    //                 <input
+    //                     name={key}
+    //                     type="number"
+    //                     min = {0}
+    //                     max = {4}
+    //                     value={value as number || '0'}
+    //                     onChange={(e) => handleInputChange(key, Number(e.target.value))}
+    //                 /><br/>
+    //             </div>
+    //         )}
+    //         const isReadOnly = (!!dropped || !isNewLabel);
+    //         return (
+    //             <div key={key}>
+    //                 {key.charAt(0).toUpperCase() + key.slice(1)}:<br/>
+    //                 <input
+    //                     readOnly={isReadOnly}
+    //                     name={key}
+    //                     type="range"
+    //                     min={0}
+    //                     max={1}
+    //                     step={.01}
+    //                     value={value as number || '0'}
+    //                     onChange={(e) => handleInputChange(key, isReadOnly ? value as number : Number(e.target.value))}
+    //                     style={{ cursor: isReadOnly ? "not-allowed" : "grab"}}
+    //                 />
+    //                 <input
+    //                     readOnly={isReadOnly}
+    //                     name={key}
+    //                     type="number"
+    //                     min={0}
+    //                     max={1}
+    //                     step={.01}
+    //                     value={value as number || '0'}
+    //                     onChange={(e) => handleInputChange(key, Number(e.target.value))}
+    //                     style={{ cursor: isReadOnly ? "not-allowed" : ""}}
+    //                 /><br/>
+    //             </div>
+    //         )
+    //     });
+    // }
 
     return (
         <Flex direction="column">
@@ -286,11 +278,12 @@ export const Toolbox: React.FC<ToolboxProps> = ({
                             key={protein.id}
                             draggable
                             onDragStart={(e: React.DragEvent) => {
-                                e.dataTransfer.setData("application/reactflow", "custom");
-                                e.dataTransfer.setData("application/node-data", JSON.stringify(protein)); // ✅ Use actual protein data
-                                e.dataTransfer.setData("application/node-in", String(protein.inputs));
-                                e.dataTransfer.setData("application/node-out", String(protein.outputs));
-                                e.dataTransfer.effectAllowed = "move";
+                                // e.dataTransfer.setData("application/reactflow", "custom");
+                                // e.dataTransfer.setData("application/node-data", JSON.stringify(protein)); // ✅ Use actual protein data
+                                // e.dataTransfer.setData("application/node-in", String(protein.inputs));
+                                // e.dataTransfer.setData("application/node-out", String(protein.outputs));
+                                // e.dataTransfer.effectAllowed = "move";
+                                onDragStart(e, "custom", protein)
                             }}
                             style={{
                                 cursor: 'grab',
@@ -304,8 +297,8 @@ export const Toolbox: React.FC<ToolboxProps> = ({
                         >
                             <Flex direction="row" justify="between" align="center">
                                 <Flex direction="column">
-                                    <Text weight="medium" size="2">{protein.name}</Text>
-                                    <Text size="1" color="gray">{protein.name}</Text> {/* TODO: change to protein type */}
+                                    <Text weight="medium" size="2">{protein.label}</Text>
+                                    <Text size="1" color="gray">{protein.label}</Text> {/* TODO: change to protein type */}
                                 </Flex>
 
                                 <IconButton
