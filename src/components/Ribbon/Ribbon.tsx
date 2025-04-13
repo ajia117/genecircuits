@@ -84,29 +84,27 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
     // make sure all nodes we send back are updated with regards to label
     // currently, this is inefficient, and runs on every node each time we hit play
     // in future, add new boolean field in NodeData to check if it has changed since last run through
-    const updateNodesWithLabels = () => {
-        return nodes.map((node) => {
-            const label = node.data?.label;
-            const sharedData = label && proteins[label];
-            return {
-                ...node,
-                data: {
-                    ...sharedData,
-                    label, // ensure label is preserved
-                }
-            };
-        });
-    };
+    // const updateNodesWithProteinData = () => {
+    //     return nodes.map((node) => {
+    //         const label = node.data?.label;
+    //         const sharedData = label && proteins[label];
+    //         return {
+    //             ...node,
+    //             data: {
+    //                 ...sharedData,
+    //                 label, // ensure label is preserved
+    //             }
+    //         };
+    //     });
+    // };
     
 
 
     const handlePlayClick = async () => {
-        console.log("og nodes", nodes)
-        console.log("og edges", edges)
-        nodes = updateNodesWithLabels();
-        setNodes(nodes); // see above comment for why this is unnecessary, but can be improved
+        // nodes = updateNodesWithProteinData();
+        // setNodes(nodes); // see above comment for why this is unnecessary, but can be improved
         
-        const circuitJson = formatCircuitToJson(circuitSettings, nodes, edges);
+        const circuitJson = formatCircuitToJson(circuitSettings, nodes, edges, proteins);
         console.log(circuitJson)
         setIsRunning(true);
         try {
@@ -129,7 +127,7 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
         e.preventDefault();
         if(nodes.length === 0 && edges.length === 0) { alert("Nothing to export."); return; }
         if(type === "json") {
-            const updatedNodes = updateNodesWithLabels();
+            // const updatedNodes = updateNodesWithProteinData();
             const circuitJson = {circuitSettings, nodes, edges}
             const blob = new Blob([JSON.stringify(circuitJson, null, 2)], {
                 type: "application/json",
