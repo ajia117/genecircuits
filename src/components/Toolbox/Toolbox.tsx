@@ -8,13 +8,16 @@ import {
     Flex,
     Button,
     TextField,
-    ScrollArea
+    ScrollArea,
+    Grid,
+    IconButton
 } from '@radix-ui/themes'
 import {
     Plus,
     Ampersands,
     Tally2,
-    Search
+    Search,
+    Ellipsis
 } from 'lucide-react'
 
 interface ToolboxProps {
@@ -45,6 +48,7 @@ export const Toolbox: React.FC<ToolboxProps> = ({
         outputs: 1
     };
     const [nodeData, setNodeData] = useState<NodeData>(genericNodeData);
+    const [searchTerm, setSearchTerm] = useState(''); // stores user input for protein search
 
     const createOption = (label: string): OptionType => ({
         label,
@@ -129,6 +133,20 @@ export const Toolbox: React.FC<ToolboxProps> = ({
         event.dataTransfer.effectAllowed = "move";
     };
 
+    // filters the protein list when user searches
+    const filteredProteins = labels
+    .filter((label) =>
+        label.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .map((label) => {
+        const data = getLabelData(label);
+        return {
+            id: label,
+            name: label,
+            ...data
+        };
+    });
+
     // generate HTML for form
     const getLabelForm = () => {
         // make sure that if a node is dropped, you cannot edit the data anymore
@@ -181,6 +199,14 @@ export const Toolbox: React.FC<ToolboxProps> = ({
         });
     }
 
+    const renderProteinNode = (label: string) => {
+        return (
+            <Flex>
+                <Text>{label}</Text>
+            </Flex>
+        )
+    }
+
     return (
         <Flex direction="column">
             {/* LOGIC GATES */}
@@ -217,64 +243,95 @@ export const Toolbox: React.FC<ToolboxProps> = ({
             </Flex>
 
             <Flex direction="column" gap="2" mt="4">
-                <TextField.Root size="3" variant="surface" placeholder="Search proteins...">
+                <TextField.Root size="3" variant="surface" placeholder="Search proteins..."
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                >
                     <TextField.Slot>
                         <Search size={20} />
                     </TextField.Slot>
                 </TextField.Root>
 
-                <ScrollArea type="auto" scrollbars="vertical" 
-                    style={{ 
-                        height: 250, 
-                        border: '1px solid var(--gray-7)',
-                        borderRadius: 'var(--radius-3)',
-                        maxHeight: '300px',
-                        overflowY: 'auto',
-                    }}
+                <ScrollArea
+                    type="auto"
+                    scrollbars="vertical"
+                    // style={{
+                    //     maxHeight: '300px',
+                    //     border: '1px solid var(--gray-a6)',
+                    //     borderRadius: 'var(--radius-3)',
+                    //     padding: '0.5rem',
+                    //     width: 'auto'
+                    // }}
                 >
-                    <Box
-
-                    >
-
+                {filteredProteins.length === 0 ? (
+                    <Box p="3" style={{ color: 'var(--gray-a9)', textAlign: 'center', fontSize: '13px' }}>
+                        No proteins found. Try creating one.
                     </Box>
+                ) : (
+                    <Grid
+                        columns={{ initial: "2", sm: "2" }}
+                        gap="3"
+                    >
+                    {filteredProteins.map((protein) => (
+                        <Box
+                            key={protein.id}
+                            draggable
+                            onDragStart={(e: React.DragEvent) => onDragStart(e, 'custom')}
+                            style={{
+                                cursor: 'grab',
+                                border: '1px solid var(--gray-a6)',
+                                borderRadius: 'var(--radius-3)',
+                                padding: '0.5rem',
+                                backgroundColor: 'var(--color-surface)',
+                                transition: 'background-color 0.2s ease',
+                            }}
+                            className="protein-grid-item"
+                        >
+                            <Flex direction="row" justify="between" align="center">
+                                <Flex direction="column">
+                                    <Text weight="medium" size="2">{protein.name}</Text>
+                                    <Text size="1" color="gray">{protein.name}</Text> {/* TODO: change to protein type */}
+                                </Flex>
+
+                                <IconButton variant='ghost' color='gray'>
+                                    <Ellipsis size={20}/>
+                                </IconButton>
+                            </Flex>
+                        </Box>
+                    ))}
+                    </Grid>
+                )}
                 </ScrollArea>
 
             </Flex>
+        {/* </Flex> */}
+        {/* <>
+            <div className="components-container">
+                <div className="mt-4 p-4 bg-gray-50 rounded shadow-sm">
+                    <h3 className="text-lg font-medium mb-3">Choose existing Protein or Create New</h3>
+                    <div className="space-y-3">
+                        <CreatableSelect
+                            isClearable
+                            onChange={handleChange}
+                            onCreateOption={handleCreate}
+                            options={labelOptions}
+                            value={selectedOption}
+                            isValidNewOption={isValidCreateString}
+                            formatCreateLabel={(inputValue) => `Create "${inputValue.trim()}"`}
+                        />
+
+                        {selectedOption && getLabelForm()}
+                    </div>
+                    <br/>
+                    {selectedOption &&
+                        <div className="dndnode output" onDragStart={(event) => onDragStart(event, 'custom')} draggable>
+                            Drag Node
+                        </div>
+                    }
+                </div>
+
+            </div>
+        </> */}
         </Flex>
-        // <>
-        //     <h1 className={`text-center`}>Toolbox</h1>
-        //     <div className="components-container">
-        //         <div className="dndnode and" onDragStart={(event) => onDragStart(event, 'and')} draggable>
-        //             AND Node
-        //         </div>
-        //         <div className="dndnode or" onDragStart={(event) => onDragStart(event, 'or')} draggable>
-        //         OR Node
-        //         </div>
-        //         <div className="mt-4 p-4 bg-gray-50 rounded shadow-sm">
-        //             <h3 className="text-lg font-medium mb-3">Choose existing Protein or Create New</h3>
-        //             <div className="space-y-3">
-        //                 <CreatableSelect
-        //                     isClearable
-        //                     onChange={handleChange}
-        //                     onCreateOption={handleCreate}
-        //                     options={labelOptions}
-        //                     value={selectedOption}
-        //                     isValidNewOption={isValidCreateString}
-        //                     formatCreateLabel={(inputValue) => `Create "${inputValue.trim()}"`}
-        //                 />
-
-        //                 {selectedOption && getLabelForm()}
-        //             </div>
-        //             <br/>
-        //             {selectedOption &&
-        //                 <div className="dndnode output" onDragStart={(event) => onDragStart(event, 'custom')} draggable>
-        //                     Drag Node
-        //                 </div>
-        //             }
-        //         </div>
-
-        //     </div>
-        // </>
     );
 };
 
