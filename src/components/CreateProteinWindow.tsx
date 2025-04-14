@@ -26,10 +26,9 @@ export default function CreateProteinWindow({ open, onOpenChange, onCreate }: Pr
     const genericNodeData: NodeData = {
         label: null,
         initialConcentration: 1,
-        hillCoefficient: 1,
         lossRate: 1,
         beta: 1,
-        delay: 0,
+        // delay: 0,
         inputs: 1,
         outputs: 1
     };
@@ -37,10 +36,9 @@ export default function CreateProteinWindow({ open, onOpenChange, onCreate }: Pr
 
     const numericProps: { key: keyof NodeData; label: string; min: number; max: number; step: number }[] = [
         { key: 'initialConcentration', label: 'Initial Concentration', min: 0, max: 100, step: 1 },
-        { key: 'hillCoefficient', label: 'Hill Coefficient', min: 0, max: 4, step: 0.1 },
         { key: 'lossRate', label: 'Loss Rate', min: 0, max: 5, step: 0.1 },
         { key: 'beta', label: 'Beta', min: 0, max: 10, step: 0.1 },
-        { key: 'delay', label: 'Delay', min: 0, max: 20, step: 1 }
+        // { key: 'delay', label: 'Delay', min: 0, max: 20, step: 1 }
     ];
 
     const handleCancel = () => {

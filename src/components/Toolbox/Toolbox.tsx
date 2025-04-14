@@ -43,10 +43,9 @@ export const Toolbox: React.FC<ToolboxProps> = ({
     const genericNodeData: NodeData = {
         label: null,
         initialConcentration: 1,
-        hillCoefficient: 1,
         lossRate: 1,
         beta: 1,
-        delay: 0,
+        // delay: 0,
         inputs: 1,
         outputs: 1
     };
