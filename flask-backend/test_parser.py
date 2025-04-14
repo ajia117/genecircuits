@@ -49,10 +49,32 @@ def test_colors_json():
         assert actual_proteins == expected_proteins
 
 
+def test_parser_missing_nodes():
+    data = {"edges": []}
+    with pytest.raises(ValueError, match="JSON must contain both 'nodes' and 'edges'"):
+        parse_circuit(data)
+
+
+def test_parser_missing_edges():
+    data = {"nodes": []}
+    with pytest.raises(ValueError, match="JSON must contain both 'nodes' and 'edges'"):
+        parse_circuit(data)
+
+
+def test_parser_unsupported_node_type():
+    data = {
+        "nodes": [{"id": "1", "type": "banana"}],
+        "edges": []
+    }
+    with pytest.raises(ValueError, match="Unsupported node type: banana"):
+        parse_circuit(data)
+
+
 # TODO: handle command line args, to run individual tests if desired
 def main():
     print("Running all test cases...")
-    pytest.main(["-v", "test_parser.py::test_animals_json", "test_parser.py::test_colors_json"])
+    #pytest.main(["-v", "test_parser.py::test_animals_json", "test_parser.py::test_colors_json"])
+    pytest.main(["-v", "test_parser.py::test_parser_missing_nodes", "test_parser.py::test_parser_missing_edges", "test_parser.py::test_parser_unsupported_node_type"])
 
 # Run the script
 if __name__ == '__main__':

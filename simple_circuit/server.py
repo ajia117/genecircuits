@@ -52,16 +52,20 @@ def run_simulation_route():
         
         # Parse data into protein objects
         # TODO: add try / catch block to catch errors in parsing and return proper code
-        protein_array = simple_parser.parse_circuit(data)
+        try:
+            protein_array = simple_parser.parse_circuit(data)
+        except Exception as parse_error:
+            return jsonify({"error": f"Parse error: {str(parse_error)}"}), 400
 
         plot_image = run_backend_simulation(protein_array)
+
         if isinstance(plot_image, str):
-            return jsonify({"error": plot_image}), 500
+            return jsonify({"error": f"Simulation error: {plot_image}"}), 500
 
         return send_file(plot_image, mimetype="image/png")
 
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": f"Server error: {str(e)}"}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
