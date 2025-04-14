@@ -1,4 +1,4 @@
-import React, {useCallback, useState, useRef, useMemo} from "react";
+import React, {useCallback, useState, useRef, useMemo, useEffect} from "react";
 import {
     ReactFlow,
     Background,
@@ -262,7 +262,11 @@ export default function CircuitBuilderFlow() {
             let newNode: Node;
     
             if (nodeType === "custom") {
-                const nodeData = JSON.parse(event.dataTransfer.getData("application/node-data")) as NodeData;
+                const rawData = JSON.parse(event.dataTransfer.getData("application/node-data")) as NodeData;
+
+                // Remove `id` if present — prevent conflict
+                const { id, ...nodeData } = rawData;
+
                 newNode = {
                     id: getId(nodeType),
                     type: nodeType,
@@ -297,7 +301,7 @@ export default function CircuitBuilderFlow() {
 
             {/* TOP MENU FUNCTION BUTTONS */}
             <Ribbon
-                proteins={proteins}
+                proteins={proteins} setProteins={setProteins}
                 nodes={nodes} setNodes={setNodes}
                 edges={edges} setEdges={setEdges}
                 showOutputWindow={showOutputWindow} 

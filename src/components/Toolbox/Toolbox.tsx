@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import CreatableSelect from "react-select/creatable";
 import NodeData from "../../types/NodeData";
 import '../../index.css';
@@ -89,7 +89,7 @@ export const Toolbox: React.FC<ToolboxProps> = ({
     // };
 
     // called when new protein is created
-    const handleCreate = (data: NodeData) => {
+    const handleCreateProtein = (data: NodeData) => {
         if (proteins[data.label]) {
             alert("That protein already exists!");
             return;
@@ -316,7 +316,7 @@ export const Toolbox: React.FC<ToolboxProps> = ({
 
             </Flex>
 
-            <CreateProteinWindow open={showCreateProteinWindow} onOpenChange={setShowCreateProteinWindow} onCreate={handleCreate}/>
+            <CreateProteinWindow open={showCreateProteinWindow} onOpenChange={setShowCreateProteinWindow} onCreate={handleCreateProtein}/>
 
         {/* </Flex> */}
         {/* <>

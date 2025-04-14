@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, Dispatch, SetStateAction } from "react";
 // import { Play, Pause, Save, Trash, Graph, SettingsSlider } from "../../assets";
 import "./Ribbon.css";
 import { Node, Edge } from "@xyflow/react";
-import { formatCircuitToJson } from "../../utils/formatCircuitToJson"
-import { fetchOutput, abortFetch } from "../../utils/fetchOutput";
+import { fetchOutput, abortFetch, formatBackendJson, formatCircuitExportJson } from "../../utils"
 import CircuitSettingsType from "../../types/CircuitSettingsType";
 import NodeData from "../../types/NodeData";
 import {
@@ -35,19 +34,21 @@ import {
 import ImportWindow from "../ImportWindow";
 
 interface TopRibbonProps {
-    proteins: { [label: string]: NodeData },
-    nodes: Node<NodeData>[],
-    setNodes: (nodes: Node[]) => void,
-    edges: Edge[],
-    setEdges: (edges: Edge[]) => void,
-    showOutputWindow: boolean,
-    setShowOutputWindow: (show: boolean) => void,
-    circuitSettings: CircuitSettingsType,
-    setCircuitSettings: (settings: CircuitSettingsType) => void,
-    setOutputData: (data: any)=>void
+    proteins: { [label: string]: NodeData };
+    setProteins: Dispatch<SetStateAction<{ [label: string]: NodeData }>>;
+    nodes: Node<NodeData>[];
+    setNodes: Dispatch<SetStateAction<Node<NodeData>[]>>;
+    edges: Edge[];
+    setEdges: Dispatch<SetStateAction<Edge[]>>;
+    showOutputWindow: boolean;
+    setShowOutputWindow: (show: boolean) => void;
+    circuitSettings: CircuitSettingsType;
+    setCircuitSettings: Dispatch<SetStateAction<CircuitSettingsType>>;
+    setOutputData: (data: any) => void;
 }
 
-const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges, showOutputWindow, setShowOutputWindow, circuitSettings, setCircuitSettings, setOutputData, proteins }) => {
+
+const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges, showOutputWindow, setShowOutputWindow, circuitSettings, setCircuitSettings, setOutputData, proteins, setProteins }) => {
     const [showClearConfirmation, setShowClearConfirmation] = useState(false); // keep track of whether clear confirmation window is open or not
     const [isRunning, setIsRunning] = useState(false) // flag to track if simulation is running or not
     const [showSettingsWindow, setShowSettingsWindow] = useState(false); // keep track of whether settings window is open or not
@@ -56,24 +57,41 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
     // listen for a circuit import
     useEffect(() => {
         const handleImportedCircuit = (event: CustomEvent) => {
-            const { circuitSettings, nodes, edges } = event.detail;
+            const { circuitSettings: importedSettings, nodes: importedNodes, edges: importedEdges, proteins: importedProteins } = event.detail;
         
-            const safeSettings = {
-                projectName: circuitSettings.projectName ?? "Untitled Project",
-                simulationDuration: circuitSettings.simulationDuration ?? 20,
-                numTimePoints: circuitSettings.numTimePoints ?? 10,
-            };
+            // Merge circuit settings (replace name, keep other values if already set)
+            setCircuitSettings(prev => ({
+                projectName: importedSettings.projectName ?? prev.projectName,
+                simulationDuration: importedSettings.simulationDuration ?? prev.simulationDuration,
+                numTimePoints: importedSettings.numTimePoints ?? prev.numTimePoints,
+            }));
         
-            setCircuitSettings(safeSettings);
-            setNodes(nodes ?? []);
-            setEdges(edges ?? []);
+            //TODO: update so nodes and edges get re IDed if things are already existing in circuit
+            // Merge nodes
+            setNodes(prevNodes => [
+                ...prevNodes,
+                ...(importedNodes ?? []),
+            ]);
+        
+            // Merge edges
+            setEdges(prevEdges => [
+                ...prevEdges,
+                ...(importedEdges ?? []),
+            ]);
+        
+            // Merge proteins
+            setProteins(prevProteins => ({
+                ...prevProteins,
+                ...(importedProteins ?? {})
+            }));
         };
       
         window.addEventListener("circuitImport", handleImportedCircuit as EventListener);
         return () => {
-            window.removeEventListener("circuitImport", handleImportedCircuit as EventListener);
+          window.removeEventListener("circuitImport", handleImportedCircuit as EventListener);
         };
     }, []);
+      
 
     const confirmClear = () => {
         setNodes([])
@@ -104,8 +122,7 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
         // nodes = updateNodesWithProteinData();
         // setNodes(nodes); // see above comment for why this is unnecessary, but can be improved
         
-        const circuitJson = formatCircuitToJson(circuitSettings, nodes, edges, proteins);
-        console.log(circuitJson)
+        const circuitJson = formatBackendJson(circuitSettings, nodes, edges, proteins);
         setIsRunning(true);
         try {
             const res = await fetchOutput(circuitJson);
@@ -128,7 +145,7 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
         if(nodes.length === 0 && edges.length === 0) { alert("Nothing to export."); return; }
         if(type === "json") {
             // const updatedNodes = updateNodesWithProteinData();
-            const circuitJson = {circuitSettings, nodes, edges}
+            const circuitJson = formatCircuitExportJson(circuitSettings, nodes, edges, proteins);
             const blob = new Blob([JSON.stringify(circuitJson, null, 2)], {
                 type: "application/json",
             });
