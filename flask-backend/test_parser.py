@@ -69,12 +69,20 @@ def test_parser_unsupported_node_type():
     with pytest.raises(ValueError, match="Unsupported node type: banana"):
         parse_circuit(data)
 
+def test_parser_missing_both_gate_inputs():
+    data = {
+        "nodes": [{"id": "g0", "type": "and"}],
+        "edges": []
+    }
+    with pytest.raises(ValueError, match="Parser failed: Gate 'G0' \\(and\\) must have exactly two inputs, got 0"):
+        parse_circuit(data)
+
 
 # TODO: handle command line args, to run individual tests if desired
 def main():
     print("Running all test cases...")
     #pytest.main(["-v", "test_parser.py::test_animals_json", "test_parser.py::test_colors_json"])
-    pytest.main(["-v", "test_parser.py::test_parser_missing_nodes", "test_parser.py::test_parser_missing_edges", "test_parser.py::test_parser_unsupported_node_type"])
+    pytest.main(["-v", "test_parser.py::test_parser_missing_nodes", "test_parser.py::test_parser_missing_edges", "test_parser.py::test_parser_unsupported_node_type", "test_parser.py::test_parser_missing_both_gate_inputs"])
 
 # Run the script
 if __name__ == '__main__':
