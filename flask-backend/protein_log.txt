@@ -1,0 +1,106 @@
+Received json
+{
+    "circuitSettings": {
+        "circuitName": "test circuit",
+        "simulationDuration": 20,
+        "numTimePoints": 10
+    },
+    "nodes": [
+        {
+            "id": "0",
+            "type": "custom",
+            "position": {
+                "x": 48.5,
+                "y": 435
+            },
+            "data": {
+                "label": "pop",
+                "initialConcentration": 10,
+                "hillCoefficient": 0,
+                "lossRate": 0.2,
+                "beta": 0,
+                "delay": 0,
+                "inputs": 1,
+                "outputs": 1
+            }
+        },
+        {
+            "id": "1",
+            "type": "custom",
+            "position": {
+                "x": 59.5,
+                "y": 514.5
+            },
+            "data": {
+                "label": "pfft",
+                "initialConcentration": 5,
+                "hillCoefficient": 0,
+                "lossRate": 0,
+                "beta": 0,
+                "delay": 0,
+                "inputs": 1,
+                "outputs": 1
+            }
+        },
+        {
+            "id": "g0",
+            "type": "and",
+            "position": {
+                "x": 163,
+                "y": 465
+            },
+            "data": {
+                "label": "pfft",
+                "initialConcentration": 5,
+                "hillCoefficient": 0,
+                "lossRate": 0,
+                "beta": 0,
+                "delay": 0,
+                "inputs": 1,
+                "outputs": 1
+            }
+        },
+        {
+            "id": "2",
+            "type": "custom",
+            "position": {
+                "x": 317,
+                "y": 471.5
+            },
+            "data": {
+                "label": "bang",
+                "initialConcentration": 0,
+                "hillCoefficient": 0,
+                "lossRate": 0.1,
+                "beta": 0,
+                "delay": 0,
+                "inputs": 1,
+                "outputs": 1
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "edge-0-g0",
+            "type": "promote",
+            "source": "0",
+            "target": "g0"
+        },
+        {
+            "id": "edge-1-g0",
+            "type": "promote",
+            "source": "1",
+            "target": "g0"
+        },
+        {
+            "id": "edge-g0-2",
+            "type": "promote",
+            "source": "g0",
+            "target": "2"
+        }
+    ]
+}
+Parsed protein list
+Protein ID: 0, Name: pop, Hill: 0, Degradation: 0.2, Gates: []
+Protein ID: 1, Name: pfft, Hill: 0, Degradation: 0, Gates: []
+Protein ID: 2, Name: bang, Hill: 0, Degradation: 0.1, Gates: [('aa_and', 0, 1)]

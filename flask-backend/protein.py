@@ -1,22 +1,16 @@
 import biocircuits
 
 class Protein:
-    def __init__(self, id, name, initConc, hill, degrad, gates, extConcFunc = None, extConcFuncArgs = None):
+    def __init__(self, id, name, initConc, degrad, gates, extConcFunc = None, extConcFuncArgs = None):
         self.mID = id
         self.mName = name
         self.mInternalConc = initConc
-        self.mHill = hill
         self.mDegradation = degrad
         self.mGates = gates
         self.mExtConcFunc = extConcFunc
         self.mExtConcFuncArgs = extConcFuncArgs
         for gate in self.mGates:
             gate.regFuncLambda = gate.getRegFunc()
-    
-    # TODO: this function should take in the name of the protein with which the self protein is interacting.
-    # The hill coefficient should be dependent on the combination of the two proteins.
-    def getHill(self):
-        return self.mHill
 
     def getID(self):
         return self.mID
@@ -49,41 +43,65 @@ class Protein:
             rate += gate.regFunc(proteinArray)
         rate -= self.mDegradation * self.mInternalConc
         return rate
+    
+    def __eq__(self, other):
+        return (
+            isinstance(other, Protein) and
+            self.mID == other.mID and
+            self.mName == other.mName and
+            self.mInternalConc == other.mInternalConc and
+            self.mDegradation == other.mDegradation and
+            self.mGates == other.mGates and
+            self.mExtConcFunc == other.mExtConcFunc and
+            self.mExtConcFuncArgs == other.mExtConcFuncArgs
+        )
 
 class Gate:
-    def __init__(self, type, first, second):
+    def __init__(self, type, *, firstInput, secondInput = None, firstHill = 1, secondHill = 1):
         self.mType = type
-        self.mFirstInput = first
-        self.mSecondInput = second
+        self.mFirstInput = firstInput
+        self.mFirstHill = firstHill
+        self.mSecondInput = secondInput
+        self.mSecondHill = secondHill
         self.prodRate = 0.0
 
     def getRegFunc(self):
         if self.mType == "act_hill":
-            return lambda p: biocircuits.act_hill(p[self.mFirstInput].getConcentration(), p[self.mFirstInput].getHill())
+            return lambda p: biocircuits.act_hill(p[self.mFirstInput].getConcentration(), self.mFirstHill)
         elif self.mType == "rep_hill":
-            return lambda p: biocircuits.rep_hill(p[self.mFirstInput].getConcentration(), p[self.mFirstInput].getHill())
+            return lambda p: biocircuits.rep_hill(p[self.mFirstInput].getConcentration(), self.mFirstHill)
         elif self.mType == "aa_and":
-            return lambda p: biocircuits.aa_and(p[self.mFirstInput].getConcentration(), p[self.mSecondInput].getConcentration(), p[self.mFirstInput].getHill(), p[self.mSecondInput].getHill())
+            return lambda p: biocircuits.aa_and(p[self.mFirstInput].getConcentration(), p[self.mSecondInput].getConcentration(), self.mFirstHill, self.mSecondHill)
         elif self.mType == "aa_or":
-            return lambda p: biocircuits.aa_or(p[self.mFirstInput].getConcentration(), p[self.mSecondInput].getConcentration(), p[self.mFirstInput].getHill(), p[self.mSecondInput].getHill())
+            return lambda p: biocircuits.aa_or(p[self.mFirstInput].getConcentration(), p[self.mSecondInput].getConcentration(), self.mFirstHill, self.mSecondHill)
         elif self.mType == "aa_or_single":
-            return lambda p: biocircuits.aa_or_single(p[self.mFirstInput].getConcentration(), p[self.mSecondInput].getConcentration(), p[self.mFirstInput].getHill(), p[self.mSecondInput].getHill())
+            return lambda p: biocircuits.aa_or_single(p[self.mFirstInput].getConcentration(), p[self.mSecondInput].getConcentration(), self.mFirstHill, self.mSecondHill)
         elif self.mType == "rr_and":
-            return lambda p: biocircuits.rr_and(p[self.mFirstInput].getConcentration(), p[self.mSecondInput].getConcentration(), p[self.mFirstInput].getHill(), p[self.mSecondInput].getHill())
+            return lambda p: biocircuits.rr_and(p[self.mFirstInput].getConcentration(), p[self.mSecondInput].getConcentration(), self.mFirstHill, self.mSecondHill)
         elif self.mType == "rr_or":
-            return lambda p: biocircuits.rr_or(p[self.mFirstInput].getConcentration(), p[self.mSecondInput].getConcentration(), p[self.mFirstInput].getHill(), p[self.mSecondInput].getHill())
+            return lambda p: biocircuits.rr_or(p[self.mFirstInput].getConcentration(), p[self.mSecondInput].getConcentration(), self.mFirstHill, self.mSecondHill)
         elif self.mType == "rr_and_single":
-            return lambda p: biocircuits.rr_and_single(p[self.mFirstInput].getConcentration(), p[self.mSecondInput].getConcentration(), p[self.mFirstInput].getHill(), p[self.mSecondInput].getHill())
+            return lambda p: biocircuits.rr_and_single(p[self.mFirstInput].getConcentration(), p[self.mSecondInput].getConcentration(), self.mFirstHill, self.mSecondHill)
         elif self.mType == "ar_and":
-            return lambda p: biocircuits.ar_and(p[self.mFirstInput].getConcentration(), p[self.mSecondInput].getConcentration(), p[self.mFirstInput].getHill(), p[self.mSecondInput].getHill())
+            return lambda p: biocircuits.ar_and(p[self.mFirstInput].getConcentration(), p[self.mSecondInput].getConcentration(), self.mFirstHill, self.mSecondHill)
         elif self.mType == "ar_or":
-            return lambda p: biocircuits.ar_or(p[self.mFirstInput].getConcentration(), p[self.mSecondInput].getConcentration(), p[self.mFirstInput].getHill(), p[self.mSecondInput].getHill())
+            return lambda p: biocircuits.ar_or(p[self.mFirstInput].getConcentration(), p[self.mSecondInput].getConcentration(), self.mFirstHill, self.mSecondHill)
         elif self.mType == "ar_and_single":
-            return lambda p: biocircuits.ar_and_single(p[self.mFirstInput].getConcentration(), p[self.mSecondInput].getConcentration(), p[self.mFirstInput].getHill(), p[self.mSecondInput].getHill())
+            return lambda p: biocircuits.ar_and_single(p[self.mFirstInput].getConcentration(), p[self.mSecondInput].getConcentration(), self.mFirstHill, self.mSecondHill)
         elif self.mType == "ar_or_single":
-            return lambda p: biocircuits.ar_or_single(p[self.mFirstInput].getConcentration(), p[self.mSecondInput].getConcentration(), p[self.mFirstInput].getHill(), p[self.mSecondInput].getHill())
+            return lambda p: biocircuits.ar_or_single(p[self.mFirstInput].getConcentration(), p[self.mSecondInput].getConcentration(), self.mFirstHill, self.mSecondHill)
         else:
             raise ValueError(f"Unknown regulatory function type: {self.mType}")
         
     def regFunc(self, proteinArray):
         return self.regFuncLambda(proteinArray)
+    
+    def __eq__(self, other):
+        return (
+            isinstance(other, Gate) and
+            self.mType == other.mType and
+            self.mFirstInput == other.mFirstInput and
+            self.mSecondInput == other.mSecondInput and 
+            self.mFirstHill == other.mFirstHill and
+            self.mSecondHill == other.mSecondHill
+        )
