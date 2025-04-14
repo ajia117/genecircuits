@@ -47,6 +47,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@radix-ui/themes": "^3.2.1",
     "@xyflow/react": "^12.4.2",
     "axios": "^1.7.9",
     "electron-squirrel-startup": "^1.0.1",

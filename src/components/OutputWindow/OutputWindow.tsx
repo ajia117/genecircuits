@@ -38,7 +38,7 @@ export default function OutputWindow({ onClose, windowSettings, setWindowSetting
             >
                 {/* Drag Handle */}
                 <div className="drag-handle cursor-move bg-gray-800 text-white p-2 flex justify-between">
-                    <span className="font-semibold">Simulation Output</span>
+                    <p className="title">Simulation Output</p>
                     <button 
                         onClick={onClose} 
                         className="close-button">
@@ -48,21 +48,17 @@ export default function OutputWindow({ onClose, windowSettings, setWindowSetting
 
                     {/* Output Content */}
                     <div className="flex-1 p-4 overflow-auto">
-                        <p>This is where the simulation results will be displayed.</p>
-                        {/* {outputData && 
-                            <p>{JSON.stringify(outputData)}</p>
-                        } */}
                         {outputData ? (
-                            <img 
-                                src={outputData.data} 
-                                alt="Simulation Output" 
+                            <img
+                                src={outputData.data}
+                                alt="Simulation Output"
                                 className="object-contain"
-                                style={{ 
-                                    maxWidth: "100%", 
-                                    maxHeight: "100%", 
-                                    width: dimensions.width - 20, 
-                                    height: dimensions.height - 50 
-                                }} 
+                                style={{
+                                    maxWidth: "100%",
+                                    maxHeight: "100%",
+                                    width: dimensions.width - 10,
+                                    height: dimensions.height - 70
+                                }}
                             />
                         ) : (
                             <p className="text-center text-gray-400">No simulation output available.</p>
