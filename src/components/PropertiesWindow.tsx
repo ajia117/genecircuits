@@ -1,6 +1,6 @@
 import {MarkerType, Node} from "@xyflow/react";
 import React, {useEffect, useState} from "react";
-import NodeData from "../../types/NodeData";
+import NodeData from "../types/NodeData";
 
 interface PropertiesWindowProps {
     selectedEdgeId: string;

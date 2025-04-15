@@ -32,6 +32,7 @@ import {
     Tabs,
     Box,
     Text,
+    ScrollArea
 } from '@radix-ui/themes'
 
 
@@ -336,6 +337,13 @@ export default function CircuitBuilderFlow() {
                             
 
                                 {/* Tab Content */}
+                                <ScrollArea
+                                    type="scroll"
+                                    scrollbars="vertical"
+                                    style={{
+                                        maxHeight: 'calc(100vh - 100px)',
+                                    }}
+                                >
                                 <Box px="4" mt="6" className="h-full overflow-y-auto">
                                     {/* TOOLBOX */}
                                     <Tabs.Content value="toolbox">
@@ -365,6 +373,7 @@ export default function CircuitBuilderFlow() {
                                         <Text size="4" weight="bold">Prebuilt Circuits</Text>
                                     </Tabs.Content>
                                 </Box>
+                                </ScrollArea>
                             </Tabs.Root>
 
                             

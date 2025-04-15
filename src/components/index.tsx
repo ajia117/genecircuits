@@ -1,4 +1,4 @@
-export { default as PropertiesWindow } from './PropertiesWindow/PropertiesWindow'
+export { default as PropertiesWindow } from './PropertiesWindow'
 export { default as OutputWindow } from './OutputWindow/OutputWindow'
 export { default as Toolbox } from './Toolbox/Toolbox'
 export { default as Ribbon } from './Ribbon/Ribbon'
