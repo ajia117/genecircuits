@@ -48,7 +48,14 @@ interface TopRibbonProps {
 }
 
 
-const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges, showOutputWindow, setShowOutputWindow, circuitSettings, setCircuitSettings, setOutputData, proteins, setProteins }) => {
+const TopRibbon: React.FC<TopRibbonProps> = ({ 
+    nodes, setNodes, 
+    edges, setEdges, 
+    showOutputWindow, setShowOutputWindow, 
+    circuitSettings, setCircuitSettings, 
+    proteins, setProteins ,
+    setOutputData, 
+}) => {
     const [showClearConfirmation, setShowClearConfirmation] = useState(false); // keep track of whether clear confirmation window is open or not
     const [isRunning, setIsRunning] = useState(false) // flag to track if simulation is running or not
     const [showSettingsWindow, setShowSettingsWindow] = useState(false); // keep track of whether settings window is open or not

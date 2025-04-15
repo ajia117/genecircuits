@@ -158,6 +158,11 @@ export default function CircuitBuilderFlow() {
     const onNodeClick = (event: React.MouseEvent, node: Node) => {
         setSelectedNodeId(node.id); // Store the clicked node ID
         setSelectedEdgeId(null);
+
+        // Auto switch to "properties" tab
+        if (node.type === "custom") {
+            setActiveTab("properties");
+        }
     };
 
     // Handler for clicking an edge
@@ -198,15 +203,13 @@ export default function CircuitBuilderFlow() {
     //     );
     // };
 
-
-    // Handler for dragging a component from toolbox to workspace
-    const onDragOver = useCallback((event: React.DragEvent) => {
-        event.preventDefault();
-        event.dataTransfer.dropEffect = 'move';
-    }, []);
+    // Function to change protein node data
+    // const changeProteinData = (name: string, value: string | number) => {
+    //     setProteinData()
+    // }
 
     // Function to change edge type of the selected edge
-    const changeMarkerType = useCallback((markerType: string) => {
+    const changeEdgeType = useCallback((markerType: string) => {
         if (!selectedEdgeId) return; // No edge selected
 
         setEdges((eds) =>
@@ -222,6 +225,12 @@ export default function CircuitBuilderFlow() {
             )
         );
     }, [selectedEdgeId]);
+
+    // Handler for dragging a component from toolbox to workspace
+    const onDragOver = useCallback((event: React.DragEvent) => {
+        event.preventDefault();
+        event.dataTransfer.dropEffect = 'move';
+    }, []);
 
     // return data if label in proteins
     // const getLabelData = (label: string) => {
@@ -246,7 +255,7 @@ export default function CircuitBuilderFlow() {
           ...prev,
           [label]: data,
         }));
-      };
+    };
 
     // get data from the selected node
     const getSelectedProteinData = () => {
@@ -328,7 +337,7 @@ export default function CircuitBuilderFlow() {
                     <Panel className="left-pane min-w-128" defaultSize={30} maxSize={50}>
                         <div className="flex flex-col h-full">
                             {/* Tab Navigation */}
-                            <Tabs.Root defaultValue="toolbox" className="h-full">
+                            <Tabs.Root defaultValue="toolbox" value={activeTab} onValueChange={setActiveTab} className="h-full">
                                 <Tabs.List>
                                     <Tabs.Trigger value="toolbox">Toolbox</Tabs.Trigger>
                                     <Tabs.Trigger value="properties">Properties</Tabs.Trigger>
@@ -366,6 +375,14 @@ export default function CircuitBuilderFlow() {
                                             selectedNode={getSelectedNode()}
                                             selectedNodeData={getSelectedNodeLabelData()}
                                         /> */}
+                                        {/* switch to properties tab when node selected */}
+                                        {selectedNodeId && getSelectedProteinData() && (
+                                            <PropertiesWindow 
+                                                selectedNodeId={selectedNodeId}
+                                                proteinData={getSelectedProteinData()}
+                                                setProteinData={setProteinData}
+                                            />
+                                        )}
                                     </Tabs.Content>
 
                                     {/* CIRCUITS */}
