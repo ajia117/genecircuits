@@ -158,17 +158,16 @@ export default function CircuitBuilderFlow() {
     const onNodeClick = (event: React.MouseEvent, node: Node) => {
         setSelectedNodeId(node.id); // Store the clicked node ID
         setSelectedEdgeId(null);
-
         // Auto switch to "properties" tab
-        if (node.type === "custom") {
-            setActiveTab("properties");
-        }
+        setActiveTab("properties");
     };
 
     // Handler for clicking an edge
     const onEdgeClick = useCallback((event: React.MouseEvent, edge: Edge) => {
         setSelectedEdgeId(edge.id); // Store the clicked edge ID
         setSelectedNodeId(null);
+        // Auto switch to "properties" tab
+        setActiveTab("properties");
     }, []);
 
     const getSelectedNode = () => {
@@ -263,6 +262,12 @@ export default function CircuitBuilderFlow() {
         if(node)
             return getProteinData(node.data.label)
     }
+
+    // get data from the selected edge
+    const getSelectedEdgeData = () => {
+        return edges.find(edge => edge.id === selectedEdgeId) ?? null;
+    };
+    
 
     const onDrop = useCallback(
         (event: React.DragEvent) => {
@@ -377,11 +382,15 @@ export default function CircuitBuilderFlow() {
                                         /> */}
                                         {/* switch to properties tab when node selected */}
                                         {/* {selectedNodeId && getSelectedProteinData() && ( */}
-                                            <PropertiesWindow 
-                                                selectedNodeId={selectedNodeId}
-                                                proteinData={getSelectedProteinData()}
-                                                setProteinData={setProteinData}
-                                            />
+                                        <PropertiesWindow 
+                                            selectedNodeId={selectedNodeId}
+                                            selectedEdgeId={selectedEdgeId}
+                                            proteinData={getSelectedProteinData()}
+                                            edgeData={getSelectedEdgeData()}
+                                            setProteinData={setProteinData}
+                                            setEdgeType={changeEdgeType}
+                                        />
+
                                         {/* )} */}
                                     </Tabs.Content>
 
