@@ -22,26 +22,26 @@ interface PropertiesWindowProps {
 const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
     selectedNodeId,
     proteinData,
-    setProteinData
+    setProteinData,
 }) => {
-    const [localData, setLocalData] = useState<NodeData | null>(null);
+    const [localProteinData, setLocalProteinData] = useState<NodeData | null>(null);
     const [editingProtein, setEditingProtein] = useState(false);
 
     useEffect(() => {
         if (proteinData) {
-            setLocalData(proteinData);
+            setLocalProteinData(proteinData);
             setEditingProtein(false); // reset edit mode when new node selected
         }
     }, [proteinData]);
 
     const handleUpdate = () => {
-        if (localData) {
-            setProteinData(localData.label, localData);
+        if (localProteinData) {
+            setProteinData(localProteinData.label, localProteinData);
             setEditingProtein(false); // exit edit mode after update
         }
     };
 
-    if (!localData) return (
+    if (!localProteinData) return (
         <Flex align="center" justify="center">
             <Text color="gray" size="2" align="center">Select a node, protein, or edge to view its properties.</Text>
         </Flex>
@@ -49,38 +49,43 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
 
     return (
         <Flex direction="column" gap="4">
-            <Text size="4" weight="bold">Selected Node ID: <Text weight="regular">{selectedNodeId}</Text></Text>
-            <Flex direction="row" justify="between" align="center">
-                <Button variant="outline" color="red">
-                    <Trash2 size={20}/> <Text size="4" weight="bold">Delete</Text>
-                </Button>
-                <Button variant="outline" onClick={() => setEditingProtein((prev) => !prev)}>
-                    <Pencil size={20} />
-                    <Text size="4" weight="bold">{editingProtein ? "Cancel" : "Edit"}</Text>
-                </Button>
-            </Flex>
-
-            { editingProtein && (
-            <ScrollArea
-                type="auto"
-                scrollbars="vertical"
-                style={{
-                    // maxHeight: 'calc(100vh - 450px)',
-                    border: '1px solid var(--gray-a6)',
-                    borderRadius: 'var(--radius-3)',
-                    padding: '0.5rem',
-                    width: 'auto'
-                }}
-            >
-                <Flex direction="column" gap="4" pb="4">
-                    <ProteinDataForm
-                        mode="edit"
-                        proteinData={localData}
-                        setProteinData={setLocalData}
-                    />
-                    <Button onClick={handleUpdate}><Text>Update Protein</Text></Button>
+            { selectedNodeId && ( // display selected node data
+                <Flex direction="column" gap="4">
+                    <Text size="4" weight="bold">Selected Node ID: <Text weight="regular">{selectedNodeId}</Text></Text>
+                    <Flex direction="row" justify="between" align="center">
+                        <Button variant="outline" color="red">
+                            <Trash2 size={20}/> <Text size="4" weight="bold">Delete</Text>
+                        </Button>
+                        <Button variant="outline" onClick={() => setEditingProtein((prev) => !prev)}>
+                            <Pencil size={20} />
+                            <Text size="4" weight="bold">{editingProtein ? "Cancel" : "Edit"}</Text>
+                        </Button>
+                    </Flex>
                 </Flex>
-            </ScrollArea>)}
+            )}
+
+            { editingProtein && ( // open protein data editor
+                <ScrollArea
+                    type="auto"
+                    scrollbars="vertical"
+                    style={{
+                        maxHeight: '400px',
+                        border: '1px solid var(--gray-a6)',
+                        borderRadius: 'var(--radius-3)',
+                        padding: '0.5rem',
+                        width: 'auto'
+                    }}
+                >
+                    <Flex direction="column" gap="4" pb="4">
+                        <ProteinDataForm
+                            mode="edit"
+                            proteinData={localProteinData}
+                            setProteinData={setLocalProteinData}
+                        />
+                        <Button onClick={handleUpdate}><Text>Update Protein</Text></Button>
+                    </Flex>
+                </ScrollArea>
+            )}
         </Flex>
     );
 };
