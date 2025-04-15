@@ -98,29 +98,44 @@ export default function CircuitBuilderFlow() {
     // handler for circuit imports
     useEffect(() => {
         const handleCircuitImport = (event: CustomEvent) => {
-            const { circuitSettings: importedSettings, nodes: importedNodes, edges: importedEdges, proteins: importedProteins } = event.detail;
+            const {
+                circuitSettings: importedSettings,
+                nodes: importedNodes,
+                edges: importedEdges,
+                proteins: importedProteins
+            } = event.detail;
     
             // Replace circuit settings (safe default fallback)
-            setCircuitSettings(prev => ({
-                projectName: importedSettings?.projectName ?? prev.projectName,
-                simulationDuration: importedSettings?.simulationDuration ?? prev.simulationDuration,
-                numTimePoints: importedSettings?.numTimePoints ?? prev.numTimePoints,
-            }));
+            setCircuitSettings({
+                projectName: importedSettings?.projectName ?? "Untitled Project",
+                simulationDuration: importedSettings?.simulationDuration ?? 20,
+                numTimePoints: importedSettings?.numTimePoints ?? 10
+            });
+
+            // Overwrite old data on import
+            setNodes(importedNodes ?? []);
+            setEdges(importedEdges ?? []);
+            setProteins(importedProteins ?? {});
     
-            // Merge nodes (or do overwrite depending on behavior you want)
-            setNodes(prev => [...prev, ...(importedNodes ?? [])]);
+            // // Merge nodes (or do overwrite depending on behavior you want)
+            // setNodes(prev => [...prev, ...(importedNodes ?? [])]);
     
-            // Merge edges
-            setEdges(prev => [...prev, ...(importedEdges ?? [])]);
+            // // Merge edges
+            // setEdges(prev => [...prev, ...(importedEdges ?? [])]);
     
-            // Merge proteins
-            setProteins(prev => ({
-                ...prev,
-                ...(importedProteins ?? {})
-            }));
+            // // Merge proteins
+            // setProteins(prev => ({
+            //     ...prev,
+            //     ...(importedProteins ?? {})
+            // }));
     
             // Sync node ID counters to avoid ID conflict
             syncNodeCounters([...nodes, ...(importedNodes ?? [])]);
+
+            // Reset controller state variables
+            setSelectedEdgeId(null);
+            setSelectedNodeId(null);
+            setSelectedNodeType(null);
         };
     
         window.addEventListener("circuitImport", handleCircuitImport as EventListener);
