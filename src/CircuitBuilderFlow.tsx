@@ -15,6 +15,9 @@ import '@xyflow/react/dist/style.css';
 import './index.css';
 import { RepressMarker, PromoteMarker } from "./assets";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
+import NodeData from "./types/NodeData";
+import SelfConnectingEdge from "./components/Edges/SelfConnectingEdge";
+import { syncNodeCounters, setRefs } from "./utils";
 
 import { 
     Toolbox, 
@@ -25,8 +28,6 @@ import {
     OrGateNode, 
     CustomNode 
 } from './components';
-import NodeData from "./types/NodeData";
-import SelfConnectingEdge from "./components/Edges/SelfConnectingEdge";
 import {
     Tabs,
     Box,
@@ -77,17 +78,56 @@ export default function CircuitBuilderFlow() {
     //     }
     // }; // creates id for the next node
 
+    // handle creating new ids for nodes and gates
     const nodeIdRef = useRef(0); // counter for protein nodes
     const gateIdRef = useRef(0); // counter for gate nodes
-
-    const getId = (nodeType: string) => { // provide id for nodes
-        if (nodeType === "and" || nodeType === "or") { 
-            return `g${gateIdRef.current++}`;
+    const getId = (nodeType: string): string => {
+        if (nodeType === "and" || nodeType === "or") {
+          return `g${gateIdRef.current++}`;
         } else if (nodeType === "custom") {
-            return `${nodeIdRef.current++}`;
+          return `${nodeIdRef.current++}`;
         }
-    };
+        return `unknown-${Math.random().toString(36).substr(2, 5)}`;
+      };
+    useEffect(() => {
+        setRefs({ nodeIdRef, gateIdRef });
+    }, []);
 
+    // handler for circuit imports
+    useEffect(() => {
+        const handleCircuitImport = (event: CustomEvent) => {
+            const { circuitSettings: importedSettings, nodes: importedNodes, edges: importedEdges, proteins: importedProteins } = event.detail;
+    
+            // Replace circuit settings (safe default fallback)
+            setCircuitSettings(prev => ({
+                projectName: importedSettings?.projectName ?? prev.projectName,
+                simulationDuration: importedSettings?.simulationDuration ?? prev.simulationDuration,
+                numTimePoints: importedSettings?.numTimePoints ?? prev.numTimePoints,
+            }));
+    
+            // Merge nodes (or do overwrite depending on behavior you want)
+            setNodes(prev => [...prev, ...(importedNodes ?? [])]);
+    
+            // Merge edges
+            setEdges(prev => [...prev, ...(importedEdges ?? [])]);
+    
+            // Merge proteins
+            setProteins(prev => ({
+                ...prev,
+                ...(importedProteins ?? {})
+            }));
+    
+            // Sync node ID counters to avoid ID conflict
+            syncNodeCounters([...nodes, ...(importedNodes ?? [])]);
+        };
+    
+        window.addEventListener("circuitImport", handleCircuitImport as EventListener);
+    
+        return () => {
+            window.removeEventListener("circuitImport", handleCircuitImport as EventListener);
+        };
+    }, [setNodes, setEdges, setProteins, setCircuitSettings, nodes]);
+    
 
     // Handler for connecting nodes
     const onConnect = useCallback(
@@ -208,41 +248,11 @@ export default function CircuitBuilderFlow() {
       };
 
     // get data from the selected node
-    const getSelectedNodeData = () => {
+    const getSelectedProteinData = () => {
         const node = getSelectedNode();
         if(node)
             return getProteinData(node.data.label)
     }
-
-
-    // const onDrop = useCallback(
-    //     (event: React.DragEvent) => {
-    //         event.preventDefault();
-
-    //         const nodeType = event.dataTransfer.getData("application/reactflow");
-    //         const nodeData = JSON.parse(event.dataTransfer.getData("application/node-data")) as NodeData;
-    //         if (!nodeType || typeof nodeType !== "string") {
-    //             console.error("Invalid node type:", nodeType);
-    //             return;
-    //         }
-    //         const position = screenToFlowPosition({ // find drop location
-    //             x: event.clientX,
-    //             y: event.clientY,
-    //         });
-    //         const newNode = { // properties of new node being added
-    //             id: getId(nodeType),
-    //             position,
-    //             type: nodeType,
-    //             data: nodeData
-    //         };
-    //         setNodes((nds) => [...nds, newNode]);
-    //         if (nodeType === "custom" && nodeData.label) {
-    //             // setLabelData(nodeData.label, nodeData);
-    //             setProteinData(nodeData.label, nodeData)
-    //         }
-    //     },
-    //     [screenToFlowPosition],
-    // );
 
     const onDrop = useCallback(
         (event: React.DragEvent) => {

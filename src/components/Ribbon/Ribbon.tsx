@@ -55,42 +55,42 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
     const [showImportWindow, setShowImportWindow] = useState(false); // keep track of whether import window is open or not
 
     // listen for a circuit import
-    useEffect(() => {
-        const handleImportedCircuit = (event: CustomEvent) => {
-            const { circuitSettings: importedSettings, nodes: importedNodes, edges: importedEdges, proteins: importedProteins } = event.detail;
+    // useEffect(() => {
+    //     const handleImportedCircuit = (event: CustomEvent) => {
+    //         const { circuitSettings: importedSettings, nodes: importedNodes, edges: importedEdges, proteins: importedProteins } = event.detail;
         
-            // Merge circuit settings (replace name, keep other values if already set)
-            setCircuitSettings(prev => ({
-                projectName: importedSettings.projectName ?? prev.projectName,
-                simulationDuration: importedSettings.simulationDuration ?? prev.simulationDuration,
-                numTimePoints: importedSettings.numTimePoints ?? prev.numTimePoints,
-            }));
+    //         // Merge circuit settings (replace name, keep other values if already set)
+    //         setCircuitSettings(prev => ({
+    //             projectName: importedSettings.projectName ?? prev.projectName,
+    //             simulationDuration: importedSettings.simulationDuration ?? prev.simulationDuration,
+    //             numTimePoints: importedSettings.numTimePoints ?? prev.numTimePoints,
+    //         }));
         
-            //TODO: update so nodes and edges get re IDed if things are already existing in circuit
-            // Merge nodes
-            setNodes(prevNodes => [
-                ...prevNodes,
-                ...(importedNodes ?? []),
-            ]);
+    //         //TODO: update so nodes and edges get re IDed if things are already existing in circuit
+    //         // Merge nodes
+    //         setNodes(prevNodes => [
+    //             ...prevNodes,
+    //             ...(importedNodes ?? []),
+    //         ]);
         
-            // Merge edges
-            setEdges(prevEdges => [
-                ...prevEdges,
-                ...(importedEdges ?? []),
-            ]);
+    //         // Merge edges
+    //         setEdges(prevEdges => [
+    //             ...prevEdges,
+    //             ...(importedEdges ?? []),
+    //         ]);
         
-            // Merge proteins
-            setProteins(prevProteins => ({
-                ...prevProteins,
-                ...(importedProteins ?? {})
-            }));
-        };
+    //         // Merge proteins
+    //         setProteins(prevProteins => ({
+    //             ...prevProteins,
+    //             ...(importedProteins ?? {})
+    //         }));
+    //     };
       
-        window.addEventListener("circuitImport", handleImportedCircuit as EventListener);
-        return () => {
-          window.removeEventListener("circuitImport", handleImportedCircuit as EventListener);
-        };
-    }, []);
+    //     window.addEventListener("circuitImport", handleImportedCircuit as EventListener);
+    //     return () => {
+    //       window.removeEventListener("circuitImport", handleImportedCircuit as EventListener);
+    //     };
+    // }, []);
       
 
     const confirmClear = () => {
