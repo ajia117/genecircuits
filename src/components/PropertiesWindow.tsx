@@ -7,10 +7,14 @@ import {
     Text,
     Button,
     ScrollArea,
+    DataList,
+    Code,
+    IconButton,
 } from "@radix-ui/themes"
 import {
     Trash2,
-    Pencil
+    Pencil,
+    Copy
 } from "lucide-react"
 
 interface PropertiesWindowProps {
@@ -26,6 +30,16 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
 }) => {
     const [localProteinData, setLocalProteinData] = useState<NodeData | null>(null);
     const [editingProtein, setEditingProtein] = useState(false);
+
+    const LABEL_MAP: { [key: string]: string } = { // used for protein data list labels
+        label: "Protein",
+        initialConcentration: "Initial Concentration",
+        lossRate: "Loss Rate",
+        beta: "Beta",
+        inputs: "Number of Inputs",
+        outputs: "Number of Outputs"
+    };
+    
 
     useEffect(() => {
         if (proteinData) {
@@ -51,7 +65,54 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
         <Flex direction="column" gap="4">
             { selectedNodeId && ( // display selected node data
                 <Flex direction="column" gap="4">
-                    <Text size="4" weight="bold">Selected Node ID: <Text weight="regular">{selectedNodeId}</Text></Text>
+                    <Text size="4" weight="bold">Node Properties</Text>
+
+                    {/* start node data */}
+                    <Flex direction="column" justify="center"
+                        style={{
+                            border: '1px solid var(--gray-a6)',
+                            borderRadius: 'var(--radius-3)',
+                            padding: '0.5rem',
+                            backgroundColor: 'var(--color-surface)',
+                            transition: 'background-color 0.2s ease',
+                        }}
+                    >
+                    <DataList.Root>
+                        <DataList.Item>
+                            <DataList.Label minWidth="88px">ID</DataList.Label>
+                            <DataList.Value>
+                                <Flex align="center" gap="2">
+                                    <Code variant="ghost">{selectedNodeId}</Code>
+                                    <IconButton
+                                        size="1"
+                                        aria-label="Copy value"
+                                        color="gray"
+                                        variant="ghost"
+                                    >
+                                        <Copy size={15} />
+                                    </IconButton>
+                                </Flex>
+                            </DataList.Value>
+                        </DataList.Item>
+                        {Object.entries(proteinData).map(([key, value]) => (
+                            <DataList.Item key={key}>
+                                <DataList.Label minWidth="88px">
+                                    {LABEL_MAP[key] ?? key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                                </DataList.Label>
+                                <DataList.Value>
+                                    {typeof value === "number"
+                                        ? value
+                                        : typeof value === "string"
+                                        ? value
+                                        : JSON.stringify(value)
+                                    }
+                                </DataList.Value>
+                            </DataList.Item>
+                        ))}
+                    </DataList.Root>
+                    </Flex>
+
+                    {/* start function buttons */}
                     <Flex direction="row" justify="between" align="center">
                         <Button variant="outline" color="red">
                             <Trash2 size={20}/> <Text size="4" weight="bold">Delete</Text>
