@@ -23,9 +23,6 @@ def run_backend_simulation(proteinArray):
         t = np.linspace(0, duration, n)
 
         # Run the simulation
-        # a_args = (0, 40, 30, 2, 0.5)
-        # b_args = (15, 50, 20, 2, 1)
-        # proteinArray = [Protein(0, "Protein A", 0.0, 1, 0.0, []), Protein(1, "Protein B", 0.0, 1, 0.00, []), Protein(2, "Protein C", 0.0, 2, 0.1, [Gate("aa_and", 0, 1)]), Protein(3, "Protein D", 0.0, 2, 0.1, [Gate("aa_or", 0, 1)]), Protein(4, "Protein E", 0.0, 0, 0.2, [Gate("ar_and", 3, 2)])]
         final_concentrations = run_simulation(t, proteinArray)
 
         # Plot results using matplotlib
@@ -54,22 +51,21 @@ def run_simulation_route():
         data = request.get_json()
         
         # Parse data into protein objects
-        protein_array = simple_parser.parse_circuit(data)  # Ensure parser.py has this function
-        
-        # Run simulation and get plot
-        x_args = (0, 15, 20, 1.0, 0.5)
-        a_args = (0, 40, 30, 2, 0.5)
+        # TODO: add try / catch block to catch errors in parsing and return proper code
+        try:
+            protein_array = simple_parser.parse_circuit(data)
+        except Exception as parse_error:
+            return jsonify({"error": f"Parse error: {str(parse_error)}"}), 400
 
-        #proteinArray = [Protein(0, "Protein A", 0.0, 1, 0.0, [], x_pulse, a_args), Protein(1, "Protein B", 0.0, 1, 0.00, [],  x_pulse, b_args), Protein(2, "Protein C", 0.0, 2, 0.1, [Gate("aa_and", 0, 1)]), Protein(3, "Protein D", 0.0, 2, 0.1, [Gate("aa_or", 0, 1)]), Protein(4, "Protein E", 0.0, 0, 0.2, [Gate("ar_and", 3, 2)])]
-        
         plot_image = run_backend_simulation(protein_array)
+
         if isinstance(plot_image, str):
-            return jsonify({"error": plot_image}), 500
+            return jsonify({"error": f"Simulation error: {plot_image}"}), 500
 
         return send_file(plot_image, mimetype="image/png")
 
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": f"Server error: {str(e)}"}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

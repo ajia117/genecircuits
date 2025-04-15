@@ -31,6 +31,12 @@ def run_simulation(t, proteinArray):
     args = (proteinArray,)
     
     final_concentrations = scipy.integrate.odeint(simulation_iter, initial_concentrations, t, args)
+
+    # Combine internal and external concentrations
+    for i, protein in enumerate(proteinArray):
+        if protein.mExtConcFunc is not None:
+            final_concentrations[:, i] += protein.mExtConcFunc(t, *protein.mExtConcFuncArgs)
+        
     return final_concentrations
 
 def x_pulse(t, t_0, t_f, tau, x_0, duty_cycle):

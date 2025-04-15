@@ -9,7 +9,7 @@ export default function OutputWindow({ onClose, windowSettings, setWindowSetting
     useEffect(() => {
         setDimensions({ width: windowSettings.width, height: windowSettings.height });
     }, [windowSettings.width, windowSettings.height]);
-
+    
     return (
         <ReactFlowPanel>
             <Rnd
