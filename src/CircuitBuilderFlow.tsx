@@ -44,6 +44,7 @@ export default function CircuitBuilderFlow() {
     const [edges, setEdges, onEdgesChange] = useEdgesState([]); // List of all edges in workspace
     const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null); // Stores clicked edge ID
     const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null); // Stores clicked node ID
+    const [selectedNodeType, setSelectedNodeType] = useState<string | null>(null); // Stores gate type if the selected node was a logic gate
 
     const [showOutputWindow, setShowOutputWindow] = useState<boolean>(false);
     const [outputWindowSettings, setOutputWindowSettings] = useState({x: 0, y: 0, width: 300, height:200})
@@ -152,12 +153,16 @@ export default function CircuitBuilderFlow() {
     const onPaneClick = useCallback(() => {
         setSelectedNodeId(null);
         setSelectedEdgeId(null);
+        setSelectedNodeType(null);
     }, []);
 
     // Handler for clicking a node
     const onNodeClick = (event: React.MouseEvent, node: Node) => {
+        console.log("clicked", node)
         setSelectedNodeId(node.id); // Store the clicked node ID
         setSelectedEdgeId(null);
+        setSelectedNodeType(node.type)
+
         // Auto switch to "properties" tab
         setActiveTab("properties");
     };
@@ -166,6 +171,7 @@ export default function CircuitBuilderFlow() {
     const onEdgeClick = useCallback((event: React.MouseEvent, edge: Edge) => {
         setSelectedEdgeId(edge.id); // Store the clicked edge ID
         setSelectedNodeId(null);
+        setSelectedNodeType(null);
         // Auto switch to "properties" tab
         setActiveTab("properties");
     }, []);
@@ -384,6 +390,7 @@ export default function CircuitBuilderFlow() {
                                         {/* {selectedNodeId && getSelectedProteinData() && ( */}
                                         <PropertiesWindow 
                                             selectedNodeId={selectedNodeId}
+                                            selectedNodeType={selectedNodeType}
                                             selectedEdgeId={selectedEdgeId}
                                             proteinData={getSelectedProteinData()}
                                             edgeData={getSelectedEdgeData()}

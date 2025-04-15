@@ -21,6 +21,7 @@ import {
 
 interface PropertiesWindowProps {
     selectedNodeId: string | null;
+    selectedNodeType: string | null;
     proteinData: NodeData | null;
     setProteinData: (label: string, data: NodeData) => void;
     selectedEdgeId: string | null;
@@ -30,6 +31,7 @@ interface PropertiesWindowProps {
 
 const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
     selectedNodeId,
+    selectedNodeType,
     proteinData,
     setProteinData,
     selectedEdgeId,
@@ -84,7 +86,7 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
         }
     };
 
-    if (!localProteinData && !edgeData) return (
+    if (!selectedNodeId && !selectedEdgeId) return (
         <Flex align="center" justify="center">
             <Text color="gray" size="2" align="center">Select a node, protein, or edge to view its properties.</Text>
         </Flex>
@@ -93,7 +95,7 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
     return (
         <Flex direction="column" gap="4">
             {/* NODE PROPERTIES */}
-            {( selectedNodeId && proteinData ) && ( // display selected node data
+            {( selectedNodeId && selectedNodeType === "custom" && proteinData ) && ( // display selected node data
                 <Flex direction="column" gap="4">
                     <Text size="4" weight="bold">Node Properties</Text>
 
@@ -241,6 +243,50 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
 
                                     </DataList.Item>
                             ))}
+                        </DataList.Root>
+                    </Flex>
+                </Flex>
+            )}
+
+            {/* -------------------------------------------------------------------------------------------- */}
+            {/* LOGIC GATE PROPERTIES */}
+            {selectedNodeId && (selectedNodeType === "and" || selectedNodeType === "or") && (
+                <Flex direction="column" gap="4">
+                    <Text size="4" weight="bold">Logic Gate Properties</Text>
+
+                    {/* edge data list */}
+                    <Flex direction="column"
+                        style={{
+                            border: '1px solid var(--gray-a6)',
+                            borderRadius: 'var(--radius-3)',
+                            padding: '0.5rem',
+                            backgroundColor: 'var(--color-surface)',
+                        }}
+                    >
+                        <DataList.Root>
+                            <DataList.Item>
+                                <DataList.Label minWidth="88px">Gate ID</DataList.Label>
+                                <DataList.Value>
+                                    <Flex align="center" gap="2">
+                                        <Code variant="ghost">{selectedNodeId}</Code>
+                                        <IconButton
+                                            size="1"
+                                            aria-label="Copy value"
+                                            color="gray"
+                                            variant="ghost"
+                                        >
+                                            <Copy size={15} />
+                                        </IconButton>
+                                    </Flex>
+                                </DataList.Value>
+                            </DataList.Item>
+                            <DataList.Item>
+                                <DataList.Label minWidth="88px">Gate Type</DataList.Label>
+                                <DataList.Value>
+                                    <Code variant="ghost">{(selectedNodeType === "and") ? "AND" : "OR"}</Code>
+                                </DataList.Value>
+                            </DataList.Item>
+
                         </DataList.Root>
                     </Flex>
                 </Flex>
