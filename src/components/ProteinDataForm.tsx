@@ -43,8 +43,8 @@ const ProteinDataForm: React.FC<ProteinDataProps> = ({
                 </Flex>
             :
                 <Flex direction="column">
-                    <Text weight="bold" size="4">Protein Editor</Text>
-                    <Text as="div" weight="bold">Editing: <Text weight="regular">{proteinData.label}</Text></Text>
+                    <Text weight="bold" size="4">Protein Properties</Text>
+                    <Text as="div" weight="regular" color="gray">Editing: <Text weight="regular" color="gray" >{proteinData.label}</Text></Text>
                 </Flex>
             }
             {/* <Flex direction="column" gap="2">

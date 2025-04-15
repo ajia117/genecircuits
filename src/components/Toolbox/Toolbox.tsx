@@ -11,7 +11,8 @@ import {
     TextField,
     ScrollArea,
     Grid,
-    IconButton
+    IconButton,
+    DropdownMenu
 } from '@radix-ui/themes'
 import {
     Plus,
@@ -168,13 +169,23 @@ export const Toolbox: React.FC<ToolboxProps> = ({
                                     <Text size="1" color="gray">{protein.label}</Text> {/* TODO: change to protein type */}
                                 </Flex>
 
-                                <IconButton
-                                    variant='ghost'
-                                    color='gray'
-                                    onClick={() => {}}
-                                >
-                                    <Ellipsis size={20} />
-                                </IconButton>
+                                {/* Protein Card Options. Ellipsis button */}
+                                <DropdownMenu.Root>
+                                    <DropdownMenu.Trigger>
+                                        <IconButton
+                                            variant='ghost'
+                                            color='gray'
+                                            onClick={() => {}} //TODO: 
+                                        >
+                                            <Ellipsis size={20} />
+                                        </IconButton>
+                                    </DropdownMenu.Trigger>
+                                    <DropdownMenu.Content>
+                                        <DropdownMenu.Item onClick={() => {}}>Edit</DropdownMenu.Item>
+                                        <DropdownMenu.Item color="red">Delete</DropdownMenu.Item>
+                                    </DropdownMenu.Content>
+                                </DropdownMenu.Root>
+                                
                             </Flex>
                         </Box>
                     ))}

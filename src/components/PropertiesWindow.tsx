@@ -6,10 +6,11 @@ import {
     Flex,
     Text,
     Button,
-    ScrollArea
+    ScrollArea,
 } from "@radix-ui/themes"
 import {
-    Trash2
+    Trash2,
+    Pencil
 } from "lucide-react"
 
 interface PropertiesWindowProps {
@@ -24,31 +25,42 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
     setProteinData
 }) => {
     const [localData, setLocalData] = useState<NodeData | null>(null);
+    const [editingProtein, setEditingProtein] = useState(false);
 
     useEffect(() => {
         if (proteinData) {
             setLocalData(proteinData);
+            setEditingProtein(false); // reset edit mode when new node selected
         }
     }, [proteinData]);
 
     const handleUpdate = () => {
         if (localData) {
             setProteinData(localData.label, localData);
+            setEditingProtein(false); // exit edit mode after update
         }
     };
 
-    if (!localData) return <Text>No protein selected.</Text>;
+    if (!localData) return (
+        <Flex align="center" justify="center">
+            <Text color="gray" size="2" align="center">Select a node, protein, or edge to view its properties.</Text>
+        </Flex>
+    );
 
     return (
         <Flex direction="column" gap="4">
             <Text size="4" weight="bold">Selected Node ID: <Text weight="regular">{selectedNodeId}</Text></Text>
             <Flex direction="row" justify="between" align="center">
-                
                 <Button variant="outline" color="red">
                     <Trash2 size={20}/> <Text size="4" weight="bold">Delete</Text>
                 </Button>
+                <Button variant="outline" onClick={() => setEditingProtein((prev) => !prev)}>
+                    <Pencil size={20} />
+                    <Text size="4" weight="bold">{editingProtein ? "Cancel" : "Edit"}</Text>
+                </Button>
             </Flex>
 
+            { editingProtein && (
             <ScrollArea
                 type="auto"
                 scrollbars="vertical"
@@ -66,9 +78,9 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
                         proteinData={localData}
                         setProteinData={setLocalData}
                     />
-                    <Button onClick={handleUpdate}><Text weight="bold">Update Protein</Text></Button>
+                    <Button onClick={handleUpdate}><Text>Update Protein</Text></Button>
                 </Flex>
-            </ScrollArea>
+            </ScrollArea>)}
         </Flex>
     );
 };

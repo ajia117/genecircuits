@@ -376,13 +376,13 @@ export default function CircuitBuilderFlow() {
                                             selectedNodeData={getSelectedNodeLabelData()}
                                         /> */}
                                         {/* switch to properties tab when node selected */}
-                                        {selectedNodeId && getSelectedProteinData() && (
+                                        {/* {selectedNodeId && getSelectedProteinData() && ( */}
                                             <PropertiesWindow 
                                                 selectedNodeId={selectedNodeId}
                                                 proteinData={getSelectedProteinData()}
                                                 setProteinData={setProteinData}
                                             />
-                                        )}
+                                        {/* )} */}
                                     </Tabs.Content>
 
                                     {/* CIRCUITS */}
