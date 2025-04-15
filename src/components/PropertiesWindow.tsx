@@ -42,9 +42,13 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
     
 
     useEffect(() => {
+        console.log('opening', proteinData)
         if (proteinData) {
             setLocalProteinData(proteinData);
             setEditingProtein(false); // reset edit mode when new node selected
+        } else { // no data at all, something going wrong, nothing to display => reset all values
+            setLocalProteinData(null);
+            setEditingProtein(false);
         }
     }, [proteinData]);
 
@@ -63,7 +67,7 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
 
     return (
         <Flex direction="column" gap="4">
-            { selectedNodeId && ( // display selected node data
+            {( selectedNodeId && proteinData ) && ( // display selected node data
                 <Flex direction="column" gap="4">
                     <Text size="4" weight="bold">Node Properties</Text>
 
@@ -77,39 +81,39 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
                             transition: 'background-color 0.2s ease',
                         }}
                     >
-                    <DataList.Root>
-                        <DataList.Item>
-                            <DataList.Label minWidth="88px">ID</DataList.Label>
-                            <DataList.Value>
-                                <Flex align="center" gap="2">
-                                    <Code variant="ghost">{selectedNodeId}</Code>
-                                    <IconButton
-                                        size="1"
-                                        aria-label="Copy value"
-                                        color="gray"
-                                        variant="ghost"
-                                    >
-                                        <Copy size={15} />
-                                    </IconButton>
-                                </Flex>
-                            </DataList.Value>
-                        </DataList.Item>
-                        {Object.entries(proteinData).map(([key, value]) => (
-                            <DataList.Item key={key}>
-                                <DataList.Label minWidth="88px">
-                                    {LABEL_MAP[key] ?? key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
-                                </DataList.Label>
+                        <DataList.Root>
+                            <DataList.Item>
+                                <DataList.Label minWidth="88px">ID</DataList.Label>
                                 <DataList.Value>
-                                    {typeof value === "number"
-                                        ? value
-                                        : typeof value === "string"
-                                        ? value
-                                        : JSON.stringify(value)
-                                    }
+                                    <Flex align="center" gap="2">
+                                        <Code variant="ghost">{selectedNodeId}</Code>
+                                        <IconButton
+                                            size="1"
+                                            aria-label="Copy value"
+                                            color="gray"
+                                            variant="ghost"
+                                        >
+                                            <Copy size={15} />
+                                        </IconButton>
+                                    </Flex>
                                 </DataList.Value>
                             </DataList.Item>
-                        ))}
-                    </DataList.Root>
+                            {Object.entries(proteinData).map(([key, value]) => (
+                                <DataList.Item key={key}>
+                                    <DataList.Label minWidth="88px">
+                                        {LABEL_MAP[key] ?? key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                                    </DataList.Label>
+                                    <DataList.Value>
+                                        {typeof value === "number"
+                                            ? value
+                                            : typeof value === "string"
+                                            ? value
+                                            : JSON.stringify(value)
+                                        }
+                                    </DataList.Value>
+                                </DataList.Item>
+                            ))}
+                        </DataList.Root>
                     </Flex>
 
                     {/* start function buttons */}
@@ -150,142 +154,4 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
         </Flex>
     );
 };
-
-
-// interface PropertiesWindowProps {
-//     selectedEdgeId: string;
-//     selectedNodeId: string;
-//     selectedNode: Node<NodeData>;
-//     selectedNodeData: NodeData;
-//     changeMarkerType: (type: string) => void;
-//     changeLabelData: (name: string, value: string | number) => void;
-//     changeNodeData: (name: string, value: string | number) => void;
-// }
-// const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
-//            selectedEdgeId,
-//            selectedNodeId,
-//            selectedNode,
-//            selectedNodeData,
-//            changeMarkerType,
-//            changeLabelData,
-//            changeNodeData
-//        }) => {
-//     // Add local state to store form values
-//     const [formValues, setFormValues] = useState<NodeData>(selectedNodeData);
-//     const isGate = selectedNode && (selectedNode.type === 'and' || selectedNode.type === 'or');
-
-//     // Update local state when selectedNode changes
-//     useEffect(() => {
-//         if (selectedNodeId && selectedNode) {
-//             setFormValues(selectedNodeData);
-//         } else {
-//             setFormValues(null);
-//         }
-//     }, [selectedNodeId, selectedNode]);
-
-//     // Handle input changes
-//     const handleInputChange = (key: string, value: string | number) => {
-//         setFormValues(prev => ({
-//             ...prev,
-//             [key]: value
-//         }));
-//     };
-
-//     // Generate form fields based on selectedNode data
-//     const formFields = selectedNodeId && selectedNode ? Object.entries(selectedNodeData).map(([key, value]) => {
-//         if (key === "label") {
-//             return (
-//                 <div key={key}>
-//                     Label:<br />
-//                     <input
-//                         name="label"
-//                         type="text"
-//                         value={formValues[key] || ''}
-//                         readOnly={true}
-//                     /><br />
-//                 </div>
-//             );
-//         }
-
-//         if (key === 'inputs' || key === 'outputs') {
-//             return (
-//                 <div key={key}>
-//                     {key.charAt(0).toUpperCase() + key.slice(1)}:<br />
-//                     <input
-//                         readOnly={true}
-//                         name={key}
-//                         type="number"
-//                         value={formValues[key] as number || '0'}
-//                         onChange={(e) => handleInputChange(key, e.target.value)}
-//                     /><br />
-//                 </div>
-//             );
-//         }
-
-//         if (typeof value === "number") {
-//             return (
-//                 <div key={key}>
-//                     {key.charAt(0).toUpperCase() + key.slice(1)}:<br />
-//                     <input
-//                         name={key}
-//                         type="number"
-//                         value={formValues[key] as number || '0'}
-//                         onChange={(e) => handleInputChange(key, Number(e.target.value))}
-//                     /><br />
-//                 </div>
-//             );
-//         }
-
-//         return null;
-//     }) : null;
-
-//     return (
-//         <div className={`h-full overflow-y-auto`}>
-//             <h1>
-//                 Properties Window
-//             </h1>
-//             {(!(selectedNode || selectedEdgeId) || isGate) &&
-//                 <div>Select a Node or Edge to view properties </div>
-//             }
-//             {selectedEdgeId && (
-//                 <>
-//                     <p>Change Marker for Edge: {selectedEdgeId}</p>
-//                     <button onClick={() => changeMarkerType(MarkerType.Arrow)}>Promote</button>
-//                     <button onClick={() => changeMarkerType("repress")}>Repress</button>
-//                 </>
-//             )}
-//             {selectedNodeId && selectedNode && !isGate && (
-//                 <>
-//                     <p>Change Node Properties</p>
-//                     <form
-//                         onSubmit={(e) => {
-//                             e.preventDefault();
-//                             // Apply all changes at once on submit
-//                             Object.entries(formValues).forEach(([key, value]) => {
-//                                 if (typeof value === 'string' || typeof value === 'number') {
-//                                     const numValue = Number(value);
-//                                     // separate handles from rest of data
-
-//                                     //todo: remove, cannot edit here
-//                                     if(key === 'inputs' || key === 'outputs') {
-//                                         // String if Not a Number
-//                                         changeNodeData(key, isNaN(numValue) ? value : numValue);
-//                                     }
-//                                     else {
-//                                         // String if Not a Number
-//                                         changeLabelData(key, isNaN(numValue) ? value : numValue);
-//                                     }
-//                                 }
-//                             });
-//                         }}
-//                     >
-//                         {formFields}
-//                         <button type="submit">Update</button>
-//                     </form>
-//                 </>
-//             )}
-//         </div>
-//     );
-// };
-
 export default PropertiesWindow;
