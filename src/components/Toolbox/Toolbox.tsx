@@ -1,5 +1,4 @@
 import React, {useEffect, useMemo, useState} from 'react';
-import CreatableSelect from "react-select/creatable";
 import NodeData from "../../types/NodeData";
 import '../../index.css';
 import CreateProteinWindow from '../CreateProteinWindow';
@@ -28,19 +27,12 @@ interface ToolboxProps {
     getProteinData: (label: string) => NodeData | null;
 }
 
-interface OptionType {
-    readonly label: string;
-    value: string | number;
-}
-
 export const Toolbox: React.FC<ToolboxProps> = ({
         proteins,
         setProteinData,
         getProteinData
     }) => {
 
-    // const [selectedOption, setSelectedOption] = useState<OptionType | null>(null);
-    // const [isNewLabel, setIsNewLabel] = useState(false);
     const genericNodeData: NodeData = {
         label: null,
         initialConcentration: 1,
@@ -51,11 +43,11 @@ export const Toolbox: React.FC<ToolboxProps> = ({
         outputs: 1
     };
     const [nodeData, setNodeData] = useState<NodeData>(genericNodeData);
-    const [searchTerm, setSearchTerm] = useState(''); // stores user input for protein search
+    const [searchTerm, setSearchTerm] = useState(''); // Stores user input from the protein search bar
     const [showCreateProteinWindow, setShowCreateProteinWindow] = useState(false);
 
 
-    // called when new protein is created
+    // Called when the create protein button is clicked
     const handleCreateProtein = (data: NodeData) => {
         if (proteins[data.label]) {
             alert("That protein already exists!");
@@ -64,7 +56,7 @@ export const Toolbox: React.FC<ToolboxProps> = ({
         setProteinData(data.label, data); // adds new protein to the list
     };
 
-    // start dragging node, calls to onDrop in CircuitBuilderFlow when done
+    // Called when user starts dragging a node, triggers onDrop in CircuitBuilderFlow when done
     const onDragStart = (e: React.DragEvent, type: string, data?: NodeData) => {
         e.dataTransfer.setData("application/reactflow", type);
         if (type === "custom" && data) {
@@ -76,7 +68,7 @@ export const Toolbox: React.FC<ToolboxProps> = ({
     };
     
 
-    // filters the protein list when user searches
+    // Filters the protein list when user searches
     const filteredProteins = useMemo(() => {
         return Object.entries(proteins)
             .filter(([label]) => label.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -166,7 +158,7 @@ export const Toolbox: React.FC<ToolboxProps> = ({
                             <Flex direction="row" justify="between" align="center">
                                 <Flex direction="column">
                                     <Text weight="medium" size="2">{protein.label}</Text>
-                                    <Text size="1" color="gray">{protein.label}</Text> {/* TODO: change to protein type */}
+                                    {/* <Text size="1" color="gray">{protein.label}</Text> */}
                                 </Flex>
 
                                 {/* Protein Card Options. Ellipsis button */}
@@ -175,7 +167,6 @@ export const Toolbox: React.FC<ToolboxProps> = ({
                                         <IconButton
                                             variant='ghost'
                                             color='gray'
-                                            onClick={() => {}} //TODO: 
                                         >
                                             <Ellipsis size={20} />
                                         </IconButton>
