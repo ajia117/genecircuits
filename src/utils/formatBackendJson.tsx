@@ -2,7 +2,7 @@ import { Node, Edge } from "@xyflow/react";
 import CircuitSettingsType from "../types/CircuitSettingsType";
 import NodeData from "../types/NodeData";
 
-export const formatCircuitToJson = (
+export const formatBackendJson = (
     circuitSettings: CircuitSettingsType,
     nodes: Node[],
     edges: Edge[],
@@ -18,7 +18,6 @@ export const formatCircuitToJson = (
             return {
                 id: node.id,
                 type: node.type || "default",
-                position: node.position,
                 ...(isCustom && proteinData // add data for non-gate nodes. maintains consistency for all nodes of the same protein
                     ? { data: { ...proteinData, label } }
                     : {})

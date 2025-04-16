@@ -1,5 +1,4 @@
-import React, {useMemo, useState} from 'react';
-import CreatableSelect from "react-select/creatable";
+import React, {Dispatch, SetStateAction, useEffect, useMemo, useState} from 'react';
 import NodeData from "../../types/NodeData";
 import '../../index.css';
 import CreateProteinWindow from '../CreateProteinWindow';
@@ -11,7 +10,8 @@ import {
     TextField,
     ScrollArea,
     Grid,
-    IconButton
+    IconButton,
+    DropdownMenu
 } from '@radix-ui/themes'
 import {
     Plus,
@@ -25,118 +25,44 @@ interface ToolboxProps {
     proteins: { [label: string]: NodeData };
     setProteinData: (label: string, data: NodeData) => void;
     getProteinData: (label: string) => NodeData | null;
-}
-
-interface OptionType {
-    readonly label: string;
-    value: string | number;
+    editingProtein?: NodeData | null;
+    setEditingProtein?: Dispatch<SetStateAction<NodeData>>;
+    setActiveTab: Dispatch<SetStateAction<'toolbox' | 'properties' | 'circuits'>>;
 }
 
 export const Toolbox: React.FC<ToolboxProps> = ({
         proteins,
         setProteinData,
-        getProteinData
+        getProteinData,
+        editingProtein,
+        setEditingProtein,
+        setActiveTab
     }) => {
 
-    // const [selectedOption, setSelectedOption] = useState<OptionType | null>(null);
-    // const [isNewLabel, setIsNewLabel] = useState(false);
     const genericNodeData: NodeData = {
         label: null,
         initialConcentration: 1,
-        hillCoefficient: 1,
         lossRate: 1,
         beta: 1,
-        delay: 0,
+        // delay: 0,
         inputs: 1,
         outputs: 1
     };
     const [nodeData, setNodeData] = useState<NodeData>(genericNodeData);
-    const [searchTerm, setSearchTerm] = useState(''); // stores user input for protein search
+    const [searchTerm, setSearchTerm] = useState(''); // Stores user input from the protein search bar
     const [showCreateProteinWindow, setShowCreateProteinWindow] = useState(false);
 
 
-    const createOption = (label: string): OptionType => ({
-        label,
-        value: label
-    });
-    // const [labelOptions, setLabelOptions] = useState<OptionType[]>(
-    //     labels.map(createOption)
-    // );
-
-    const handleInputChange = (key: string, value: string | number) => {
-        setNodeData(prev => ({
-            ...prev,
-            [key]: value
-        }));
-    };
-
-    // const handleCreate = (inputValue: string) => {
-    //     // return if option already exists without trailing/leading whitespace
-    //     const option = labelOptions.find(option => option.label === inputValue.trim());
-    //     if(option) {
-    //         setSelectedOption(option);
-    //         return;
-    //     }
-
-    //     // add new option to list of labels
-    //     const newOption = createOption(inputValue);
-    //     setLabelOptions([...labelOptions, newOption]);
-    //     setSelectedOption(newOption);
-    //     setIsNewLabel(true);
-    //     setNodeData({
-    //         ...genericNodeData,
-    //         label: inputValue
-    //     });
-    // };
-
-    // called when new protein is created
-    const handleCreate = (data: NodeData) => {
+    // Called when the create protein button is clicked
+    const handleCreateProtein = (data: NodeData) => {
         if (proteins[data.label]) {
             alert("That protein already exists!");
             return;
         }
         setProteinData(data.label, data); // adds new protein to the list
     };
-    
 
-    // don't always allow the create string option to appear
-    // const isValidCreateString = (inputValue: string) => {
-    //     return inputValue !== "" && !labelOptions.find(option => option.label === inputValue.trim());
-    // }
-
-    // this is for changing to an already existing label
-    // const handleChange = (inputValue: OptionType | null) => {
-    //     setSelectedOption(inputValue);
-
-    //     if(!inputValue) {
-    //         // Reset form when cleared
-    //         setNodeData(genericNodeData);
-    //         setIsNewLabel(false);
-    //         return;
-    //     }
-    //     const data = getLabelData(inputValue.label);
-
-    //     // if someone made a label, but never dropped a node, still allow them to change its values
-    //     // getLabelData only returns data if a node was dropped
-    //     if(!data) {
-    //         setSelectedOption(inputValue);
-    //         setIsNewLabel(true);
-    //         setNodeData({
-    //             ...genericNodeData,
-    //             label: inputValue.label
-    //         });
-    //     }
-    //     else {
-    //         setIsNewLabel(false);
-    //         setNodeData({
-    //             ...data,
-    //             label: inputValue.label
-    //         });
-    //     }
-
-    // };
-
-    // start dragging node, calls to onDrop in CircuitBuilderFlow when done
+    // Called when user starts dragging a node, triggers onDrop in CircuitBuilderFlow when done
     const onDragStart = (e: React.DragEvent, type: string, data?: NodeData) => {
         e.dataTransfer.setData("application/reactflow", type);
         if (type === "custom" && data) {
@@ -148,65 +74,12 @@ export const Toolbox: React.FC<ToolboxProps> = ({
     };
     
 
-    // filters the protein list when user searches
+    // Filters the protein list when user searches
     const filteredProteins = useMemo(() => {
         return Object.entries(proteins)
             .filter(([label]) => label.toLowerCase().includes(searchTerm.toLowerCase()))
             .map(([label, data]) => ({ id: label, label, ...data }));
     }, [proteins, searchTerm]);
-    
-
-    // generate HTML for form
-    // const getLabelForm = () => {
-    //     // make sure that if a node is dropped, you cannot edit the data anymore
-    //     const dropped = getLabelData(selectedOption.label);
-
-    //     return Object.entries(nodeData).map(([key, value]) => {
-    //         if(key === 'label') return;
-    //         if(key === 'inputs' || key === 'outputs') {
-    //             return (
-    //                 <div key={key}>
-    //                 {key.charAt(0).toUpperCase() + key.slice(1)}:<br/>
-    //                 <input
-    //                     name={key}
-    //                     type="number"
-    //                     min = {0}
-    //                     max = {4}
-    //                     value={value as number || '0'}
-    //                     onChange={(e) => handleInputChange(key, Number(e.target.value))}
-    //                 /><br/>
-    //             </div>
-    //         )}
-    //         const isReadOnly = (!!dropped || !isNewLabel);
-    //         return (
-    //             <div key={key}>
-    //                 {key.charAt(0).toUpperCase() + key.slice(1)}:<br/>
-    //                 <input
-    //                     readOnly={isReadOnly}
-    //                     name={key}
-    //                     type="range"
-    //                     min={0}
-    //                     max={1}
-    //                     step={.01}
-    //                     value={value as number || '0'}
-    //                     onChange={(e) => handleInputChange(key, isReadOnly ? value as number : Number(e.target.value))}
-    //                     style={{ cursor: isReadOnly ? "not-allowed" : "grab"}}
-    //                 />
-    //                 <input
-    //                     readOnly={isReadOnly}
-    //                     name={key}
-    //                     type="number"
-    //                     min={0}
-    //                     max={1}
-    //                     step={.01}
-    //                     value={value as number || '0'}
-    //                     onChange={(e) => handleInputChange(key, Number(e.target.value))}
-    //                     style={{ cursor: isReadOnly ? "not-allowed" : ""}}
-    //                 /><br/>
-    //             </div>
-    //         )
-    //     });
-    // }
 
     return (
         <Flex direction="column">
@@ -256,13 +129,13 @@ export const Toolbox: React.FC<ToolboxProps> = ({
                 <ScrollArea
                     type="auto"
                     scrollbars="vertical"
-                    // style={{
-                    //     maxHeight: '300px',
-                    //     border: '1px solid var(--gray-a6)',
-                    //     borderRadius: 'var(--radius-3)',
-                    //     padding: '0.5rem',
-                    //     width: 'auto'
-                    // }}
+                    style={{
+                        maxHeight: 'calc(100vh - 450px)',
+                        border: '1px solid var(--gray-a6)',
+                        borderRadius: 'var(--radius-3)',
+                        padding: '0.5rem',
+                        width: 'auto'
+                    }}
                 >
                 {filteredProteins.length === 0 ? (
                     <Box p="3" style={{ color: 'var(--gray-a9)', textAlign: 'center', fontSize: '13px' }}>
@@ -277,14 +150,7 @@ export const Toolbox: React.FC<ToolboxProps> = ({
                         <Box
                             key={protein.id}
                             draggable
-                            onDragStart={(e: React.DragEvent) => {
-                                // e.dataTransfer.setData("application/reactflow", "custom");
-                                // e.dataTransfer.setData("application/node-data", JSON.stringify(protein)); // ✅ Use actual protein data
-                                // e.dataTransfer.setData("application/node-in", String(protein.inputs));
-                                // e.dataTransfer.setData("application/node-out", String(protein.outputs));
-                                // e.dataTransfer.effectAllowed = "move";
-                                onDragStart(e, "custom", protein)
-                            }}
+                            onDragStart={(e: React.DragEvent) => {onDragStart(e, "custom", protein)}}
                             style={{
                                 cursor: 'grab',
                                 border: '1px solid var(--gray-a6)',
@@ -298,16 +164,28 @@ export const Toolbox: React.FC<ToolboxProps> = ({
                             <Flex direction="row" justify="between" align="center">
                                 <Flex direction="column">
                                     <Text weight="medium" size="2">{protein.label}</Text>
-                                    <Text size="1" color="gray">{protein.label}</Text> {/* TODO: change to protein type */}
+                                    {/* <Text size="1" color="gray">{protein.label}</Text> */}
                                 </Flex>
 
-                                <IconButton
-                                    variant='ghost'
-                                    color='gray'
-                                    onClick={() => {}}
-                                >
-                                    <Ellipsis size={20} />
-                                </IconButton>
+                                {/* Protein Card Options. Ellipsis button */}
+                                <DropdownMenu.Root>
+                                    <DropdownMenu.Trigger>
+                                        <IconButton
+                                            variant='ghost'
+                                            color='gray'
+                                        >
+                                            <Ellipsis size={20} />
+                                        </IconButton>
+                                    </DropdownMenu.Trigger>
+                                    <DropdownMenu.Content>
+                                        <DropdownMenu.Item onClick={() => {
+                                            setEditingProtein(protein)
+                                            setActiveTab('properties')
+                                        }}>Edit</DropdownMenu.Item>
+                                        <DropdownMenu.Item color="red">Delete</DropdownMenu.Item>
+                                    </DropdownMenu.Content>
+                                </DropdownMenu.Root>
+                                
                             </Flex>
                         </Box>
                     ))}
@@ -317,36 +195,7 @@ export const Toolbox: React.FC<ToolboxProps> = ({
 
             </Flex>
 
-            <CreateProteinWindow open={showCreateProteinWindow} onOpenChange={setShowCreateProteinWindow} onCreate={handleCreate}/>
-
-        {/* </Flex> */}
-        {/* <>
-            <div className="components-container">
-                <div className="mt-4 p-4 bg-gray-50 rounded shadow-sm">
-                    <h3 className="text-lg font-medium mb-3">Choose existing Protein or Create New</h3>
-                    <div className="space-y-3">
-                        <CreatableSelect
-                            isClearable
-                            onChange={handleChange}
-                            onCreateOption={handleCreate}
-                            options={labelOptions}
-                            value={selectedOption}
-                            isValidNewOption={isValidCreateString}
-                            formatCreateLabel={(inputValue) => `Create "${inputValue.trim()}"`}
-                        />
-
-                        {selectedOption && getLabelForm()}
-                    </div>
-                    <br/>
-                    {selectedOption &&
-                        <div className="dndnode output" onDragStart={(event) => onDragStart(event, 'custom')} draggable>
-                            Drag Node
-                        </div>
-                    }
-                </div>
-
-            </div>
-        </> */}
+            <CreateProteinWindow open={showCreateProteinWindow} onOpenChange={setShowCreateProteinWindow} onCreate={handleCreateProtein}/>
         </Flex>
     );
 };

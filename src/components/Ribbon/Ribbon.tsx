@@ -1,9 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
-// import { Play, Pause, Save, Trash, Graph, SettingsSlider } from "../../assets";
+import React, { useState, useEffect, Dispatch, SetStateAction } from "react";
 import "./Ribbon.css";
 import { Node, Edge } from "@xyflow/react";
-import { formatCircuitToJson } from "../../utils/formatCircuitToJson"
-import { fetchOutput, abortFetch } from "../../utils/fetchOutput";
+import { fetchOutput, abortFetch, formatBackendJson, formatCircuitExportJson } from "../../utils"
 import CircuitSettingsType from "../../types/CircuitSettingsType";
 import NodeData from "../../types/NodeData";
 import {
@@ -35,77 +33,43 @@ import {
 import ImportWindow from "../ImportWindow";
 
 interface TopRibbonProps {
-    proteins: { [label: string]: NodeData },
-    nodes: Node<NodeData>[],
-    setNodes: (nodes: Node[]) => void,
-    edges: Edge[],
-    setEdges: (edges: Edge[]) => void,
-    showOutputWindow: boolean,
-    setShowOutputWindow: (show: boolean) => void,
-    circuitSettings: CircuitSettingsType,
-    setCircuitSettings: (settings: CircuitSettingsType) => void,
-    setOutputData: (data: any)=>void
+    proteins: { [label: string]: NodeData };
+    setProteins: Dispatch<SetStateAction<{ [label: string]: NodeData }>>;
+    nodes: Node<NodeData>[];
+    setNodes: Dispatch<SetStateAction<Node<NodeData>[]>>;
+    edges: Edge[];
+    setEdges: Dispatch<SetStateAction<Edge[]>>;
+    showOutputWindow: boolean;
+    setShowOutputWindow: (show: boolean) => void;
+    circuitSettings: CircuitSettingsType;
+    setCircuitSettings: Dispatch<SetStateAction<CircuitSettingsType>>;
+    setOutputData: (data: any) => void;
 }
 
-const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges, showOutputWindow, setShowOutputWindow, circuitSettings, setCircuitSettings, setOutputData, proteins }) => {
-    const [showClearConfirmation, setShowClearConfirmation] = useState(false); // keep track of whether clear confirmation window is open or not
-    const [isRunning, setIsRunning] = useState(false) // flag to track if simulation is running or not
-    const [showSettingsWindow, setShowSettingsWindow] = useState(false); // keep track of whether settings window is open or not
-    const [showImportWindow, setShowImportWindow] = useState(false); // keep track of whether import window is open or not
 
-    // listen for a circuit import
-    useEffect(() => {
-        const handleImportedCircuit = (event: CustomEvent) => {
-            const { circuitSettings, nodes, edges } = event.detail;
-        
-            const safeSettings = {
-                projectName: circuitSettings.projectName ?? "Untitled Project",
-                simulationDuration: circuitSettings.simulationDuration ?? 20,
-                numTimePoints: circuitSettings.numTimePoints ?? 10,
-            };
-        
-            setCircuitSettings(safeSettings);
-            setNodes(nodes ?? []);
-            setEdges(edges ?? []);
-        };
-      
-        window.addEventListener("circuitImport", handleImportedCircuit as EventListener);
-        return () => {
-            window.removeEventListener("circuitImport", handleImportedCircuit as EventListener);
-        };
-    }, []);
+const TopRibbon: React.FC<TopRibbonProps> = ({ 
+    nodes, setNodes, 
+    edges, setEdges, 
+    showOutputWindow, setShowOutputWindow, 
+    circuitSettings, setCircuitSettings, 
+    proteins, setProteins ,
+    setOutputData, 
+}) => {
+    const [showClearConfirmation, setShowClearConfirmation] = useState(false); // Track whether clear confirmation window is open or not
+    const [isRunning, setIsRunning] = useState(false) // Track if simulation is running or not
+    const [showSettingsWindow, setShowSettingsWindow] = useState(false); // Track whether settings window is open or not
+    const [showImportWindow, setShowImportWindow] = useState(false); // Track whether import window is open or not
 
+    // Handler called when user confirms clearing the screen
     const confirmClear = () => {
         setNodes([])
         setEdges([])
         setShowClearConfirmation(false);
     };
 
-    // make sure all nodes we send back are updated with regards to label
-    // currently, this is inefficient, and runs on every node each time we hit play
-    // in future, add new boolean field in NodeData to check if it has changed since last run through
-    // const updateNodesWithProteinData = () => {
-    //     return nodes.map((node) => {
-    //         const label = node.data?.label;
-    //         const sharedData = label && proteins[label];
-    //         return {
-    //             ...node,
-    //             data: {
-    //                 ...sharedData,
-    //                 label, // ensure label is preserved
-    //             }
-    //         };
-    //     });
-    // };
-    
-
-
-    const handlePlayClick = async () => {
-        // nodes = updateNodesWithProteinData();
-        // setNodes(nodes); // see above comment for why this is unnecessary, but can be improved
-        
-        const circuitJson = formatCircuitToJson(circuitSettings, nodes, edges, proteins);
-        console.log(circuitJson)
+    // Handler for when user clicks the run simulation button
+    const handlePlayClick = async () => {        
+        const circuitJson = formatBackendJson(circuitSettings, nodes, edges, proteins);
         setIsRunning(true);
         try {
             const res = await fetchOutput(circuitJson);
@@ -118,17 +82,19 @@ const TopRibbon: React.FC<TopRibbonProps> = ({ nodes, setNodes, edges, setEdges,
         }
     };
 
+    // Handler for when user pauses the simulation process
     const handlePauseClick = () => {
         abortFetch()
         setIsRunning(false)
     }
 
+    // Exports the circuit displayed on the screen
     const handleExport = (e: React.MouseEvent<HTMLDivElement>, type: string) => {
         e.preventDefault();
         if(nodes.length === 0 && edges.length === 0) { alert("Nothing to export."); return; }
         if(type === "json") {
             // const updatedNodes = updateNodesWithProteinData();
-            const circuitJson = {circuitSettings, nodes, edges}
+            const circuitJson = formatCircuitExportJson(circuitSettings, nodes, edges, proteins);
             const blob = new Blob([JSON.stringify(circuitJson, null, 2)], {
                 type: "application/json",
             });

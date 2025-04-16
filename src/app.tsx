@@ -16,7 +16,7 @@ if (rootElement) {
             <ToolboxProvider>
                 <Theme appearance='light' accentColor='jade' radius='large' scaling='95%'>
                     <CircuitBuilderFlow />
-                    <ThemePanel />
+                    {/* <ThemePanel /> */}
                 </Theme>
             </ToolboxProvider>
         </ReactFlowProvider>

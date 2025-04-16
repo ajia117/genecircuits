@@ -30,17 +30,18 @@ export default function ImportWindow({ open, onOpenChange }: ImportWindowProps) 
           try {
             const result = JSON.parse(event.target?.result as string);
       
-            const { circuitSettings, nodes, edges } = result;
+            const { circuitSettings, nodes, edges, proteins } = result;
       
-            if (!circuitSettings || !Array.isArray(nodes) || !Array.isArray(edges)) {
-              alert("Invalid circuit file format.");
-              return;
-            }
+            // TODO: import validation: make sure files have valid nodes, edges, and protein data. no corrupt files
+            // if (!circuitSettings || !Array.isArray(nodes) || !Array.isArray(edges) || !Array.isArray(proteins)) {
+            //   alert("Invalid circuit file format.");
+            //   return;
+            // }
       
             // Send parsed values to the global handler
             window.dispatchEvent(
               new CustomEvent("circuitImport", {
-                detail: { circuitSettings, nodes, edges },
+                detail: { circuitSettings, nodes, edges, proteins },
               })
             );
       
