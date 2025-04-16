@@ -176,12 +176,12 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
                                         {PROTEIN_LABEL_MAP[key] ?? key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
                                     </DataList.Label>
                                     <DataList.Value>
-                                        {typeof value === "number"
+                                        <Code variant="ghost">{typeof value === "number"
                                             ? value
                                             : typeof value === "string"
                                             ? value
                                             : JSON.stringify(value)
-                                        }
+                                        }</Code>
                                     </DataList.Value>
                                 </DataList.Item>
                             ))}

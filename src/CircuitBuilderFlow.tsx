@@ -92,6 +92,7 @@ export default function CircuitBuilderFlow() {
         setSelectedEdgeId(null);
         setSelectedNodeId(null);
         setSelectedNodeType(null);
+        setEditingProtein(null);
     }
 
     // Handler for circuit imports
