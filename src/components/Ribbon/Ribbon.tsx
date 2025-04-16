@@ -1,5 +1,4 @@
 import React, { useState, useEffect, Dispatch, SetStateAction } from "react";
-// import { Play, Pause, Save, Trash, Graph, SettingsSlider } from "../../assets";
 import "./Ribbon.css";
 import { Node, Edge } from "@xyflow/react";
 import { fetchOutput, abortFetch, formatBackendJson, formatCircuitExportJson } from "../../utils"
@@ -56,79 +55,20 @@ const TopRibbon: React.FC<TopRibbonProps> = ({
     proteins, setProteins ,
     setOutputData, 
 }) => {
-    const [showClearConfirmation, setShowClearConfirmation] = useState(false); // keep track of whether clear confirmation window is open or not
-    const [isRunning, setIsRunning] = useState(false) // flag to track if simulation is running or not
-    const [showSettingsWindow, setShowSettingsWindow] = useState(false); // keep track of whether settings window is open or not
-    const [showImportWindow, setShowImportWindow] = useState(false); // keep track of whether import window is open or not
+    const [showClearConfirmation, setShowClearConfirmation] = useState(false); // Track whether clear confirmation window is open or not
+    const [isRunning, setIsRunning] = useState(false) // Track if simulation is running or not
+    const [showSettingsWindow, setShowSettingsWindow] = useState(false); // Track whether settings window is open or not
+    const [showImportWindow, setShowImportWindow] = useState(false); // Track whether import window is open or not
 
-    // listen for a circuit import
-    // useEffect(() => {
-    //     const handleImportedCircuit = (event: CustomEvent) => {
-    //         const { circuitSettings: importedSettings, nodes: importedNodes, edges: importedEdges, proteins: importedProteins } = event.detail;
-        
-    //         // Merge circuit settings (replace name, keep other values if already set)
-    //         setCircuitSettings(prev => ({
-    //             projectName: importedSettings.projectName ?? prev.projectName,
-    //             simulationDuration: importedSettings.simulationDuration ?? prev.simulationDuration,
-    //             numTimePoints: importedSettings.numTimePoints ?? prev.numTimePoints,
-    //         }));
-        
-    //         //TODO: update so nodes and edges get re IDed if things are already existing in circuit
-    //         // Merge nodes
-    //         setNodes(prevNodes => [
-    //             ...prevNodes,
-    //             ...(importedNodes ?? []),
-    //         ]);
-        
-    //         // Merge edges
-    //         setEdges(prevEdges => [
-    //             ...prevEdges,
-    //             ...(importedEdges ?? []),
-    //         ]);
-        
-    //         // Merge proteins
-    //         setProteins(prevProteins => ({
-    //             ...prevProteins,
-    //             ...(importedProteins ?? {})
-    //         }));
-    //     };
-      
-    //     window.addEventListener("circuitImport", handleImportedCircuit as EventListener);
-    //     return () => {
-    //       window.removeEventListener("circuitImport", handleImportedCircuit as EventListener);
-    //     };
-    // }, []);
-      
-
+    // Handler called when user confirms clearing the screen
     const confirmClear = () => {
         setNodes([])
         setEdges([])
         setShowClearConfirmation(false);
     };
 
-    // make sure all nodes we send back are updated with regards to label
-    // currently, this is inefficient, and runs on every node each time we hit play
-    // in future, add new boolean field in NodeData to check if it has changed since last run through
-    // const updateNodesWithProteinData = () => {
-    //     return nodes.map((node) => {
-    //         const label = node.data?.label;
-    //         const sharedData = label && proteins[label];
-    //         return {
-    //             ...node,
-    //             data: {
-    //                 ...sharedData,
-    //                 label, // ensure label is preserved
-    //             }
-    //         };
-    //     });
-    // };
-    
-
-
-    const handlePlayClick = async () => {
-        // nodes = updateNodesWithProteinData();
-        // setNodes(nodes); // see above comment for why this is unnecessary, but can be improved
-        
+    // Handler for when user clicks the run simulation button
+    const handlePlayClick = async () => {        
         const circuitJson = formatBackendJson(circuitSettings, nodes, edges, proteins);
         setIsRunning(true);
         try {
@@ -142,11 +82,13 @@ const TopRibbon: React.FC<TopRibbonProps> = ({
         }
     };
 
+    // Handler for when user pauses the simulation process
     const handlePauseClick = () => {
         abortFetch()
         setIsRunning(false)
     }
 
+    // Exports the circuit displayed on the screen
     const handleExport = (e: React.MouseEvent<HTMLDivElement>, type: string) => {
         e.preventDefault();
         if(nodes.length === 0 && edges.length === 0) { alert("Nothing to export."); return; }
