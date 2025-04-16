@@ -42,19 +42,19 @@ export default function CircuitBuilderFlow() {
 
     const [nodes, setNodes, onNodesChange] = useNodesState([]); // List of all nodes in workspace
     const [edges, setEdges, onEdgesChange] = useEdgesState([]); // List of all edges in workspace
+    const [proteins, setProteins] = useState<{[label: string]: NodeData}>({}); // List of all proteins created
+
     const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null); // Stores clicked edge ID
     const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null); // Stores clicked node ID
     const [selectedNodeType, setSelectedNodeType] = useState<string | null>(null); // Stores gate type if the selected node was a logic gate
 
-    const [showOutputWindow, setShowOutputWindow] = useState<boolean>(false);
-    const [outputWindowSettings, setOutputWindowSettings] = useState({x: 0, y: 0, width: 300, height:200})
+    const [showOutputWindow, setShowOutputWindow] = useState<boolean>(false); // Toggle for output window
+    const [outputWindowSettings, setOutputWindowSettings] = useState({x: 0, y: 0, width: 300, height:200}) // Stores output window properties
 
-    const [outputData, setOutputData] = useState(); // Holds data received from backend to be used as graph
-    const [proteins, setProteins] = useState<{[label: string]: NodeData}>({});
+    const [outputData, setOutputData] = useState(); // Holds data received from backend after simulation is ran
+    const [activeTab, setActiveTab] = useState('toolbox'); // Keeps track of which tab is open in the lefthand window
 
-    const [activeTab, setActiveTab] = useState('toolbox');
-
-    const [circuitSettings, setCircuitSettings] = useState({
+    const [circuitSettings, setCircuitSettings] = useState({ // Stores all the circuit-wide setting data
         projectName: "Untitled Project",
         simulationDuration: 20,
         numTimePoints: 10
@@ -70,17 +70,8 @@ export default function CircuitBuilderFlow() {
         selfConnecting: SelfConnectingEdge,
     }), []);
 
-    // let nodeId = 0; // counter for protein nodes
-    // let gateId = 0; // counter for gate nodes
-    // const getId = (nodeType: string) => { // provide id for nodes
-    //     if (nodeType == "and" || nodeType == "or") {
-    //         return `g${gateId++}`
-    //     } else if (nodeType == "custom") {
-    //         return `${nodeId++}`
-    //     }
-    // }; // creates id for the next node
 
-    // handle creating new ids for nodes and gates
+    // Create new ids for nodes and gates
     const nodeIdRef = useRef(0); // counter for protein nodes
     const gateIdRef = useRef(0); // counter for gate nodes
     const getId = (nodeType: string): string => {
@@ -89,13 +80,20 @@ export default function CircuitBuilderFlow() {
         } else if (nodeType === "custom") {
           return `${nodeIdRef.current++}`;
         }
-        return `unknown-${Math.random().toString(36).substr(2, 5)}`;
+        return `unknown-${Math.random().toString(36).substr(2, 5)}`; // generate random id if there invalid node
       };
     useEffect(() => {
         setRefs({ nodeIdRef, gateIdRef });
     }, []);
 
-    // handler for circuit imports
+    // Function to reset selected state data used by the properties tab
+    const resetSelectedStateData= () => {
+        setSelectedEdgeId(null);
+        setSelectedNodeId(null);
+        setSelectedNodeType(null);
+    }
+
+    // Handler for circuit imports
     useEffect(() => {
         const handleCircuitImport = (event: CustomEvent) => {
             const {
@@ -133,9 +131,7 @@ export default function CircuitBuilderFlow() {
             syncNodeCounters([...nodes, ...(importedNodes ?? [])]);
 
             // Reset controller state variables
-            setSelectedEdgeId(null);
-            setSelectedNodeId(null);
-            setSelectedNodeType(null);
+            resetSelectedStateData();
         };
     
         window.addEventListener("circuitImport", handleCircuitImport as EventListener);
@@ -165,16 +161,15 @@ export default function CircuitBuilderFlow() {
         [setEdges]
     );
     
+    // Handler called when react flow pane clicked
     const onPaneClick = useCallback(() => {
-        setSelectedNodeId(null);
-        setSelectedEdgeId(null);
-        setSelectedNodeType(null);
+        resetSelectedStateData();
     }, []);
 
     // Handler for clicking a node
     const onNodeClick = (event: React.MouseEvent, node: Node) => {
+        resetSelectedStateData();
         setSelectedNodeId(node.id); // Store the clicked node ID
-        setSelectedEdgeId(null);
         setSelectedNodeType(node.type)
 
         // Auto switch to "properties" tab
@@ -183,49 +178,46 @@ export default function CircuitBuilderFlow() {
 
     // Handler for clicking an edge
     const onEdgeClick = useCallback((event: React.MouseEvent, edge: Edge) => {
+        resetSelectedStateData();
         setSelectedEdgeId(edge.id); // Store the clicked edge ID
-        setSelectedNodeId(null);
-        setSelectedNodeType(null);
         // Auto switch to "properties" tab
         setActiveTab("properties");
     }, []);
 
+    // Handler for resetting logic when switching tabs
+    useEffect(() => {
+        if (activeTab !== "properties") {
+            resetSelectedStateData();
+        }
+    }, [activeTab]);
+
+    // Return all data from a given protein label
+    const getProteinData = (label: string) => proteins[label] ?? null;
+
+    // Update or add a key value pair to a node's protein data (this will update the data for every node of the same protein)
+    const setProteinData = (label: string, data: NodeData) => {
+        setProteins((prev) => ({
+          ...prev,
+          [label]: data,
+        }));
+    };
+
+    // Returns entire Node object for the selected node (includes node ID)
     const getSelectedNode = () => {
         return nodes.find(node => node.id === selectedNodeId) as Node<NodeData>;
     };
 
-    // const changeLabelData = (name: string, value: string | number) => {
-    //     // get label for node data you want to change
-    //     const labelToChange = nodes.find((node) => node.id === selectedNodeId).data.label
-    //     // only change the name and value of the label
-    //     setProteins(prevMap => ({
-    //         ...prevMap,
-    //         [labelToChange]: {
-    //             ...prevMap[labelToChange],
-    //             [name]: value
-    //         }
-    //     }));
-    // };
+    // Returns protein data from the selected node
+    const getSelectedProteinData = () => {
+        const node = getSelectedNode();
+        if(node)
+            return getProteinData(node.data.label)
+    }
 
-    // change node-specific data, such as input and output handles
-    // const changeNodeData = (name: string, value: string | number) => {
-    //     setNodes((nodes) =>
-    //         nodes.map((node) =>
-    //             node.id === selectedNodeId ? {
-    //                 ...node,
-    //                 data: {
-    //                     ...node.data,
-    //                     [name]: value
-    //                 }
-    //             } : node
-    //         )
-    //     );
-    // };
-
-    // Function to change protein node data
-    // const changeProteinData = (name: string, value: string | number) => {
-    //     setProteinData()
-    // }
+    // Returns data from the selected edge
+    const getSelectedEdgeData = () => {
+        return edges.find(edge => edge.id === selectedEdgeId) ?? null;
+    };
 
     // Function to change edge type of the selected edge
     const changeEdgeType = useCallback((markerType: string) => {
@@ -250,45 +242,8 @@ export default function CircuitBuilderFlow() {
         event.preventDefault();
         event.dataTransfer.dropEffect = 'move';
     }, []);
-
-    // return data if label in proteins
-    // const getLabelData = (label: string) => {
-    //     if(label in proteins) {
-    //         return proteins[label];
-    //     }
-    //     return null;
-    // }
-
-    // get all data from a given protein label
-    const getProteinData = (label: string) => proteins[label] ?? null;
-
-    // set label data if exists, or add to nodeLabelData if not
-    // const setLabelData = (label: string, data: NodeData) => {
-    //     setProteins(prevMap => ({
-    //         ...prevMap,
-    //         [label]: data
-    //     }));
-    // }
-    const setProteinData = (label: string, data: NodeData) => {
-        setProteins((prev) => ({
-          ...prev,
-          [label]: data,
-        }));
-    };
-
-    // get data from the selected node
-    const getSelectedProteinData = () => {
-        const node = getSelectedNode();
-        if(node)
-            return getProteinData(node.data.label)
-    }
-
-    // get data from the selected edge
-    const getSelectedEdgeData = () => {
-        return edges.find(edge => edge.id === selectedEdgeId) ?? null;
-    };
     
-
+    // Handler called when a node is dropped into the React Flow pane
     const onDrop = useCallback(
         (event: React.DragEvent) => {
             event.preventDefault();
@@ -333,7 +288,7 @@ export default function CircuitBuilderFlow() {
             setNodes((nds) => [...nds, newNode]);
         }, [screenToFlowPosition, setNodes, setProteinData]);
 
-    // display output window
+    // Display output window
     const renderOutputWindow = () => {
         return <OutputWindow onClose={() => setShowOutputWindow(false)} outputData={outputData} windowSettings={outputWindowSettings} setWindowSettings={setOutputWindowSettings} />;
     };
@@ -390,18 +345,6 @@ export default function CircuitBuilderFlow() {
 
                                     {/* PROPERTIES */}
                                     <Tabs.Content value="properties">
-                                        {/* <PropertiesWindow
-                                            key={`${selectedNodeId || ''}-${selectedEdgeId || ''}`}
-                                            changeMarkerType={changeMarkerType}
-                                            changeLabelData={changeLabelData}
-                                            changeNodeData={changeNodeData}
-                                            selectedEdgeId={selectedEdgeId}
-                                            selectedNodeId={selectedNodeId}
-                                            selectedNode={getSelectedNode()}
-                                            selectedNodeData={getSelectedNodeLabelData()}
-                                        /> */}
-                                        {/* switch to properties tab when node selected */}
-                                        {/* {selectedNodeId && getSelectedProteinData() && ( */}
                                         <PropertiesWindow 
                                             selectedNodeId={selectedNodeId}
                                             selectedNodeType={selectedNodeType}
@@ -411,12 +354,10 @@ export default function CircuitBuilderFlow() {
                                             setProteinData={setProteinData}
                                             setEdgeType={changeEdgeType}
                                         />
-
-                                        {/* )} */}
                                     </Tabs.Content>
 
                                     {/* CIRCUITS */}
-                                    <Tabs.Content value="circuit">
+                                    <Tabs.Content value="circuits">
                                         <Text size="4" weight="bold">Prebuilt Circuits</Text>
                                     </Tabs.Content>
                                 </Box>
