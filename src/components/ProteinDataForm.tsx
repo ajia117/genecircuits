@@ -10,7 +10,7 @@ import {
 
 interface ProteinDataProps {
     mode: 'edit' | 'create'
-    proteinData: NodeData,
+    proteinData: NodeData | null,
     setProteinData: Dispatch<SetStateAction<NodeData>>;
 }
 

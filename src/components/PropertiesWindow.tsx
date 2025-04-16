@@ -1,5 +1,5 @@
 import {MarkerType, Node} from "@xyflow/react";
-import React, {useEffect, useState} from "react";
+import React, {Dispatch, SetStateAction, useEffect, useState} from "react";
 import NodeData from "../types/NodeData";
 import EdgeData from "../types/EdgeData";
 import {ProteinDataForm} from '../components'
@@ -27,6 +27,9 @@ interface PropertiesWindowProps {
     selectedEdgeId: string | null;
     edgeData: EdgeData | null;
     setEdgeType: (type: "promote" | "repress") => void;
+    editingProtein?: NodeData | null;
+    setEditingProtein?: Dispatch<SetStateAction<NodeData>>;
+    setActiveTab: Dispatch<SetStateAction<'toolbox' | 'properties' | 'circuits'>>;
 }
 
 const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
@@ -37,13 +40,16 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
     selectedEdgeId,
     edgeData,
     setEdgeType,
+    editingProtein,
+    setEditingProtein,
+    setActiveTab
 }) => {
     const [localProteinData, setLocalProteinData] = useState<NodeData | null>(null);
-    const [editingProtein, setEditingProtein] = useState(false);
+    const [showProteinEditor, setShowProteinEditor] = useState(false);
     const [localEdgeData, setLocalEdgeData] = useState<EdgeData | null>(null);
 
 
-    const PROTEIN_LABEL_MAP: { [key: string]: string } = { // used for protein data list labels
+    const PROTEIN_LABEL_MAP: { [key: string]: string } = {
         label: "Protein Name",
         initialConcentration: "Initial Concentration",
         lossRate: "Loss Rate",
@@ -57,18 +63,18 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
     };
     
     
-    // reset proteinData when new node clicked
+    // Reset proteinData when new node clicked
     useEffect(() => {
         if (proteinData) {
             setLocalProteinData(proteinData);
-            setEditingProtein(false); // reset edit mode when new node selected
+            setShowProteinEditor(false); // reset edit mode when new node selected. close the protein editor
         } else { // no data at all, something going wrong, nothing to display => reset all values
             setLocalProteinData(null);
-            setEditingProtein(false);
+            setShowProteinEditor(false);
         }
     }, [proteinData]);
 
-    // reset edge edgeData when new edge clicked
+    // Reset edgeData when new edge clicked
     useEffect(() => {
         if (edgeData) {
             setLocalEdgeData(edgeData);
@@ -76,21 +82,60 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
             setLocalEdgeData(null);
         }
     }, [edgeData]);
-    
 
+    // Reset proteinData when new node clicked
+    useEffect(() => {
+        if (editingProtein) {
+            setLocalProteinData(editingProtein);
+            setShowProteinEditor(true);          
+        }
+    }, [editingProtein]);
+    
+    // Called when user submits the updated protein data
     const handleUpdate = () => {
         if (localProteinData) {
             setProteinData(localProteinData.label, localProteinData);
-            setEditingProtein(false); // exit edit mode after update
+            setShowProteinEditor(false); // exit edit mode after update
+        }
+        if(editingProtein) {
+            setShowProteinEditor(false);
+            setLocalProteinData(null);
+            setLocalEdgeData(null);
+            setEditingProtein(null);
+            setActiveTab('toolbox')
         }
     };
 
+    if (editingProtein) return (// Show protein editor if user clicks edit on a protein from the toolbox)
+        <ScrollArea
+            type="auto"
+            scrollbars="vertical"
+            style={{
+                maxHeight: '400px',
+                border: '1px solid var(--gray-a6)',
+                borderRadius: 'var(--radius-3)',
+                padding: '0.5rem',
+                width: 'auto'
+            }}
+        >
+            <Flex direction="column" gap="4" pb="4">
+                <ProteinDataForm
+                    mode="edit"
+                    proteinData={editingProtein}
+                    setProteinData={setEditingProtein}
+                />
+                <Button onClick={handleUpdate}><Text>Update Protein</Text></Button>
+            </Flex>
+        </ScrollArea>
+    )
+
+    // Text displayed when no node or edge is selected
     if (!selectedNodeId && !selectedEdgeId) return (
         <Flex align="center" justify="center">
             <Text color="gray" size="2" align="center">Select a node, protein, or edge to view its properties.</Text>
         </Flex>
-    );
-
+    ) 
+    
     return (
         <Flex direction="column" gap="4">
             {/* NODE PROPERTIES */}
@@ -148,15 +193,15 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
                         <Button variant="outline" color="red">
                             <Trash2 size={20}/> <Text size="4" weight="bold">Delete</Text>
                         </Button>
-                        <Button variant="outline" onClick={() => setEditingProtein((prev) => !prev)}>
+                        <Button variant="outline" onClick={() => setShowProteinEditor((prev) => !prev)}>
                             <Pencil size={20} />
-                            <Text size="4" weight="bold">{editingProtein ? "Cancel" : "Edit"}</Text>
+                            <Text size="4" weight="bold">{showProteinEditor ? "Cancel" : "Edit"}</Text>
                         </Button>
                     </Flex>
                 </Flex>
             )}
 
-            { editingProtein && ( // open protein data editor
+            { showProteinEditor && ( // open protein data editor
                 <ScrollArea
                     type="auto"
                     scrollbars="vertical"

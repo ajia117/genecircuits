@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {Dispatch, SetStateAction, useEffect, useMemo, useState} from 'react';
 import NodeData from "../../types/NodeData";
 import '../../index.css';
 import CreateProteinWindow from '../CreateProteinWindow';
@@ -25,12 +25,18 @@ interface ToolboxProps {
     proteins: { [label: string]: NodeData };
     setProteinData: (label: string, data: NodeData) => void;
     getProteinData: (label: string) => NodeData | null;
+    editingProtein?: NodeData | null;
+    setEditingProtein?: Dispatch<SetStateAction<NodeData>>;
+    setActiveTab: Dispatch<SetStateAction<'toolbox' | 'properties' | 'circuits'>>;
 }
 
 export const Toolbox: React.FC<ToolboxProps> = ({
         proteins,
         setProteinData,
-        getProteinData
+        getProteinData,
+        editingProtein,
+        setEditingProtein,
+        setActiveTab
     }) => {
 
     const genericNodeData: NodeData = {
@@ -172,7 +178,10 @@ export const Toolbox: React.FC<ToolboxProps> = ({
                                         </IconButton>
                                     </DropdownMenu.Trigger>
                                     <DropdownMenu.Content>
-                                        <DropdownMenu.Item onClick={() => {}}>Edit</DropdownMenu.Item>
+                                        <DropdownMenu.Item onClick={() => {
+                                            setEditingProtein(protein)
+                                            setActiveTab('properties')
+                                        }}>Edit</DropdownMenu.Item>
                                         <DropdownMenu.Item color="red">Delete</DropdownMenu.Item>
                                     </DropdownMenu.Content>
                                 </DropdownMenu.Root>

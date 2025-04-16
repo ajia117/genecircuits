@@ -47,6 +47,7 @@ export default function CircuitBuilderFlow() {
     const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null); // Stores clicked edge ID
     const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null); // Stores clicked node ID
     const [selectedNodeType, setSelectedNodeType] = useState<string | null>(null); // Stores gate type if the selected node was a logic gate
+    const [editingProtein, setEditingProtein] = useState<NodeData | null>(null); // Store initial protein data for the protein user wants to edit
 
     const [showOutputWindow, setShowOutputWindow] = useState<boolean>(false); // Toggle for output window
     const [outputWindowSettings, setOutputWindowSettings] = useState({x: 0, y: 0, width: 300, height:200}) // Stores output window properties
@@ -340,6 +341,9 @@ export default function CircuitBuilderFlow() {
                                             proteins={proteins}
                                             setProteinData={setProteinData}
                                             getProteinData={getProteinData}
+                                            editingProtein={editingProtein}
+                                            setEditingProtein={setEditingProtein}
+                                            setActiveTab={setActiveTab}
                                         />
                                     </Tabs.Content>
 
@@ -353,6 +357,9 @@ export default function CircuitBuilderFlow() {
                                             edgeData={getSelectedEdgeData()}
                                             setProteinData={setProteinData}
                                             setEdgeType={changeEdgeType}
+                                            editingProtein={editingProtein}
+                                            setEditingProtein={setEditingProtein}
+                                            setActiveTab={setActiveTab}
                                         />
                                     </Tabs.Content>
 
