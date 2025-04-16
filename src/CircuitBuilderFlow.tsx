@@ -173,7 +173,6 @@ export default function CircuitBuilderFlow() {
 
     // Handler for clicking a node
     const onNodeClick = (event: React.MouseEvent, node: Node) => {
-        console.log("clicked", node)
         setSelectedNodeId(node.id); // Store the clicked node ID
         setSelectedEdgeId(null);
         setSelectedNodeType(node.type)

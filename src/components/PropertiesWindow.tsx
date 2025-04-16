@@ -59,7 +59,6 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
     
     // reset proteinData when new node clicked
     useEffect(() => {
-        console.log('opening', proteinData)
         if (proteinData) {
             setLocalProteinData(proteinData);
             setEditingProtein(false); // reset edit mode when new node selected
