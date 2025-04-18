@@ -8,12 +8,12 @@ interface ProteinData extends Record<string, unknown>{
     outputs: number;
     inputFunctionType: 'steady-state' | 'pulse';
     inputFunctionData: {
-        steadyStateValue?: number;
-        timeStart?: number;
-        timeEnd?: number;
-        pulsePeriod?: number;
-        amplitude?: number;
-        dutyCycle?: number;
+        steadyStateValue: number;
+        timeStart: number;
+        timeEnd: number;
+        pulsePeriod: number;
+        amplitude: number;
+        dutyCycle: number;
     }
 }
 

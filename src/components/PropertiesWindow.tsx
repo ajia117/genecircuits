@@ -55,7 +55,13 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
         lossRate: "Loss Rate",
         beta: "Beta",
         inputs: "Number of Inputs",
-        outputs: "Number of Outputs"
+        outputs: "Number of Outputs",
+        "inputFunctionData.steadyStateValue": "Steady State Value",
+        "inputFunctionData.timeStart": "Pulse Start Time",
+        "inputFunctionData.timeEnd": "Pulse End Time",
+        "inputFunctionData.pulsePeriod": "Pulse Period",
+        "inputFunctionData.amplitude": "Amplitude",
+        "inputFunctionData.dutyCycle": "Duty Cycle",
     };
     const EDGE_LABEL_MAP: { [key: string]: string } = {
         source: "Source Node ID",
@@ -170,21 +176,44 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
                                     </Flex>
                                 </DataList.Value>
                             </DataList.Item>
-                            {Object.entries(proteinData).map(([key, value]) => (
-                                <DataList.Item key={key}>
-                                    <DataList.Label minWidth="88px">
-                                        {PROTEIN_LABEL_MAP[key] ?? key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
-                                    </DataList.Label>
-                                    <DataList.Value>
-                                        <Code variant="ghost">{typeof value === "number"
-                                            ? value
-                                            : typeof value === "string"
-                                            ? value
-                                            : JSON.stringify(value)
-                                        }</Code>
-                                    </DataList.Value>
-                                </DataList.Item>
-                            ))}
+                            {Object.entries(proteinData).map(([key, value]) => {
+                                if (key === "inputFunctionData" && typeof value === "object" && value !== null) {
+                                    return Object.entries(value).map(([innerKey, innerValue]) => (
+                                        <DataList.Item key={innerKey}>
+                                            <DataList.Label minWidth="88px">
+                                                {PROTEIN_LABEL_MAP[`inputFunctionData.${innerKey}`] ?? innerKey.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                                            </DataList.Label>
+                                            <DataList.Value>
+                                                <Code variant="ghost">
+                                                    {typeof innerValue === "number"
+                                                        ? innerValue
+                                                        : typeof innerValue === "string"
+                                                        ? innerValue
+                                                        : JSON.stringify(innerValue)}
+                                                </Code>
+                                            </DataList.Value>
+                                        </DataList.Item>
+                                    ));
+                                }
+
+                                return (
+                                    <DataList.Item key={key}>
+                                        <DataList.Label minWidth="88px">
+                                            {PROTEIN_LABEL_MAP[key] ?? key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                                        </DataList.Label>
+                                        <DataList.Value>
+                                            <Code variant="ghost">
+                                                {typeof value === "number"
+                                                    ? value
+                                                    : typeof value === "string"
+                                                    ? value
+                                                    : JSON.stringify(value)}
+                                            </Code>
+                                        </DataList.Value>
+                                    </DataList.Item>
+                                );
+                            })}
+
                         </DataList.Root>
                     </Flex>
 

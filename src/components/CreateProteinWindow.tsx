@@ -35,16 +35,14 @@ export default function CreateProteinWindow({ open, onOpenChange, onCreate }: Pr
         inputFunctionType: 'steady-state',
         inputFunctionData: {
             steadyStateValue: 0,
+            timeStart: 0,
+            timeEnd: 1,
+            pulsePeriod: 1,
+            amplitude: 1,
+            dutyCycle: 0.5,
         }
     };
     const [newProteinData, setNewProteinData] = useState<ProteinData>(genericNodeData);
-
-    // const numericProps: { key: keyof ProteinData; label: string; min: number; max: number; step: number }[] = [
-    //     { key: 'initialConcentration', label: 'Initial Concentration', min: 0, max: 100, step: 1 },
-    //     { key: 'lossRate', label: 'Loss Rate', min: 0, max: 5, step: 0.1 },
-    //     { key: 'beta', label: 'Beta', min: 0, max: 10, step: 0.1 },
-    //     // { key: 'delay', label: 'Delay', min: 0, max: 20, step: 1 }
-    // ];
 
     const handleCancel = () => {
         setNewProteinData(genericNodeData)
