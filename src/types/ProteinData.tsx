@@ -6,6 +6,15 @@ interface ProteinData extends Record<string, unknown>{
     // delay: number;
     inputs: number;
     outputs: number;
+    inputFunctionType: 'steady-state' | 'pulse';
+    inputFunctionData: {
+        steadyStateValue?: number;
+        timeStart?: number;
+        timeEnd?: number;
+        pulsePeriod?: number;
+        amplitude?: number;
+        dutyCycle?: number;
+    }
 }
 
 export default ProteinData;

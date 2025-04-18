@@ -31,7 +31,11 @@ export default function CreateProteinWindow({ open, onOpenChange, onCreate }: Pr
         beta: 1,
         // delay: 0,
         inputs: 1,
-        outputs: 1
+        outputs: 1,
+        inputFunctionType: 'steady-state',
+        inputFunctionData: {
+            steadyStateValue: 0,
+        }
     };
     const [newProteinData, setNewProteinData] = useState<ProteinData>(genericNodeData);
 
