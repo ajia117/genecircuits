@@ -55,44 +55,6 @@ const ProteinDataForm: React.FC<ProteinDataProps> = ({
                 </SegmentedControl.Root>
             </Flex> */}
 
-            {/* Dynamically generated sliders and fields */}
-            {numericProps.map(({ key, label, min, max, step }) => {
-                const rawValue = proteinData[key];
-                const numericValue = typeof rawValue === 'number' && !isNaN(rawValue) ? rawValue : "";
-
-                return (
-                    <Flex direction="column" gap="2" key={key}>
-                        <Flex direction="row" justify="between" align="center">
-                            <Text as="div" weight="bold">{label}</Text>
-                            <TextField.Root
-                                type="number"
-                                style={{ maxWidth: '100px' }}
-                                value={numericValue}
-                                onChange={(e) => {
-                                    const val = e.target.value;
-                                    setProteinData({
-                                        ...proteinData,
-                                        [key]: val === "" ? undefined : parseFloat(val)
-                                    });
-                                }}
-                            />
-                        </Flex>
-                        <Slider
-                            min={min}
-                            max={max}
-                            step={step}
-                            value={[typeof numericValue === "number" ? numericValue : 0]}
-                            onValueChange={(value) =>
-                                setProteinData({
-                                    ...proteinData,
-                                    [key]: value[0]
-                                })
-                            }
-                        />
-                    </Flex>
-                );
-            })}
-
             {/* Num inputs/outputs */}
             <Flex direction="row" gap="2">
                 <Flex direction="column" gap="2">
@@ -132,6 +94,45 @@ const ProteinDataForm: React.FC<ProteinDataProps> = ({
                     />
                 </Flex>
             </Flex>
+
+            {/* Dynamically generated sliders and fields */}
+            {numericProps.map(({ key, label, min, max, step }) => {
+                const rawValue = proteinData[key];
+                const numericValue = typeof rawValue === 'number' && !isNaN(rawValue) ? rawValue : "";
+
+                return (
+                    <Flex direction="column" gap="2" key={key}>
+                        <Flex direction="row" justify="between" align="center">
+                            <Text as="div" weight="bold">{label}</Text>
+                            <TextField.Root
+                                type="number"
+                                style={{ maxWidth: '100px' }}
+                                value={numericValue}
+                                onChange={(e) => {
+                                    const val = e.target.value;
+                                    setProteinData({
+                                        ...proteinData,
+                                        [key]: val === "" ? undefined : parseFloat(val)
+                                    });
+                                }}
+                            />
+                        </Flex>
+                        <Slider
+                            min={min}
+                            max={max}
+                            step={step}
+                            value={[typeof numericValue === "number" ? numericValue : 0]}
+                            onValueChange={(value) =>
+                                setProteinData({
+                                    ...proteinData,
+                                    [key]: value[0]
+                                })
+                            }
+                        />
+                    </Flex>
+                );
+            })}
+
         </>
     )
 }
