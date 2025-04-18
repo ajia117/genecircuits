@@ -1,5 +1,5 @@
 import React, {Dispatch, SetStateAction, useEffect, useMemo, useState} from 'react';
-import NodeData from "../../types/NodeData";
+import ProteinData from "../../types/ProteinData";
 import '../../index.css';
 import CreateProteinWindow from '../CreateProteinWindow';
 import {
@@ -22,11 +22,11 @@ import {
 } from 'lucide-react'
 
 interface ToolboxProps {
-    proteins: { [label: string]: NodeData };
-    setProteinData: (label: string, data: NodeData) => void;
-    getProteinData: (label: string) => NodeData | null;
-    editingProtein?: NodeData | null;
-    setEditingProtein?: Dispatch<SetStateAction<NodeData>>;
+    proteins: { [label: string]: ProteinData };
+    setProteinData: (label: string, data: ProteinData) => void;
+    getProteinData: (label: string) => ProteinData | null;
+    editingProtein?: ProteinData | null;
+    setEditingProtein?: Dispatch<SetStateAction<ProteinData>>;
     setActiveTab: Dispatch<SetStateAction<'toolbox' | 'properties' | 'circuits'>>;
 }
 
@@ -39,7 +39,7 @@ export const Toolbox: React.FC<ToolboxProps> = ({
         setActiveTab
     }) => {
 
-    const genericNodeData: NodeData = {
+    const genericNodeData: ProteinData = {
         label: null,
         initialConcentration: 1,
         lossRate: 1,
@@ -48,13 +48,13 @@ export const Toolbox: React.FC<ToolboxProps> = ({
         inputs: 1,
         outputs: 1
     };
-    const [nodeData, setNodeData] = useState<NodeData>(genericNodeData);
+    const [nodeData, setNodeData] = useState<ProteinData>(genericNodeData);
     const [searchTerm, setSearchTerm] = useState(''); // Stores user input from the protein search bar
     const [showCreateProteinWindow, setShowCreateProteinWindow] = useState(false);
 
 
     // Called when the create protein button is clicked
-    const handleCreateProtein = (data: NodeData) => {
+    const handleCreateProtein = (data: ProteinData) => {
         if (proteins[data.label]) {
             alert("That protein already exists!");
             return;
@@ -63,7 +63,7 @@ export const Toolbox: React.FC<ToolboxProps> = ({
     };
 
     // Called when user starts dragging a node, triggers onDrop in CircuitBuilderFlow when done
-    const onDragStart = (e: React.DragEvent, type: string, data?: NodeData) => {
+    const onDragStart = (e: React.DragEvent, type: string, data?: ProteinData) => {
         e.dataTransfer.setData("application/reactflow", type);
         if (type === "custom" && data) {
             e.dataTransfer.setData("application/node-data", JSON.stringify(data));

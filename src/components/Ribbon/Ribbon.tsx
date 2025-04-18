@@ -3,7 +3,7 @@ import "./Ribbon.css";
 import { Node, Edge } from "@xyflow/react";
 import { fetchOutput, abortFetch, formatBackendJson, formatCircuitExportJson } from "../../utils"
 import CircuitSettingsType from "../../types/CircuitSettingsType";
-import NodeData from "../../types/NodeData";
+import ProteinData from "../../types/ProteinData";
 import {
     Play,
     Pause,
@@ -33,10 +33,10 @@ import {
 import ImportWindow from "../ImportWindow";
 
 interface TopRibbonProps {
-    proteins: { [label: string]: NodeData };
-    setProteins: Dispatch<SetStateAction<{ [label: string]: NodeData }>>;
-    nodes: Node<NodeData>[];
-    setNodes: Dispatch<SetStateAction<Node<NodeData>[]>>;
+    proteins: { [label: string]: ProteinData };
+    setProteins: Dispatch<SetStateAction<{ [label: string]: ProteinData }>>;
+    nodes: Node<ProteinData>[];
+    setNodes: Dispatch<SetStateAction<Node<ProteinData>[]>>;
     edges: Edge[];
     setEdges: Dispatch<SetStateAction<Edge[]>>;
     showOutputWindow: boolean;

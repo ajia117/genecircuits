@@ -1,4 +1,4 @@
-interface NodeData extends Record<string, unknown>{
+interface ProteinData extends Record<string, unknown>{
     label: string;
     initialConcentration: number;
     lossRate: number;
@@ -8,4 +8,4 @@ interface NodeData extends Record<string, unknown>{
     outputs: number;
 }
 
-export default NodeData;
+export default ProteinData;

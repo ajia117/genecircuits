@@ -1,6 +1,6 @@
 import {MarkerType, Node} from "@xyflow/react";
 import React, {Dispatch, SetStateAction, useEffect, useState} from "react";
-import NodeData from "../types/NodeData";
+import ProteinData from "../types/ProteinData";
 import EdgeData from "../types/EdgeData";
 import {ProteinDataForm} from '../components'
 import {
@@ -22,13 +22,13 @@ import {
 interface PropertiesWindowProps {
     selectedNodeId: string | null;
     selectedNodeType: string | null;
-    proteinData: NodeData | null;
-    setProteinData: (label: string, data: NodeData) => void;
+    proteinData: ProteinData | null;
+    setProteinData: (label: string, data: ProteinData) => void;
     selectedEdgeId: string | null;
     edgeData: EdgeData | null;
     setEdgeType: (type: "promote" | "repress") => void;
-    editingProtein?: NodeData | null;
-    setEditingProtein?: Dispatch<SetStateAction<NodeData>>;
+    editingProtein?: ProteinData | null;
+    setEditingProtein?: Dispatch<SetStateAction<ProteinData>>;
     setActiveTab: Dispatch<SetStateAction<'toolbox' | 'properties' | 'circuits'>>;
 }
 
@@ -44,7 +44,7 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
     setEditingProtein,
     setActiveTab
 }) => {
-    const [localProteinData, setLocalProteinData] = useState<NodeData | null>(null);
+    const [localProteinData, setLocalProteinData] = useState<ProteinData | null>(null);
     const [showProteinEditor, setShowProteinEditor] = useState(false);
     const [localEdgeData, setLocalEdgeData] = useState<EdgeData | null>(null);
 
@@ -209,7 +209,7 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
                         maxHeight: '400px',
                         border: '1px solid var(--gray-a6)',
                         borderRadius: 'var(--radius-3)',
-                        padding: '0.5rem',
+                        padding: '1rem',
                         width: 'auto'
                     }}
                 >

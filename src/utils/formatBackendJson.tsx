@@ -1,12 +1,12 @@
 import { Node, Edge } from "@xyflow/react";
 import CircuitSettingsType from "../types/CircuitSettingsType";
-import NodeData from "../types/NodeData";
+import ProteinData from "../types/ProteinData";
 
 export const formatBackendJson = (
     circuitSettings: CircuitSettingsType,
     nodes: Node[],
     edges: Edge[],
-    proteins: { [label: string]: NodeData }
+    proteins: { [label: string]: ProteinData }
 ) => {
     return {
         circuitSettings,

@@ -1,5 +1,5 @@
-import { Dispatch, SetStateAction } from "react";
-import NodeData from "../types/NodeData";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import ProteinData from "../types/ProteinData";
 import {
     Flex,
     TextField,
@@ -10,17 +10,18 @@ import {
 
 interface ProteinDataProps {
     mode: 'edit' | 'create'
-    proteinData: NodeData | null,
-    setProteinData: Dispatch<SetStateAction<NodeData>>;
+    proteinData: ProteinData | null,
+    setProteinData: Dispatch<SetStateAction<ProteinData>>;
 }
 
 const ProteinDataForm: React.FC<ProteinDataProps> = ({
     mode,
     proteinData,
-    setProteinData
+    setProteinData,
 }: ProteinDataProps) => {
+    const [inputFunctionType, setInputFunctionType] = useState<'steady-state' | 'pulse'>('steady-state');
 
-    const numericProps: { key: keyof NodeData; label: string; min: number; max: number; step: number }[] = [
+    const numericProps: { key: keyof ProteinData; label: string; min: number; max: number; step: number }[] = [
         { key: 'initialConcentration', label: 'Initial Concentration', min: 0, max: 100, step: 1 },
         { key: 'lossRate', label: 'Loss Rate', min: 0, max: 5, step: 0.1 },
         { key: 'beta', label: 'Beta', min: 0, max: 10, step: 0.1 },
@@ -30,6 +31,7 @@ const ProteinDataForm: React.FC<ProteinDataProps> = ({
     return (
         <>
             {mode === "create" ?
+                <>
                 <Flex direction="column" gap="2">
                     <Text as="div" weight="bold">Protein Name</Text>
                     <TextField.Root
@@ -41,22 +43,16 @@ const ProteinDataForm: React.FC<ProteinDataProps> = ({
                         }
                     />
                 </Flex>
+                </>
             :
                 <Flex direction="column">
                     <Text weight="bold" size="4">Protein Properties</Text>
                     <Text as="div" weight="regular" color="gray">Editing: <Text weight="regular" color="gray" >{proteinData.label}</Text></Text>
                 </Flex>
             }
-            {/* <Flex direction="column" gap="2">
-                <Text as="div" weight="bold">Protein Type</Text>
-                <SegmentedControl.Root defaultValue="pulse"> 
-                    <SegmentedControl.Item value="pulse">Pulse</SegmentedControl.Item>
-                    <SegmentedControl.Item value="steady-state">Steady State</SegmentedControl.Item>
-                </SegmentedControl.Root>
-            </Flex> */}
 
-            {/* Num inputs/outputs */}
-            <Flex direction="row" gap="2">
+             {/* Num inputs/outputs */}
+             <Flex direction="row" gap="2">
                 <Flex direction="column" gap="2">
                     <Text as="div" weight="bold">Inputs</Text>
                     <TextField.Root
