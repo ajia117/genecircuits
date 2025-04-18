@@ -46,7 +46,16 @@ export const Toolbox: React.FC<ToolboxProps> = ({
         beta: 1,
         // delay: 0,
         inputs: 1,
-        outputs: 1
+        outputs: 1,
+        inputFunctionType: 'steady-state',
+        inputFunctionData: {
+            steadyStateValue: 0,
+            timeStart: 0,
+            timeEnd: 1,
+            pulsePeriod: 1,
+            amplitude: 1,
+            dutyCycle: 0.5,
+        }
     };
     const [nodeData, setNodeData] = useState<ProteinData>(genericNodeData);
     const [searchTerm, setSearchTerm] = useState(''); // Stores user input from the protein search bar
