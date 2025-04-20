@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import ProteinData from "../types/ProteinData";
+import { ProteinData } from "../types";
 import {
     Flex,
     TextField,

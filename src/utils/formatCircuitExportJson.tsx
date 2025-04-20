@@ -1,6 +1,5 @@
 import { Node, Edge } from "@xyflow/react";
-import CircuitSettingsType from "../types/CircuitSettingsType";
-import ProteinData from "../types/ProteinData";
+import { CircuitSettingsType, ProteinData } from "../types";
 
 // JSON to export and import individual circuits
 export const formatCircuitExportJson = (

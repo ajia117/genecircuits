@@ -15,10 +15,9 @@ import '@xyflow/react/dist/style.css';
 import './index.css';
 import { RepressMarker, PromoteMarker } from "./assets";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
-import ProteinData from "./types/ProteinData";
 import SelfConnectingEdge from "./components/Edges/SelfConnectingEdge";
 import { syncNodeCounters, setRefs } from "./utils";
-import { HillCoefficientData } from "./types";
+import { HillCoefficientData, ProteinData } from "./types";
 import { 
     Toolbox, 
     PropertiesWindow, 

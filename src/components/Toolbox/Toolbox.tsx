@@ -1,5 +1,5 @@
 import React, {Dispatch, SetStateAction, useEffect, useMemo, useState} from 'react';
-import ProteinData from "../../types/ProteinData";
+import { ProteinData } from "../../types";
 import '../../index.css';
 import CreateProteinWindow from '../CreateProteinWindow';
 import {

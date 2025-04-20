@@ -1,4 +1,4 @@
-import ProteinData from "../types/ProteinData";
+import { ProteinData } from "../types";
 import {
     Dialog,
     Flex,

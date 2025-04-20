@@ -1,6 +1,5 @@
 import { Node, Edge } from "@xyflow/react";
-import CircuitSettingsType from "../types/CircuitSettingsType";
-import { ProteinData, HillCoefficientData } from "../types";
+import { ProteinData, HillCoefficientData, CircuitSettingsType } from "../types";
 
 export const formatBackendJson = (
     circuitSettings: CircuitSettingsType,
