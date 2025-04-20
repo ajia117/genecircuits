@@ -1,12 +1,13 @@
 import { Node, Edge } from "@xyflow/react";
 import CircuitSettingsType from "../types/CircuitSettingsType";
-import ProteinData from "../types/ProteinData";
+import { ProteinData, HillCoefficientData } from "../types";
 
 export const formatBackendJson = (
     circuitSettings: CircuitSettingsType,
     nodes: Node[],
     edges: Edge[],
-    proteins: { [label: string]: ProteinData }
+    proteins: { [label: string]: ProteinData },
+    hillCoefficients: HillCoefficientData[],
 ) => {
     // Get all unique protein labels used in the nodes
     const usedLabels = new Set<string>(
@@ -43,6 +44,7 @@ export const formatBackendJson = (
             source: edge.source,
             target: edge.target,
         })),
-        proteins: includedProteins
+        proteins: includedProteins,
+        hillCoefficients
     };
 };

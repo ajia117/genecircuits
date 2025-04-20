@@ -18,7 +18,7 @@ import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import ProteinData from "./types/ProteinData";
 import SelfConnectingEdge from "./components/Edges/SelfConnectingEdge";
 import { syncNodeCounters, setRefs } from "./utils";
-
+import { HillCoefficientData } from "./types";
 import { 
     Toolbox, 
     PropertiesWindow, 
@@ -26,7 +26,8 @@ import {
     Ribbon, 
     AndGateNode, 
     OrGateNode, 
-    CustomNode 
+    CustomNode,
+    HillCoefficientMatrix
 } from './components';
 import {
     Tabs,
@@ -43,6 +44,7 @@ export default function CircuitBuilderFlow() {
     const [nodes, setNodes, onNodesChange] = useNodesState([]); // List of all nodes in workspace
     const [edges, setEdges, onEdgesChange] = useEdgesState([]); // List of all edges in workspace
     const [proteins, setProteins] = useState<{[label: string]: ProteinData}>({}); // List of all proteins created
+    const [usedProteins, setUsedProteins] = useState<Set<string>>(new Set());
 
     const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null); // Stores clicked edge ID
     const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null); // Stores clicked node ID
@@ -51,6 +53,9 @@ export default function CircuitBuilderFlow() {
 
     const [showOutputWindow, setShowOutputWindow] = useState<boolean>(false); // Toggle for output window
     const [outputWindowSettings, setOutputWindowSettings] = useState({x: 0, y: 0, width: 300, height:200}) // Stores output window properties
+
+    const [showHillCoeffMatrix, setShowHillCoeffMatrix] = useState(false) // Track whether hill coefficient matrix window is open or not
+    const [hillCoefficients, setHillCoefficients] = useState<HillCoefficientData[]>([]); 
 
     const [outputData, setOutputData] = useState(); // Holds data received from backend after simulation is ran
     const [activeTab, setActiveTab] = useState('toolbox'); // Keeps track of which tab is open in the lefthand window
@@ -278,6 +283,11 @@ export default function CircuitBuilderFlow() {
         
                 if (nodeData.label) {
                     setProteinData(nodeData.label, nodeData);
+                    if (!usedProteins.has(nodeData.label)) {
+                        const updatedSet = new Set(usedProteins);
+                        updatedSet.add(nodeData.label);
+                        setUsedProteins(updatedSet);
+                    }
                 }
             } else { // if logic gate
                 newNode = {
@@ -289,6 +299,38 @@ export default function CircuitBuilderFlow() {
             }
             setNodes((nds) => [...nds, newNode]);
         }, [screenToFlowPosition, setNodes, setProteinData]);
+
+    // Updates the usedProteins list when nodes change
+    useEffect(() => { 
+        const labels = new Set(
+            nodes
+                .filter((node) => node.type === "custom" && typeof node.data?.label === "string")
+                .map((node) => node.data!.label as string)
+        );
+        setUsedProteins(labels);
+    }, [nodes]);
+
+    // Initializes the hillCoefficients array values when new usedProteins list is updated
+    useEffect(() => {
+        const updated: HillCoefficientData[] = [];
+        
+        const labels = Array.from(usedProteins).sort();
+        
+        labels.forEach((source) => {
+            labels.forEach((target) => {
+            const id = `${source}-${target}`;
+            const alreadyExists = hillCoefficients.some(h => h.id === id);
+            if (!alreadyExists) {
+                updated.push({ id, value: 1 }); // default value
+            }
+            });
+        });
+        
+        if (updated.length > 0) {
+            setHillCoefficients(prev => [...prev, ...updated]);
+        }
+    }, [usedProteins]);
+      
 
     // Display output window
     const renderOutputWindow = () => {
@@ -311,6 +353,18 @@ export default function CircuitBuilderFlow() {
                 circuitSettings={circuitSettings}
                 setCircuitSettings={setCircuitSettings}
                 setOutputData={setOutputData}
+                showHillCoefficientMatrix={showHillCoeffMatrix} 
+                setShowHillCoefficientMatrix={setShowHillCoeffMatrix}
+                hillCoefficients={hillCoefficients}
+            />
+
+            {/* HILL COEFFICIENT MATRIX WINDOW */}
+            <HillCoefficientMatrix 
+                open={showHillCoeffMatrix} 
+                onOpenChange={setShowHillCoeffMatrix} 
+                usedProteins={usedProteins} 
+                hillCoefficients={hillCoefficients}
+                setHillCoefficients={setHillCoefficients}
             />
             
             <div className="bottom-container">

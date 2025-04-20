@@ -1,9 +1,6 @@
 import React, { useState, useEffect, Dispatch, SetStateAction } from "react";
-import "./Ribbon.css";
 import { Node, Edge } from "@xyflow/react";
 import { fetchOutput, abortFetch, formatBackendJson, formatCircuitExportJson } from "../../utils"
-import CircuitSettingsType from "../../types/CircuitSettingsType";
-import ProteinData from "../../types/ProteinData";
 import {
     Play,
     Pause,
@@ -16,6 +13,7 @@ import {
     X,
     Dna,
     AreaChart,
+    Grid3X3
 } from "lucide-react";
 import {
     Flex,
@@ -30,7 +28,8 @@ import {
     DropdownMenu,
     Slider
 } from "@radix-ui/themes";
-import ImportWindow from "../ImportWindow";
+import { ImportWindow, HillCoefficientMatrix } from "../../components";
+import { HillCoefficientData, ProteinData, CircuitSettingsType } from "../../types";
 
 interface TopRibbonProps {
     proteins: { [label: string]: ProteinData };
@@ -44,6 +43,9 @@ interface TopRibbonProps {
     circuitSettings: CircuitSettingsType;
     setCircuitSettings: Dispatch<SetStateAction<CircuitSettingsType>>;
     setOutputData: (data: any) => void;
+    showHillCoefficientMatrix: boolean;
+    setShowHillCoefficientMatrix: Dispatch<SetStateAction<boolean>>;
+    hillCoefficients: HillCoefficientData[]
 }
 
 
@@ -52,13 +54,17 @@ const TopRibbon: React.FC<TopRibbonProps> = ({
     edges, setEdges, 
     showOutputWindow, setShowOutputWindow, 
     circuitSettings, setCircuitSettings, 
-    proteins, setProteins ,
+    proteins, setProteins,
     setOutputData, 
+    showHillCoefficientMatrix,
+    setShowHillCoefficientMatrix,
+    hillCoefficients
 }) => {
     const [showClearConfirmation, setShowClearConfirmation] = useState(false); // Track whether clear confirmation window is open or not
     const [isRunning, setIsRunning] = useState(false) // Track if simulation is running or not
     const [showSettingsWindow, setShowSettingsWindow] = useState(false); // Track whether settings window is open or not
     const [showImportWindow, setShowImportWindow] = useState(false); // Track whether import window is open or not
+    
 
     // Handler called when user confirms clearing the screen
     const confirmClear = () => {
@@ -69,7 +75,7 @@ const TopRibbon: React.FC<TopRibbonProps> = ({
 
     // Handler for when user clicks the run simulation button
     const handlePlayClick = async () => {        
-        const circuitJson = formatBackendJson(circuitSettings, nodes, edges, proteins);
+        const circuitJson = formatBackendJson(circuitSettings, nodes, edges, proteins, hillCoefficients);
         setIsRunning(true);
         try {
             const res = await fetchOutput(circuitJson);
@@ -121,13 +127,13 @@ const TopRibbon: React.FC<TopRibbonProps> = ({
                     <Flex gap="2" align="center">
                     <Tooltip content="Open File">
                         <IconButton variant="outline" size="3" color="gray" onClick={() => setShowImportWindow(true)}>
-                        <FolderOpen />
+                        <FolderOpen size={20} />
                         </IconButton>
                     </Tooltip>
 
                     <Tooltip content="Save">
                         <IconButton variant="outline" size="3" color="gray">
-                        <Save />
+                        <Save size={20} />
                         </IconButton>
                     </Tooltip>
 
@@ -135,7 +141,7 @@ const TopRibbon: React.FC<TopRibbonProps> = ({
                         <Tooltip content="Export Circuit">
                             <DropdownMenu.Trigger>
                             <IconButton variant="outline" size="3" color="gray">
-                                <Download />
+                                <Download size={20} />
                             </IconButton>
                             </DropdownMenu.Trigger>
                         </Tooltip>
@@ -157,25 +163,31 @@ const TopRibbon: React.FC<TopRibbonProps> = ({
                 </Box>
 
                 <Flex gap="2" align="center">
+                    <Tooltip content="Hill Coefficient Matrix">
+                        <IconButton variant="outline" size="3" color="gray" onClick={() => setShowHillCoefficientMatrix(!showHillCoefficientMatrix)}>
+                        <Grid3X3 size={20} />
+                        </IconButton>
+                    </Tooltip>
+
                     <Button variant="solid" size="3" onClick={handlePlayClick} disabled={isRunning}>
-                        <Play /> Run Simulation
+                        <Play size={20} /> Run Simulation
                     </Button>
 
                     <Tooltip content={showOutputWindow ? "Close Output" : "Show Output"}>
                         <IconButton variant="outline" size="3" color="gray" onClick={() => setShowOutputWindow(!showOutputWindow)}>
-                        {showOutputWindow ? <X /> : <AreaChart />}
+                        {showOutputWindow ? <X size={20} /> : <AreaChart size={20} />}
                         </IconButton>
                     </Tooltip>
 
                     <Tooltip content="Clear Canvas">
                         <IconButton variant="outline" size="3" color="gray" onClick={() => setShowClearConfirmation(true)}>
-                        <Trash2 />
+                        <Trash2 size={20} />
                         </IconButton>
                     </Tooltip>
 
                     <Tooltip content="Settings">
                         <IconButton variant="outline" size="3" color="gray" onClick={() => setShowSettingsWindow(!showSettingsWindow)}>
-                        <Settings />
+                        <Settings size={20} />
                         </IconButton>
                     </Tooltip>
                 </Flex>
