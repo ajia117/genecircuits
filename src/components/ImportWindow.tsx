@@ -11,8 +11,6 @@ import {
     Upload,
     Import
 } from "lucide-react";
-import CircuitSettingsType from "../types/CircuitSettingsType";
-import { Node, Edge } from "@xyflow/react";
 
 interface ImportWindowProps {
     open: boolean

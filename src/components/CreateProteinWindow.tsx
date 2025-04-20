@@ -1,4 +1,4 @@
-import NodeData from "../types/NodeData";
+import { ProteinData } from "../types";
 import {
     Dialog,
     Flex,
@@ -20,43 +20,45 @@ import ProteinDataForm from "./ProteinDataForm";
 interface ProteinWindowProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    onCreate: (newData: NodeData) => void;
+    onCreate: (newData: ProteinData) => void;
 }  
 
 export default function CreateProteinWindow({ open, onOpenChange, onCreate }: ProteinWindowProps) {
-    const genericNodeData: NodeData = {
+    const genericNodeData: ProteinData = {
         label: null,
         initialConcentration: 1,
         lossRate: 1,
         beta: 1,
         // delay: 0,
         inputs: 1,
-        outputs: 1
+        outputs: 1,
+        inputFunctionType: 'steady-state',
+        inputFunctionData: {
+            steadyStateValue: 0,
+            timeStart: 0,
+            timeEnd: 1,
+            pulsePeriod: 1,
+            amplitude: 1,
+            dutyCycle: 0.5,
+        }
     };
-    const [nodeData, setNodeData] = useState<NodeData>(genericNodeData);
-
-    // const numericProps: { key: keyof NodeData; label: string; min: number; max: number; step: number }[] = [
-    //     { key: 'initialConcentration', label: 'Initial Concentration', min: 0, max: 100, step: 1 },
-    //     { key: 'lossRate', label: 'Loss Rate', min: 0, max: 5, step: 0.1 },
-    //     { key: 'beta', label: 'Beta', min: 0, max: 10, step: 0.1 },
-    //     // { key: 'delay', label: 'Delay', min: 0, max: 20, step: 1 }
-    // ];
+    const [newProteinData, setNewProteinData] = useState<ProteinData>(genericNodeData);
 
     const handleCancel = () => {
-        setNodeData(genericNodeData)
+        setNewProteinData(genericNodeData)
     }
 
     const handleCreate = () => {
-        if (!nodeData.label || nodeData.label.trim() === '') {
+        if (!newProteinData.label || newProteinData.label.trim() === '') {
             alert("Protein label is required");
             return;
         } 
-        else if (nodeData.inputs === 0) { nodeData.inputs = 1 }
-        else if (nodeData.outputs === 0) { nodeData.outputs = 1 }
+        else if (newProteinData.inputs === 0) { newProteinData.inputs = 1 }
+        else if (newProteinData.outputs === 0) { newProteinData.outputs = 1 }
 
       
-        onCreate(nodeData);
-        setNodeData(genericNodeData); // reset for next time
+        onCreate(newProteinData);
+        setNewProteinData(genericNodeData); // reset for next time
     };
 
     return (
@@ -69,7 +71,7 @@ export default function CreateProteinWindow({ open, onOpenChange, onCreate }: Pr
                 <Dialog.Description mb="3">Define the properties of your new protein. You can modify these parameters later.</Dialog.Description>
 
                 <Grid columns={{initial: "2"}} gap="4">
-                    <ProteinDataForm mode="create" proteinData={nodeData} setProteinData={setNodeData} />
+                    <ProteinDataForm mode="create" proteinData={newProteinData} setProteinData={setNewProteinData} />
                 </Grid>
 
                 <Flex justify="end" gap="3" mt="8">

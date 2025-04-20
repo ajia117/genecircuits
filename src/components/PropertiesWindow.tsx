@@ -1,7 +1,6 @@
 import {MarkerType, Node} from "@xyflow/react";
 import React, {Dispatch, SetStateAction, useEffect, useState} from "react";
-import NodeData from "../types/NodeData";
-import EdgeData from "../types/EdgeData";
+import { ProteinData, EdgeData } from "../types";
 import {ProteinDataForm} from '../components'
 import {
     Flex,
@@ -22,13 +21,13 @@ import {
 interface PropertiesWindowProps {
     selectedNodeId: string | null;
     selectedNodeType: string | null;
-    proteinData: NodeData | null;
-    setProteinData: (label: string, data: NodeData) => void;
+    proteinData: ProteinData | null;
+    setProteinData: (label: string, data: ProteinData) => void;
     selectedEdgeId: string | null;
     edgeData: EdgeData | null;
     setEdgeType: (type: "promote" | "repress") => void;
-    editingProtein?: NodeData | null;
-    setEditingProtein?: Dispatch<SetStateAction<NodeData>>;
+    editingProtein?: ProteinData | null;
+    setEditingProtein?: Dispatch<SetStateAction<ProteinData>>;
     setActiveTab: Dispatch<SetStateAction<'toolbox' | 'properties' | 'circuits'>>;
 }
 
@@ -44,7 +43,7 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
     setEditingProtein,
     setActiveTab
 }) => {
-    const [localProteinData, setLocalProteinData] = useState<NodeData | null>(null);
+    const [localProteinData, setLocalProteinData] = useState<ProteinData | null>(null);
     const [showProteinEditor, setShowProteinEditor] = useState(false);
     const [localEdgeData, setLocalEdgeData] = useState<EdgeData | null>(null);
 
@@ -55,7 +54,13 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
         lossRate: "Loss Rate",
         beta: "Beta",
         inputs: "Number of Inputs",
-        outputs: "Number of Outputs"
+        outputs: "Number of Outputs",
+        "inputFunctionData.steadyStateValue": "Steady State Value",
+        "inputFunctionData.timeStart": "Pulse Start Time",
+        "inputFunctionData.timeEnd": "Pulse End Time",
+        "inputFunctionData.pulsePeriod": "Pulse Period",
+        "inputFunctionData.amplitude": "Amplitude",
+        "inputFunctionData.dutyCycle": "Duty Cycle",
     };
     const EDGE_LABEL_MAP: { [key: string]: string } = {
         source: "Source Node ID",
@@ -170,21 +175,44 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
                                     </Flex>
                                 </DataList.Value>
                             </DataList.Item>
-                            {Object.entries(proteinData).map(([key, value]) => (
-                                <DataList.Item key={key}>
-                                    <DataList.Label minWidth="88px">
-                                        {PROTEIN_LABEL_MAP[key] ?? key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
-                                    </DataList.Label>
-                                    <DataList.Value>
-                                        <Code variant="ghost">{typeof value === "number"
-                                            ? value
-                                            : typeof value === "string"
-                                            ? value
-                                            : JSON.stringify(value)
-                                        }</Code>
-                                    </DataList.Value>
-                                </DataList.Item>
-                            ))}
+                            {Object.entries(proteinData).map(([key, value]) => {
+                                if (key === "inputFunctionData" && typeof value === "object" && value !== null) {
+                                    return Object.entries(value).map(([innerKey, innerValue]) => (
+                                        <DataList.Item key={innerKey}>
+                                            <DataList.Label minWidth="88px">
+                                                {PROTEIN_LABEL_MAP[`inputFunctionData.${innerKey}`] ?? innerKey.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                                            </DataList.Label>
+                                            <DataList.Value>
+                                                <Code variant="ghost">
+                                                    {typeof innerValue === "number"
+                                                        ? innerValue
+                                                        : typeof innerValue === "string"
+                                                        ? innerValue
+                                                        : JSON.stringify(innerValue)}
+                                                </Code>
+                                            </DataList.Value>
+                                        </DataList.Item>
+                                    ));
+                                }
+
+                                return (
+                                    <DataList.Item key={key}>
+                                        <DataList.Label minWidth="88px">
+                                            {PROTEIN_LABEL_MAP[key] ?? key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                                        </DataList.Label>
+                                        <DataList.Value>
+                                            <Code variant="ghost">
+                                                {typeof value === "number"
+                                                    ? value
+                                                    : typeof value === "string"
+                                                    ? value
+                                                    : JSON.stringify(value)}
+                                            </Code>
+                                        </DataList.Value>
+                                    </DataList.Item>
+                                );
+                            })}
+
                         </DataList.Root>
                     </Flex>
 
@@ -209,7 +237,7 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
                         maxHeight: '400px',
                         border: '1px solid var(--gray-a6)',
                         borderRadius: 'var(--radius-3)',
-                        padding: '0.5rem',
+                        padding: '1rem',
                         width: 'auto'
                     }}
                 >

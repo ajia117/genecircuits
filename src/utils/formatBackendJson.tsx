@@ -1,25 +1,39 @@
 import { Node, Edge } from "@xyflow/react";
-import CircuitSettingsType from "../types/CircuitSettingsType";
-import NodeData from "../types/NodeData";
+import { ProteinData, HillCoefficientData, CircuitSettingsType } from "../types";
 
 export const formatBackendJson = (
     circuitSettings: CircuitSettingsType,
     nodes: Node[],
     edges: Edge[],
-    proteins: { [label: string]: NodeData }
+    proteins: { [label: string]: ProteinData },
+    hillCoefficients: HillCoefficientData[],
 ) => {
+    // Get all unique protein labels used in the nodes
+    const usedLabels = new Set<string>(
+        nodes
+            .filter((node) => node.type === "custom" && typeof node.data?.label === "string")
+            .map((node) => node.data.label as string)
+    );
+
+    // Create a filtered proteins object for only used labels
+    const includedProteins: { [label: string]: ProteinData } = {};
+    usedLabels.forEach((label) => {
+        if (proteins[label]) {
+            includedProteins[label] = proteins[label];
+        }
+    });
+
     return {
         circuitSettings,
         nodes: nodes.map((node: Node) => {
             const isCustom = node.type === "custom";
             const label = node.data?.label;
-            const proteinData = isCustom && typeof label === "string" ? proteins[label] : null;
 
             return {
                 id: node.id,
                 type: node.type || "default",
-                ...(isCustom && proteinData // add data for non-gate nodes. maintains consistency for all nodes of the same protein
-                    ? { data: { ...proteinData, label } }
+                ...(isCustom && label
+                    ? { proteinName: label }
                     : {})
             };
         }),
@@ -28,6 +42,8 @@ export const formatBackendJson = (
             type: edge.markerEnd,
             source: edge.source,
             target: edge.target,
-        }))
+        })),
+        proteins: includedProteins,
+        hillCoefficients
     };
 };

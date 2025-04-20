@@ -4,6 +4,7 @@ export { default as Toolbox } from './Toolbox/Toolbox'
 export { default as Ribbon } from './Ribbon/Ribbon'
 export { default as ImportWindow } from './ImportWindow'
 export { default as CreateProteinWindow } from './CreateProteinWindow'
+export { default as HillCoefficientMatrix } from './HillCoefficientMatrix'
 
 export { default as AndGateNode } from './Nodes/AndGateNode'
 export { default as CustomNode } from './Nodes/CustomNode'
