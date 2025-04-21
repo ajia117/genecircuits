@@ -10,13 +10,23 @@ import { FuseV1Options, FuseVersion } from '@electron/fuses';
 
 import { mainConfig } from './webpack.main.config';
 import { rendererConfig } from './webpack.renderer.config';
+import * as path from "node:path";
 
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
+    // Add extraResource to include Flask backend
+    extraResource: [
+      path.join(__dirname, 'flask-backend', 'dist', 'app')
+    ]
   },
   rebuildConfig: {},
-  makers: [new MakerSquirrel({}), new MakerZIP({}, ['darwin']), new MakerRpm({}), new MakerDeb({})],
+  makers: [
+    new MakerSquirrel({}),
+    new MakerZIP({}, ['darwin']),
+    new MakerRpm({}),
+    new MakerDeb({})
+  ],
   plugins: [
     new AutoUnpackNativesPlugin({}),
     new WebpackPlugin({
