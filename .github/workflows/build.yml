@@ -52,6 +52,15 @@ jobs:
           ls -la flask-backend/dist
         shell: bash
 
+      - name: Fix Windows executable path (Windows only)
+        if: matrix.os == 'windows-latest'
+        run: |
+          # Create a copy without the .exe extension for Electron to find
+          if [ -f "flask-backend/dist/app.exe" ]; then
+            cp "flask-backend/dist/app.exe" "flask-backend/dist/app"
+          fi
+        shell: bash
+
       - name: Build Electron app
         run: npm run make
 
