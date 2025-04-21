@@ -55,13 +55,7 @@ jobs:
       - name: Fix Windows executable path (Windows only)
         if: matrix.os == 'windows-latest'
         run: |
-          # Create a symbolic link without the .exe extension for Electron to find
-          if [ -f "flask-backend/dist/app.exe" ]; then
-            # Remove any existing file first
-            rm -f "flask-backend/dist/app" || true
-            # Use PowerShell to create a copy
-            powershell -Command "Copy-Item -Path 'flask-backend/dist/app.exe' -Destination 'flask-backend/dist/app' -Force"
-          fi
+          sed -i 's/"app")/"app.exe")/g' forge.config.ts
         shell: bash
 
       - name: Build Electron app
