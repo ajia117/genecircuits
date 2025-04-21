@@ -318,6 +318,127 @@ const circuitTemplates: CircuitTemplate[] = [
                 }
             }
         }
+    },
+    {
+        id: 'incoherentfeedforward-loop',
+        name: 'Incoherent Feed-Forward Loop',
+        description: 'An incoherent feed-forward loop circuit',
+        nodes: [
+            {
+                id: '0',
+                type: 'custom',
+                position: { x: 200, y: 50 },
+                data: {
+                    label: 'Input',
+                    inputs: 0,
+                    outputs: 2, }
+            },
+            {
+                id: '1',
+                type: 'custom',
+                position: { x: 100, y: 150 },
+                data: { label: 'Intermediate',
+                    inputs: 1,
+                    outputs: 1, }
+            },
+            {
+                id: '2',
+                type: 'custom',
+                position: { x: 300, y: 250 },
+                data: { label: 'Output',
+                    inputs: 1,
+                    outputs: 0, }
+            },
+            {
+                id: 'g0',
+                type: 'and',
+                position: { x: 300, y: 150 },
+                data: {}
+            }
+        ],
+        edges: [
+            {
+                id: 'edge-0-1',
+                source: '0',
+                sourceHandle: "output-1",
+                target: "1",
+                targetHandle: "input-0",
+                markerEnd: 'promote'
+            },
+            {
+                id: 'edge-0-g0',
+                source: '0',
+                sourceHandle: "output-0",
+                target: "g0",
+                targetHandle: "input-2",
+                markerEnd: 'promote'
+            },
+            {
+                id: 'edge-1-g0',
+                source: '1',
+                target: 'g0',
+                markerEnd: 'repress'
+            },
+            {
+                id: 'edge-g0-2',
+                source: 'g0',
+                target: '2',
+                markerEnd: 'promote'
+            }
+        ],
+        proteins: {
+            'Input': {
+                label: 'Input',
+                initialConcentration: 0,
+                lossRate: 0.1,
+                beta: 1,
+                inputs: 0,
+                outputs: 2,
+                inputFunctionType: 'pulse',
+                inputFunctionData: {
+                    steadyStateValue: 0,
+                    timeStart: 1,
+                    timeEnd: 3,
+                    pulsePeriod: 10,
+                    amplitude: 1,
+                    dutyCycle: 0.5,
+                }
+            },
+            'Intermediate': {
+                label: 'Intermediate',
+                initialConcentration: 0,
+                lossRate: 0.2,
+                beta: 1,
+                inputs: 1,
+                outputs: 1,
+                inputFunctionType: 'steady-state',
+                inputFunctionData: {
+                    steadyStateValue: 0,
+                    timeStart: 0,
+                    timeEnd: 1,
+                    pulsePeriod: 1,
+                    amplitude: 1,
+                    dutyCycle: 0.5,
+                }
+            },
+            'Output': {
+                label: 'Output',
+                initialConcentration: 0,
+                lossRate: 0.3,
+                beta: 1,
+                inputs: 1,
+                outputs: 0,
+                inputFunctionType: 'steady-state',
+                inputFunctionData: {
+                    steadyStateValue: 0,
+                    timeStart: 0,
+                    timeEnd: 1,
+                    pulsePeriod: 1,
+                    amplitude: 1,
+                    dutyCycle: 0.5,
+                }
+            }
+        }
     }
 ];
 
