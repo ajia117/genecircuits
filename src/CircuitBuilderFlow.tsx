@@ -34,6 +34,8 @@ import {
     Text,
     ScrollArea
 } from '@radix-ui/themes'
+import PrebuiltCircuits from "./components/Circuits/PrebuiltCircuits";
+import {ApplyCircuitTemplateProps, CircuitTemplate} from "./types/PreBuiltCircuitTypes";
 
 
 export default function CircuitBuilderFlow() {
@@ -186,6 +188,7 @@ export default function CircuitBuilderFlow() {
     const onEdgeClick = useCallback((event: React.MouseEvent, edge: Edge) => {
         resetSelectedStateData();
         setSelectedEdgeId(edge.id); // Store the clicked edge ID
+        console.log(edge)
         // Auto switch to "properties" tab
         setActiveTab("properties");
     }, []);
@@ -329,7 +332,87 @@ export default function CircuitBuilderFlow() {
             setHillCoefficients(prev => [...prev, ...updated]);
         }
     }, [usedProteins]);
-      
+
+    const applyCircuitTemplate = ({
+                                      template,
+                                      nodes,
+                                      edges,
+                                      proteins,
+                                      nodeIdRef,
+                                      gateIdRef,
+                                      setNodes,
+                                      setEdges,
+                                      setProteins
+                                  }: ApplyCircuitTemplateProps): void => {
+        // Track original ID to new ID mapping
+        const idMap: {[originalId: string]: string} = {};
+
+        // Create new nodes with updated IDs and positions
+        const newNodes: Node<any>[] = template.nodes.map(node => {
+            // Generate new ID based on node type
+            const newId: string = node.type === 'custom' ?
+                `${nodeIdRef.current++}` :
+                `g${gateIdRef.current++}`;
+
+            idMap[node.id] = newId;
+
+            // Calculate position offset to center the template in the visible viewport
+            const xOffset = 100;
+            const yOffset = 100;
+
+            return {
+                ...node,
+                id: newId,
+                position: {
+                    x: node.position.x + xOffset,
+                    y: node.position.y + yOffset
+                }
+            };
+        });
+
+        // Create new edges with updated source/target IDs
+        const newEdges: Edge[] = template.edges.map(edge => {
+            const newSource: string = idMap[edge.source];
+            const newTarget: string = idMap[edge.target];
+
+            return {
+                ...edge,
+                id: `edge-${newSource}-${newTarget}`,
+                source: newSource,
+                target: newTarget
+            };
+        });
+
+        // Add the new proteins
+        const mergedProteins: {[label: string]: ProteinData} = {...proteins};
+
+        // Handle potential protein label conflicts
+        Object.entries(template.proteins).forEach(([label, proteinData]) => {
+
+                mergedProteins[label] = proteinData;
+
+        });
+
+        // Update state
+        setNodes((prevNodes: Node<any>[]) => [...prevNodes, ...newNodes]);
+        setEdges((prevEdges: Edge[]) => [...prevEdges, ...newEdges]);
+        setProteins(() => mergedProteins);
+    };
+
+    const handleApplyCircuitTemplate = useCallback((template: CircuitTemplate): void => {
+        // Call the typed function with all required parameters
+        applyCircuitTemplate({
+            template,
+            nodes,
+            edges,
+            proteins,
+            nodeIdRef,
+            gateIdRef,
+            setNodes,
+            setEdges,
+            setProteins,
+        });
+    }, [nodes, edges, proteins, nodeIdRef, gateIdRef, setNodes, setEdges, setProteins]);
 
     // Display output window
     const renderOutputWindow = () => {
@@ -419,7 +502,9 @@ export default function CircuitBuilderFlow() {
 
                                     {/* CIRCUITS */}
                                     <Tabs.Content value="circuits">
-                                        <Text size="4" weight="bold">Prebuilt Circuits</Text>
+                                        <PrebuiltCircuits
+                                            applyCircuitTemplate={handleApplyCircuitTemplate}
+                                        />
                                     </Tabs.Content>
                                 </Box>
                                 </ScrollArea>
