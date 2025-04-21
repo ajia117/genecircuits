@@ -58,6 +58,12 @@ jobs:
           sed -i 's/"app")/"app.exe")/g' forge.config.ts
         shell: bash
 
+      - name: Create copy for Windows
+        if: matrix.os == 'windows-latest'
+        run: |
+          copy flask-backend\dist\app.exe flask-backend\dist\app
+        shell: cmd
+
       - name: Build Electron app
         run: npm run make
 
