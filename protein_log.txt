@@ -9,17 +9,12 @@ Received json
         {
             "id": "0",
             "type": "custom",
-            "proteinName": "Gene1"
+            "proteinName": "ProteinA"
         },
         {
             "id": "1",
             "type": "custom",
-            "proteinName": "Gene2"
-        },
-        {
-            "id": "2",
-            "type": "custom",
-            "proteinName": "Gene3"
+            "proteinName": "ProteinB"
         }
     ],
     "edges": [
@@ -30,56 +25,33 @@ Received json
             "target": "1"
         },
         {
-            "id": "edge-1-2",
+            "id": "edge-1-0",
             "type": "repress",
             "source": "1",
-            "target": "2"
-        },
-        {
-            "id": "edge-2-0",
-            "type": "repress",
-            "source": "2",
             "target": "0"
         }
     ],
     "proteins": {
-        "Gene1": {
-            "label": "Gene1",
-            "initialConcentration": 0,
-            "lossRate": 0.2,
-            "beta": 1,
-            "inputs": 1,
-            "outputs": 1,
-            "inputFunctionType": "steady-state",
-            "inputFunctionData": {
-                "steadyStateValue": 0,
-                "timeStart": 0,
-                "timeEnd": 1,
-                "pulsePeriod": 1,
-                "amplitude": 1,
-                "dutyCycle": 0.5
-            }
-        },
-        "Gene2": {
-            "label": "Gene2",
-            "initialConcentration": 0,
-            "lossRate": 0.2,
-            "beta": 1,
-            "inputs": 1,
-            "outputs": 1,
-            "inputFunctionType": "steady-state",
-            "inputFunctionData": {
-                "steadyStateValue": 0,
-                "timeStart": 0,
-                "timeEnd": 1,
-                "pulsePeriod": 1,
-                "amplitude": 1,
-                "dutyCycle": 0.5
-            }
-        },
-        "Gene3": {
-            "label": "Gene3",
+        "ProteinA": {
+            "label": "ProteinA",
             "initialConcentration": 1,
+            "lossRate": 0.2,
+            "beta": 1,
+            "inputs": 1,
+            "outputs": 1,
+            "inputFunctionType": "steady-state",
+            "inputFunctionData": {
+                "steadyStateValue": 0,
+                "timeStart": 0,
+                "timeEnd": 1,
+                "pulsePeriod": 1,
+                "amplitude": 1,
+                "dutyCycle": 0.5
+            }
+        },
+        "ProteinB": {
+            "label": "ProteinB",
+            "initialConcentration": 0,
             "lossRate": 0.2,
             "beta": 1,
             "inputs": 1,
@@ -97,44 +69,23 @@ Received json
     },
     "hillCoefficients": [
         {
-            "id": "Gene1-Gene1",
+            "id": "ProteinA-ProteinA",
             "value": 1
         },
         {
-            "id": "Gene1-Gene2",
+            "id": "ProteinA-ProteinB",
             "value": 1
         },
         {
-            "id": "Gene1-Gene3",
+            "id": "ProteinB-ProteinA",
             "value": 1
         },
         {
-            "id": "Gene2-Gene1",
-            "value": 1
-        },
-        {
-            "id": "Gene2-Gene2",
-            "value": 1
-        },
-        {
-            "id": "Gene2-Gene3",
-            "value": 1
-        },
-        {
-            "id": "Gene3-Gene1",
-            "value": 1
-        },
-        {
-            "id": "Gene3-Gene2",
-            "value": 1
-        },
-        {
-            "id": "Gene3-Gene3",
+            "id": "ProteinB-ProteinB",
             "value": 1
         }
     ]
 }
 Output protein list:
-Protein ID: 0, Name: Gene1, Degradation: 0.2, Gates: [('rep_hill', 2, None)]
-Protein ID: 1, Name: Gene2, Degradation: 0.2, Gates: [('rep_hill', 0, None)]
-Protein ID: 2, Name: Gene3, Degradation: 0.2, Gates: [('rep_hill', 1, None)]
+Protein ID: 0, Name: ProteinA, Degradation: 0.2, Gates: [('rep_hill', 1, None)]
+Protein ID: 1, Name: ProteinB, Degradation: 0.2, Gates: [('rep_hill', 0, None)]
