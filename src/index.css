@@ -62,21 +62,6 @@
   max-width: 400px;
 }
 
-/* Toolbox Section */
-.toolbox-container {
-  flex-grow: 1; /* Allows Toolbox to expand while leaving space for properties */
-  overflow-y: auto;
-  padding: 10px;
-}
-
-/* Properties Window */
-.properties-window {
-  border-top: 1px solid #ddd;
-  padding: 10px;
-  box-sizing: border-box;
-}
-
-
 /* ------- RIGHT PANE (ReactFlow workspace) ------- */
 
 .circuit-builder-container .flow-wrapper {
@@ -87,18 +72,26 @@
 }
 
 .dndnode {
-  min-width: 130px;
-  max-width: 300px;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 4px;
-  border: 1px solid #1a192b;
-  border-radius: 2px;
-  margin-bottom: 10px;
   display: flex;
-  justify-content: center;
   align-items: center;
+  padding: 10px 14px;
+  border-radius: 6px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--gray-a6);
   cursor: grab;
+  transition: background-color 0.2s ease;
+}
+
+.dndnode:hover {
+  background-color: var(--accent-a2);
+}
+
+.dndnode:active {
+  cursor: grabbing;
+}
+
+.gate-icon {
+  color: var(--accent-9);
 }
 
 .custom-node {
@@ -106,4 +99,20 @@
   padding: 5px;
   border-radius: 5px;
   background: white;
+}
+
+.tab-navigation {
+  display: flex;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.tab-button {
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  color: #6b7280; /* text-gray-500 */
+}
+
+.tab-active {
+  border-bottom: 2px solid #3b82f6; /* border-blue-500 */
+  color: #2563eb; /* text-blue-600 */
 }

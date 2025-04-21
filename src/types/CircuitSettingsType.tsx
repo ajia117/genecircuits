@@ -1,2 +1,2 @@
-interface CircuitSettingsType { circuitName: string, simulationDuration: number, numTimePoints: number };
+interface CircuitSettingsType { projectName: string, simulationDuration: number, numTimePoints: number };
 export default CircuitSettingsType;

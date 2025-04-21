@@ -1,4 +1,4 @@
-import React, {useCallback, useState, useRef, useMemo} from "react";
+import React, {useCallback, useState, useRef, useMemo, useEffect} from "react";
 import {
     ReactFlow,
     Background,
@@ -15,7 +15,9 @@ import '@xyflow/react/dist/style.css';
 import './index.css';
 import { RepressMarker, PromoteMarker } from "./assets";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
-
+import SelfConnectingEdge from "./components/Edges/SelfConnectingEdge";
+import { syncNodeCounters, setRefs } from "./utils";
+import { HillCoefficientData, ProteinData } from "./types";
 import { 
     Toolbox, 
     PropertiesWindow, 
@@ -23,56 +25,143 @@ import {
     Ribbon, 
     AndGateNode, 
     OrGateNode, 
-    CustomNode 
+    CustomNode,
+    HillCoefficientMatrix
 } from './components';
-import NodeData from "./types/NodeData";
+import {
+    Tabs,
+    Box,
+    Text,
+    ScrollArea
+} from '@radix-ui/themes'
+import PrebuiltCircuits from "./components/Circuits/PrebuiltCircuits";
+import {ApplyCircuitTemplateProps, CircuitTemplate} from "./types/PreBuiltCircuitTypes";
+
 
 export default function CircuitBuilderFlow() {
     const reactFlowWrapper = useRef(null);
+    const { screenToFlowPosition } = useReactFlow();
+
     const [nodes, setNodes, onNodesChange] = useNodesState([]); // List of all nodes in workspace
     const [edges, setEdges, onEdgesChange] = useEdgesState([]); // List of all edges in workspace
-    const { screenToFlowPosition } = useReactFlow();
+    const [proteins, setProteins] = useState<{[label: string]: ProteinData}>({}); // List of all proteins created
+    const [usedProteins, setUsedProteins] = useState<Set<string>>(new Set());
+
     const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null); // Stores clicked edge ID
     const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null); // Stores clicked node ID
-    const [showOutputWindow, setShowOutputWindow] = useState<boolean>(false);
-    const [outputWindowSettings, setOutputWindowSettings] = useState({x: 0, y: 0, width: 300, height:200})
-    const [outputData, setOutputData] = useState(); // Holds data received from backend to be used as graph
-    const [labelDataMap, setLabelDataMap] = useState<{[label: string]: NodeData}>({});
+    const [selectedNodeType, setSelectedNodeType] = useState<string | null>(null); // Stores gate type if the selected node was a logic gate
+    const [editingProtein, setEditingProtein] = useState<ProteinData | null>(null); // Store initial protein data for the protein user wants to edit
 
-    const circuitSettings = {
-        circuitName: "test circuit",
+    const [showOutputWindow, setShowOutputWindow] = useState<boolean>(false); // Toggle for output window
+    const [outputWindowSettings, setOutputWindowSettings] = useState({x: 0, y: 0, width: 300, height:200}) // Stores output window properties
+
+    const [showHillCoeffMatrix, setShowHillCoeffMatrix] = useState(false) // Track whether hill coefficient matrix window is open or not
+    const [hillCoefficients, setHillCoefficients] = useState<HillCoefficientData[]>([]); 
+
+    const [outputData, setOutputData] = useState(); // Holds data received from backend after simulation is ran
+    const [activeTab, setActiveTab] = useState('toolbox'); // Keeps track of which tab is open in the lefthand window
+
+    const [circuitSettings, setCircuitSettings] = useState({ // Stores all the circuit-wide setting data
+        projectName: "Untitled Project",
         simulationDuration: 20,
         numTimePoints: 10
-    }
+    });
+    
 
     const nodeTypes = useMemo(() => ({
         custom: CustomNode,
         and: AndGateNode,
         or: OrGateNode
     }), []);
+    const edgeTypes = useMemo(() => ({
+        selfConnecting: SelfConnectingEdge,
+    }), []);
 
-    let nodeId = 0; // counter for protein nodes
-    let gateId = 0; // counter for gate nodes
-    const getId = (nodeType: string) => { // provide id for nodes
-        if (nodeType == "and" || nodeType == "or") {
-            return `g${gateId++}`
-        } else if (nodeType == "custom") {
-            return `${nodeId++}`
+
+    // Create new ids for nodes and gates
+    const nodeIdRef = useRef(0); // counter for protein nodes
+    const gateIdRef = useRef(0); // counter for gate nodes
+    const getId = (nodeType: string): string => {
+        if (nodeType === "and" || nodeType === "or") {
+          return `g${gateIdRef.current++}`;
+        } else if (nodeType === "custom") {
+          return `${nodeIdRef.current++}`;
         }
-    }; // creates id for the next node
+        return `unknown-${Math.random().toString(36).substr(2, 5)}`; // generate random id if there invalid node
+      };
+    useEffect(() => {
+        setRefs({ nodeIdRef, gateIdRef });
+    }, []);
+
+    // Function to reset selected state data used by the properties tab
+    const resetSelectedStateData= () => {
+        setSelectedEdgeId(null);
+        setSelectedNodeId(null);
+        setSelectedNodeType(null);
+        setEditingProtein(null);
+    }
+
+    // Handler for circuit imports
+    useEffect(() => {
+        const handleCircuitImport = (event: CustomEvent) => {
+            const {
+                circuitSettings: importedSettings,
+                nodes: importedNodes,
+                edges: importedEdges,
+                proteins: importedProteins
+            } = event.detail;
+    
+            // Replace circuit settings (safe default fallback)
+            setCircuitSettings({
+                projectName: importedSettings?.projectName ?? "Untitled Project",
+                simulationDuration: importedSettings?.simulationDuration ?? 20,
+                numTimePoints: importedSettings?.numTimePoints ?? 10
+            });
+
+            // Overwrite old data on import
+            setNodes(importedNodes ?? []);
+            setEdges(importedEdges ?? []);
+            setProteins(importedProteins ?? {});
+    
+            // // Merge nodes (or do overwrite depending on behavior you want)
+            // setNodes(prev => [...prev, ...(importedNodes ?? [])]);
+    
+            // // Merge edges
+            // setEdges(prev => [...prev, ...(importedEdges ?? [])]);
+    
+            // // Merge proteins
+            // setProteins(prev => ({
+            //     ...prev,
+            //     ...(importedProteins ?? {})
+            // }));
+    
+            // Sync node ID counters to avoid ID conflict
+            syncNodeCounters([...nodes, ...(importedNodes ?? [])]);
+
+            // Reset controller state variables
+            resetSelectedStateData();
+        };
+    
+        window.addEventListener("circuitImport", handleCircuitImport as EventListener);
+    
+        return () => {
+            window.removeEventListener("circuitImport", handleCircuitImport as EventListener);
+        };
+    }, [setNodes, setEdges, setProteins, setCircuitSettings, nodes]);
+    
 
     // Handler for connecting nodes
     const onConnect = useCallback(
         (params: Connection) => {
             setEdges((eds) => {
                 const filteredEdges = eds.filter(edge => !(edge.source === params.source && edge.target === params.target));
-                
+                const selfConnection = params.source === params.target;
                 const newEdge: Edge = {
-                    ...params,
-                    id: `edge-${params.source}-${params.target}`,
-                    type: 'default',
-                    markerEnd: "promote"
-                };
+                        ...params,
+                        id: `edge-${params.source}-${params.target}`,
+                        type: `${selfConnection ? 'selfConnecting' : 'default'}`,
+                        markerEnd: "promote"
+                    };
                 
                 return [...filteredEdges, newEdge];
             });
@@ -80,90 +169,67 @@ export default function CircuitBuilderFlow() {
         [setEdges]
     );
     
+    // Handler called when react flow pane clicked
     const onPaneClick = useCallback(() => {
-        setSelectedNodeId(null);
-        setSelectedEdgeId(null);
+        resetSelectedStateData();
     }, []);
 
-    // Handler for clicking an edge
+    // Handler for clicking a node
     const onNodeClick = (event: React.MouseEvent, node: Node) => {
+        resetSelectedStateData();
         setSelectedNodeId(node.id); // Store the clicked node ID
-        setSelectedEdgeId(null);
-    };
+        setSelectedNodeType(node.type)
 
-    const getSelectedNode = () => {
-        return nodes.find(node => node.id === selectedNodeId) as Node<NodeData>;
-    };
-
-    const changeLabelData = (name: string, value: string | number) => {
-        // get label for node data you want to change
-        const labelToChange = nodes.find((node) => node.id === selectedNodeId).data.label
-        // only change the name and value of the label
-        setLabelDataMap(prevMap => ({
-            ...prevMap,
-            [labelToChange]: {
-                ...prevMap[labelToChange],
-                [name]: value
-            }
-        }));
-    };
-
-    // change node-specific data, such as input and output handles
-    const changeNodeData = (name: string, value: string | number) => {
-        setNodes((nodes) =>
-            nodes.map((node) =>
-                node.id === selectedNodeId ? {
-                    ...node,
-                    data: {
-                        ...node.data,
-                        [name]: value
-                    }
-                } : node
-            )
-        );
+        // Auto switch to "properties" tab
+        setActiveTab("properties");
     };
 
     // Handler for clicking an edge
     const onEdgeClick = useCallback((event: React.MouseEvent, edge: Edge) => {
+        resetSelectedStateData();
         setSelectedEdgeId(edge.id); // Store the clicked edge ID
-        setSelectedNodeId(null);
+        console.log(edge)
+        // Auto switch to "properties" tab
+        setActiveTab("properties");
     }, []);
 
-    // Handler for dragging a component from toolbox to workspace
-    const onDragOver = useCallback((event: React.DragEvent) => {
-        event.preventDefault();
-        event.dataTransfer.dropEffect = 'move';
-    }, []);
+    // Handler for resetting logic when switching tabs
+    useEffect(() => {
+        if (activeTab !== "properties") {
+            resetSelectedStateData();
+        }
+    }, [activeTab]);
 
-    // Add new node
-    const onDrop = useCallback(
-        (event: React.DragEvent) => {
-            event.preventDefault();
+    // Return all data from a given protein label
+    const getProteinData = (label: string) => proteins[label] ?? null;
 
-            const nodeType = event.dataTransfer.getData("application/reactflow");
-            const nodeData = JSON.parse(event.dataTransfer.getData("application/node-data")) as NodeData;
-            if (!nodeType || typeof nodeType !== "string") {
-                console.error("Invalid node type:", nodeType);
-                return;
-            }
-            const position = screenToFlowPosition({ // find drop location
-                x: event.clientX,
-                y: event.clientY,
-            });
-            const newNode = { // properties of new node being added
-                id: getId(nodeType),
-                position,
-                type: nodeType,
-                data: nodeData
-            };
-            setNodes((nds) => [...nds, newNode]);
-            setLabelData(nodeData.label, nodeData);
-        },
-        [screenToFlowPosition],
-    );
+    // Update or add a key value pair to a node's protein data (this will update the data for every node of the same protein)
+    const setProteinData = (label: string, data: ProteinData) => {
+        setProteins((prev) => ({
+          ...prev,
+          [label]: data,
+        }));
+    };
 
-    // Function to change marker type of the selected edge
-    const changeMarkerType = useCallback((markerType: string) => {
+    // Returns entire Node object for the selected node (includes node ID)
+    const getSelectedNode = () => {
+        return nodes.find(node => node.id === selectedNodeId) as Node<ProteinData>;
+    };
+
+    // Returns protein data from the selected node
+    const getSelectedProteinData = () => {
+        const node = getSelectedNode();
+        if(node)
+            return getProteinData(node.data.label)
+    }
+
+    // Returns data from the selected edge
+    const getSelectedEdgeData = () => {
+        return edges.find(edge => edge.id === selectedEdgeId) ?? null;
+    };
+
+    // Function to change edge type of the selected edge
+    const changeEdgeType = useCallback((markerType: string) => {
         if (!selectedEdgeId) return; // No edge selected
 
         setEdges((eds) =>
@@ -180,31 +246,178 @@ export default function CircuitBuilderFlow() {
         );
     }, [selectedEdgeId]);
 
-    // return data if label in labelDataMap
-    const getLabelData = (label: string) => {
-        if(label in labelDataMap) {
-            return labelDataMap[label];
+    // Handler for dragging a component from toolbox to workspace
+    const onDragOver = useCallback((event: React.DragEvent) => {
+        event.preventDefault();
+        event.dataTransfer.dropEffect = 'move';
+    }, []);
+    
+    // Handler called when a node is dropped into the React Flow pane
+    const onDrop = useCallback(
+        (event: React.DragEvent) => {
+            event.preventDefault();
+    
+            const nodeType = event.dataTransfer.getData("application/reactflow");
+            if (!nodeType || typeof nodeType !== "string") {
+                console.error("Invalid node type:", nodeType);
+                return;
+            }
+
+            const position = screenToFlowPosition({
+                x: event.clientX,
+                y: event.clientY,
+            });
+
+            let newNode: Node;
+    
+            if (nodeType === "custom") {
+                const rawData = JSON.parse(event.dataTransfer.getData("application/node-data")) as ProteinData;
+
+                // Remove `id` if present — prevent conflict
+                const { id, ...nodeData } = rawData;
+
+                newNode = {
+                    id: getId(nodeType),
+                    type: nodeType,
+                    position,
+                    data: nodeData,
+                };
+        
+                if (nodeData.label) {
+                    setProteinData(nodeData.label, nodeData);
+                    if (!usedProteins.has(nodeData.label)) {
+                        const updatedSet = new Set(usedProteins);
+                        updatedSet.add(nodeData.label);
+                        setUsedProteins(updatedSet);
+                    }
+                }
+            } else { // if logic gate
+                newNode = {
+                    id: getId(nodeType),
+                    type: nodeType,
+                    position,
+                    data: {},
+                };
+            }
+            setNodes((nds) => [...nds, newNode]);
+        }, [screenToFlowPosition, setNodes, setProteinData]);
+
+    // Updates the usedProteins list when nodes change
+    useEffect(() => { 
+        const labels = new Set(
+            nodes
+                .filter((node) => node.type === "custom" && typeof node.data?.label === "string")
+                .map((node) => node.data!.label as string)
+        );
+        setUsedProteins(labels);
+    }, [nodes]);
+
+    // Initializes the hillCoefficients array values when new usedProteins list is updated
+    useEffect(() => {
+        const updated: HillCoefficientData[] = [];
+        
+        const labels = Array.from(usedProteins).sort();
+        
+        labels.forEach((source) => {
+            labels.forEach((target) => {
+            const id = `${source}-${target}`;
+            const alreadyExists = hillCoefficients.some(h => h.id === id);
+            if (!alreadyExists) {
+                updated.push({ id, value: 1 }); // default value
+            }
+            });
+        });
+        
+        if (updated.length > 0) {
+            setHillCoefficients(prev => [...prev, ...updated]);
         }
-        return null;
-    }
+    }, [usedProteins]);
 
-    // set label data if exists, or add to nodeLabelData if not
-    const setLabelData = (label: string, data: NodeData) => {
-        setLabelDataMap(prevMap => ({
-            ...prevMap,
-            [label]: data
-        }));
-    }
+    const applyCircuitTemplate = ({
+                                      template,
+                                      nodes,
+                                      edges,
+                                      proteins,
+                                      nodeIdRef,
+                                      gateIdRef,
+                                      setNodes,
+                                      setEdges,
+                                      setProteins
+                                  }: ApplyCircuitTemplateProps): void => {
+        // Track original ID to new ID mapping
+        const idMap: {[originalId: string]: string} = {};
 
+        // Create new nodes with updated IDs and positions
+        const newNodes: Node<any>[] = template.nodes.map(node => {
+            // Generate new ID based on node type
+            const newId: string = node.type === 'custom' ?
+                `${nodeIdRef.current++}` :
+                `g${gateIdRef.current++}`;
+
+            idMap[node.id] = newId;
+
+            // Calculate position offset to center the template in the visible viewport
+            const xOffset = 100;
+            const yOffset = 100;
+
+            return {
+                ...node,
+                id: newId,
+                position: {
+                    x: node.position.x + xOffset,
+                    y: node.position.y + yOffset
+                }
+            };
+        });
+
+        // Create new edges with updated source/target IDs
+        const newEdges: Edge[] = template.edges.map(edge => {
+            const newSource: string = idMap[edge.source];
+            const newTarget: string = idMap[edge.target];
+
+            return {
+                ...edge,
+                id: `edge-${newSource}-${newTarget}`,
+                source: newSource,
+                target: newTarget
+            };
+        });
+
+        // Add the new proteins
+        const mergedProteins: {[label: string]: ProteinData} = {...proteins};
+
+        // Handle potential protein label conflicts
+        Object.entries(template.proteins).forEach(([label, proteinData]) => {
+
+                mergedProteins[label] = proteinData;
+
+        });
+
+        // Update state
+        setNodes((prevNodes: Node<any>[]) => [...prevNodes, ...newNodes]);
+        setEdges((prevEdges: Edge[]) => [...prevEdges, ...newEdges]);
+        setProteins(() => mergedProteins);
+    };
+
+    const handleApplyCircuitTemplate = useCallback((template: CircuitTemplate): void => {
+        // Call the typed function with all required parameters
+        applyCircuitTemplate({
+            template,
+            nodes,
+            edges,
+            proteins,
+            nodeIdRef,
+            gateIdRef,
+            setNodes,
+            setEdges,
+            setProteins,
+        });
+    }, [nodes, edges, proteins, nodeIdRef, gateIdRef, setNodes, setEdges, setProteins]);
+
+    // Display output window
     const renderOutputWindow = () => {
         return <OutputWindow onClose={() => setShowOutputWindow(false)} outputData={outputData} windowSettings={outputWindowSettings} setWindowSettings={setOutputWindowSettings} />;
     };
-
-    const getSelectedNodeLabelData = () => {
-        const node = getSelectedNode();
-        if(node)
-            return getLabelData(node.data.label)
-    }
 
     return (
         <>
@@ -214,41 +427,91 @@ export default function CircuitBuilderFlow() {
 
             {/* TOP MENU FUNCTION BUTTONS */}
             <Ribbon
-                labelDataMap={labelDataMap}
+                proteins={proteins} setProteins={setProteins}
                 nodes={nodes} setNodes={setNodes}
                 edges={edges} setEdges={setEdges}
                 showOutputWindow={showOutputWindow} 
                 setShowOutputWindow={setShowOutputWindow}
                 circuitSettings={circuitSettings}
+                setCircuitSettings={setCircuitSettings}
                 setOutputData={setOutputData}
+                showHillCoefficientMatrix={showHillCoeffMatrix} 
+                setShowHillCoefficientMatrix={setShowHillCoeffMatrix}
+                hillCoefficients={hillCoefficients}
+            />
+
+            {/* HILL COEFFICIENT MATRIX WINDOW */}
+            <HillCoefficientMatrix 
+                open={showHillCoeffMatrix} 
+                onOpenChange={setShowHillCoeffMatrix} 
+                usedProteins={usedProteins} 
+                hillCoefficients={hillCoefficients}
+                setHillCoefficients={setHillCoefficients}
             />
             
             <div className="bottom-container">
                 <PanelGroup className="circuit-builder-container" direction="horizontal">
-                {/* Left Pane (Toolbox + Properties Window) */}
+                    {/* Left Pane (Toolbox + Properties Window) */}
                     <Panel className="left-pane min-w-128" defaultSize={30} maxSize={50}>
-                        <PanelGroup direction="vertical">
-                            <Panel className="toolbox-container" defaultSize={70} minSize={30} maxSize={90}>
-                                <Toolbox
-                                    labels={Object.keys(labelDataMap)}
-                                    getLabelData={getLabelData}
-                                />
-                            </Panel>
-                            <PanelResizeHandle className="resize-handle-horizontal" />
-                            <Panel className="properties-window" defaultSize={30} minSize={30} maxSize={90}>
-                                <h1 className={`m-0`}>Properties Window</h1>
-                                {(selectedNodeId || selectedEdgeId) && <PropertiesWindow
-                                    key={`${selectedNodeId || ''}-${selectedEdgeId || ''}`}
-                                    changeMarkerType={changeMarkerType}
-                                    changeLabelData={changeLabelData}
-                                    changeNodeData={changeNodeData}
-                                    selectedEdgeId={selectedEdgeId}
-                                    selectedNodeId={selectedNodeId}
-                                    selectedNode={getSelectedNode()}
-                                    selectedNodeData={getSelectedNodeLabelData()}
-                                />}
-                            </Panel>
-                        </PanelGroup>
+                        <div className="flex flex-col h-full">
+                            {/* Tab Navigation */}
+                            <Tabs.Root defaultValue="toolbox" value={activeTab} onValueChange={setActiveTab} className="h-full">
+                                <Tabs.List>
+                                    <Tabs.Trigger value="toolbox">Toolbox</Tabs.Trigger>
+                                    <Tabs.Trigger value="properties">Properties</Tabs.Trigger>
+                                    <Tabs.Trigger value="circuits">Circuits</Tabs.Trigger>
+                                </Tabs.List>
+                            
+
+                                {/* Tab Content */}
+                                <ScrollArea
+                                    type="scroll"
+                                    scrollbars="vertical"
+                                    style={{
+                                        maxHeight: 'calc(100vh - 100px)',
+                                    }}
+                                >
+                                <Box px="4" mt="6" className="h-full overflow-y-auto">
+                                    {/* TOOLBOX */}
+                                    <Tabs.Content value="toolbox">
+                                        <Toolbox
+                                            proteins={proteins}
+                                            setProteinData={setProteinData}
+                                            getProteinData={getProteinData}
+                                            editingProtein={editingProtein}
+                                            setEditingProtein={setEditingProtein}
+                                            setActiveTab={setActiveTab}
+                                        />
+                                    </Tabs.Content>
+
+                                    {/* PROPERTIES */}
+                                    <Tabs.Content value="properties">
+                                        <PropertiesWindow 
+                                            selectedNodeId={selectedNodeId}
+                                            selectedNodeType={selectedNodeType}
+                                            selectedEdgeId={selectedEdgeId}
+                                            proteinData={getSelectedProteinData()}
+                                            edgeData={getSelectedEdgeData()}
+                                            setProteinData={setProteinData}
+                                            setEdgeType={changeEdgeType}
+                                            editingProtein={editingProtein}
+                                            setEditingProtein={setEditingProtein}
+                                            setActiveTab={setActiveTab}
+                                        />
+                                    </Tabs.Content>
+
+                                    {/* CIRCUITS */}
+                                    <Tabs.Content value="circuits">
+                                        <PrebuiltCircuits
+                                            applyCircuitTemplate={handleApplyCircuitTemplate}
+                                        />
+                                    </Tabs.Content>
+                                </Box>
+                                </ScrollArea>
+                            </Tabs.Root>
+
+                            
+                        </div>
                     </Panel>
 
                     <PanelResizeHandle className="resize-handle-vertical"/>
@@ -269,6 +532,7 @@ export default function CircuitBuilderFlow() {
                             onEdgeClick={onEdgeClick}
                             onPaneClick={onPaneClick}
                             nodeTypes={nodeTypes}
+                            edgeTypes={edgeTypes}
                             fitView
                         >
                             <Background />

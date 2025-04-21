@@ -9,3 +9,6 @@ python xor.py
 
 echo "Running i1_ffl.py..."
 python i1_ffl.py
+
+echo "Running repressilator.py..."
+python repressilator.py

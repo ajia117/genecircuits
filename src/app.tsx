@@ -3,6 +3,8 @@ import './index.css';
 import CircuitBuilderFlow from "./CircuitBuilderFlow";
 import { ReactFlowProvider } from "@xyflow/react";
 import { ToolboxProvider } from "./components/Toolbox/ToolboxContext";
+import { Theme, ThemePanel } from "@radix-ui/themes";
+import "@radix-ui/themes/styles.css";
 
 const rootElement = document.getElementById('root');
 
@@ -12,7 +14,10 @@ if (rootElement) {
     root.render(
         <ReactFlowProvider>
             <ToolboxProvider>
-                <CircuitBuilderFlow />
+                <Theme appearance='light' accentColor='jade' radius='large' scaling='95%'>
+                    <CircuitBuilderFlow />
+                    {/* <ThemePanel /> */}
+                </Theme>
             </ToolboxProvider>
         </ReactFlowProvider>
     );

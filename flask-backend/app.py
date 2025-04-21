@@ -23,7 +23,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import io
-import simple_parser
+import new_parser
 from simulate import run_simulation
 # from protein import Protein, Gate
 from flask import Flask, request, jsonify, send_file
@@ -73,7 +73,8 @@ def run_simulation_route():
         # Parse data into protein objects
         # TODO: add try / catch block to catch errors in parsing and return proper code
         try:
-            protein_array = simple_parser.parse_circuit(data)
+            
+            protein_array = new_parser.parse_circuit(data)
         except Exception as parse_error:
             return jsonify({"error": f"Parse error: {str(parse_error)}"}), 400
 

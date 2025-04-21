@@ -1,16 +1,17 @@
 import biocircuits
 
 class Protein:
-    def __init__(self, id, name, initConc, degrad, gates, extConcFunc = None, extConcFuncArgs = None):
+    def __init__(self, id, name, initConc, degrad, gates, extConcFunc = None, extConcFuncArgs = None, beta = 1):
         self.mID = id
         self.mName = name
         self.mInternalConc = initConc
         self.mDegradation = degrad
+        self.mBeta = beta
         self.mGates = gates
         self.mExtConcFunc = extConcFunc
         self.mExtConcFuncArgs = extConcFuncArgs
-        for gate in self.mGates:
-            gate.regFuncLambda = gate.getRegFunc()
+        # for gate in self.mGates:
+        #     gate.regFuncLambda = gate.getRegFunc()
 
     def getID(self):
         return self.mID
@@ -41,6 +42,7 @@ class Protein:
         rate = 0.0
         for i, gate in enumerate(self.mGates):
             rate += gate.regFunc(proteinArray)
+        rate *= self.mBeta
         rate -= self.mDegradation * self.mInternalConc
         return rate
     
@@ -64,6 +66,7 @@ class Gate:
         self.mSecondInput = secondInput
         self.mSecondHill = secondHill
         self.prodRate = 0.0
+        self.regFuncLambda = self.getRegFunc() 
 
     def getRegFunc(self):
         if self.mType == "act_hill":
