@@ -15,14 +15,19 @@ if (require('electron-squirrel-startup')) {
 let pythonProcess: ChildProcess | null = null;
 async function startBackend() {
   // Path to pyinstaller script
-  // TODO: change this for windows, currently only linux/macos executable form
   let scriptPath: string;
   if (app.isPackaged) {
-    // In production/packaged mode
     scriptPath = path.join(process.resourcesPath, 'app');
+
+    if (process.platform === 'win32') {
+      scriptPath += '.exe';
+    }
   } else {
-    // In development mode
     scriptPath = path.join(__dirname, '..', '..', 'flask-backend', 'dist', 'app');
+
+    if (process.platform === 'win32') {
+      scriptPath += '.exe';
+    }
   }
   console.log('Starting Flask backend at:', scriptPath);
 
