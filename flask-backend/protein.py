@@ -10,8 +10,8 @@ class Protein:
         self.mGates = gates
         self.mExtConcFunc = extConcFunc
         self.mExtConcFuncArgs = extConcFuncArgs
-        for gate in self.mGates:
-            gate.regFuncLambda = gate.getRegFunc()
+        # for gate in self.mGates:
+        #     gate.regFuncLambda = gate.getRegFunc()
 
     def getID(self):
         return self.mID
@@ -66,6 +66,7 @@ class Gate:
         self.mSecondInput = secondInput
         self.mSecondHill = secondHill
         self.prodRate = 0.0
+        self.regFuncLambda = self.getRegFunc() 
 
     def getRegFunc(self):
         if self.mType == "act_hill":
