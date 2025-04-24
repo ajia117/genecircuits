@@ -188,6 +188,7 @@ export default function CircuitBuilderFlow() {
     const onEdgeClick = useCallback((event: React.MouseEvent, edge: Edge) => {
         resetSelectedStateData();
         setSelectedEdgeId(edge.id); // Store the clicked edge ID
+        console.log(edge)
         // Auto switch to "properties" tab
         setActiveTab("properties");
     }, []);

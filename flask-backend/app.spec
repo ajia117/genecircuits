@@ -6,7 +6,8 @@ a = Analysis(
     ['app.py', 'simulate.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[
+    ],
     hiddenimports=['IPython', 'IPython.display', 'unicodedata'],
     hookspath=[],
     hooksconfig={},
