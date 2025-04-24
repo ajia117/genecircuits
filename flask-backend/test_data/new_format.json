@@ -1,0 +1,227 @@
+{
+    "circuitSettings": {
+        "projectName": "Untitled Project",
+        "simulationDuration": 20,
+        "numTimePoints": 10
+    },
+    "nodes": [
+        {
+            "id": "0",
+            "type": "custom",
+            "proteinName": "Orange"
+        },
+        {
+            "id": "g0",
+            "type": "and"
+        },
+        {
+            "id": "1",
+            "type": "custom",
+            "proteinName": "Strawberry"
+        },
+        {
+            "id": "2",
+            "type": "custom",
+            "proteinName": "Grape"
+        },
+        {
+            "id": "3",
+            "type": "custom",
+            "proteinName": "Banana"
+        },
+        {
+            "id": "g1",
+            "type": "or"
+        },
+        {
+            "id": "4",
+            "type": "custom",
+            "proteinName": "Orange"
+        },
+        {
+            "id": "5",
+            "type": "custom",
+            "proteinName": "Grape"
+        }
+    ],
+    "edges": [
+        {
+            "id": "edge-0-1",
+            "type": "promote",
+            "source": "0",
+            "target": "1"
+        },
+        {
+            "id": "edge-1-g0",
+            "type": "promote",
+            "source": "1",
+            "target": "g0"
+        },
+        {
+            "id": "edge-2-g0",
+            "type": "repress",
+            "source": "2",
+            "target": "g0"
+        },
+        {
+            "id": "edge-g0-3",
+            "type": "promote",
+            "source": "g0",
+            "target": "3"
+        },
+        {
+            "id": "edge-3-g1",
+            "type": "repress",
+            "source": "3",
+            "target": "g1"
+        },
+        {
+            "id": "edge-4-g1",
+            "type": "promote",
+            "source": "4",
+            "target": "g1"
+        },
+        {
+            "id": "edge-g1-5",
+            "type": "promote",
+            "source": "g1",
+            "target": "5"
+        }
+    ],
+    "proteins": {
+        "Orange": {
+            "label": "Orange",
+            "initialConcentration": 1,
+            "lossRate": 1,
+            "beta": 1,
+            "inputs": 1,
+            "outputs": 1,
+            "inputFunctionType": "steady-state",
+            "inputFunctionData": {
+                "steadyStateValue": 0,
+                "timeStart": 0,
+                "timeEnd": 1,
+                "pulsePeriod": 1,
+                "amplitude": 1,
+                "dutyCycle": 0.5
+            }
+        },
+        "Strawberry": {
+            "label": "Strawberry",
+            "initialConcentration": 76,
+            "lossRate": 1,
+            "beta": 1,
+            "inputs": 1,
+            "outputs": 1,
+            "inputFunctionType": "pulse",
+            "inputFunctionData": {
+                "steadyStateValue": 0,
+                "timeStart": 1,
+                "timeEnd": 10,
+                "pulsePeriod": 2,
+                "amplitude": 1,
+                "dutyCycle": 0.5
+            }
+        },
+        "Grape": {
+            "label": "Grape",
+            "initialConcentration": 100,
+            "lossRate": 1,
+            "beta": 1,
+            "inputs": 1,
+            "outputs": 1,
+            "inputFunctionType": "steady-state",
+            "inputFunctionData": {
+                "steadyStateValue": 50,
+                "timeStart": 0,
+                "timeEnd": 1,
+                "pulsePeriod": 1,
+                "amplitude": 1,
+                "dutyCycle": 0.5
+            }
+        },
+        "Banana": {
+            "label": "Banana",
+            "initialConcentration": 56,
+            "lossRate": 1,
+            "beta": 1,
+            "inputs": 1,
+            "outputs": 1,
+            "inputFunctionType": "pulse",
+            "inputFunctionData": {
+                "steadyStateValue": 0,
+                "timeStart": 0,
+                "timeEnd": 472,
+                "pulsePeriod": 1,
+                "amplitude": 81,
+                "dutyCycle": 0.5
+            }
+        }
+    },
+    "hillCoefficients": [
+        {
+            "id": "Banana-Banana",
+            "value": 1
+        },
+        {
+            "id": "Banana-Grape",
+            "value": 1
+        },
+        {
+            "id": "Banana-Orange",
+            "value": 23
+        },
+        {
+            "id": "Banana-Strawberry",
+            "value": 1
+        },
+        {
+            "id": "Grape-Banana",
+            "value": 1
+        },
+        {
+            "id": "Grape-Grape",
+            "value": 1
+        },
+        {
+            "id": "Grape-Orange",
+            "value": 1
+        },
+        {
+            "id": "Grape-Strawberry",
+            "value": 1
+        },
+        {
+            "id": "Orange-Banana",
+            "value": 1
+        },
+        {
+            "id": "Orange-Grape",
+            "value": 1
+        },
+        {
+            "id": "Orange-Orange",
+            "value": 1
+        },
+        {
+            "id": "Orange-Strawberry",
+            "value": 1
+        },
+        {
+            "id": "Strawberry-Banana",
+            "value": 1
+        },
+        {
+            "id": "Strawberry-Grape",
+            "value": 1
+        },
+        {
+            "id": "Strawberry-Orange",
+            "value": 1
+        },
+        {
+            "id": "Strawberry-Strawberry",
+            "value": 1
+        }
+    ]
+}

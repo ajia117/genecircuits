@@ -4,7 +4,7 @@ from simulate import run_simulation, x_pulse
 from protein import Protein, Gate
 import bokeh.plotting as bp
 from   bokeh.io import output_file
-import bokeh.application
+import bokeh.palettes
 
 def runAllTests():
     test_ffl_simulation()
@@ -108,7 +108,7 @@ def test_i1_ffl_simulation():
     t = np.linspace(0, duration, n)
     x_args = (0.04, t_stepdown,duration, x_0, 1)
 
-    proteinArray = [Protein(0, "Protein X", 0.0, 0.0, [], x_pulse, x_args), Protein(1, "Protein Y", 0.0, gamma, [Gate("act_hill", firstInput=0, firstHill=n_xy)], None, None), Protein(2, "Protein Z", 0.0, gamma, [Gate("ar_and", firstInput=0, secondInput=1, firstHill=n_xz, secondHill=n_yz)])]
+    proteinArray = [Protein(0, "Protein X", 0.0, 0.0, [], x_pulse, x_args), Protein(1, "Protein Y", 0.0, gamma, [Gate("act_hill", firstInput=0, firstHill=n_xy)], None, None, 3), Protein(2, "Protein Z", 0.0, gamma, [Gate("ar_and", firstInput=0, secondInput=1, firstHill=n_xz, secondHill=n_yz)], None, None)]
 
     final_concentrations = run_simulation(t, proteinArray)
     plot_results(t, final_concentrations, "I1 FFL Simulation Results")
@@ -118,11 +118,31 @@ def test_i1_ffl_simulation():
         np.savetxt(f, final_concentrations, comments='')
     assert np.allclose(final_concentrations, expected_concentrations, atol=1e-1) # Tolerance is 0.1
 
+def test_repressilator():
+    # Specify expected results. These are based on the ../biocircuits_experimentation/xor_circuit.py script
+    expected_concentrations = np.loadtxt("simulation_test_data/repressilator_results.txt")
+    n = 1000
+    gamma = 1
+    n_all = 3
+    beta_all = 5
+    duration = 10
+    x0 = np.array([1, 1, 1.2])
+    t = np.linspace(0, duration, n)
+
+    proteinArray = [Protein(0, "Protein 1", x0[0], gamma, [Gate("rep_hill", firstInput=2, firstHill=n_all)], None, None, beta_all), Protein(1, "Protein 2", x0[1], gamma, [Gate("rep_hill", firstInput=0, firstHill=n_all)], None, None, beta_all), Protein(2, "Protein 3", x0[2], gamma, [Gate("rep_hill", firstInput=1, firstHill=n_all)], None, None, beta_all)]
+
+    final_concentrations = run_simulation(t, proteinArray)
+    plot_results(t, final_concentrations, "Repressilator Simulation Results")
+
+    # write out to file
+    with open("simulation_test_data/repressilator_actual_results.log", "w") as f:
+        np.savetxt(f, final_concentrations, comments='')
+    assert np.allclose(final_concentrations, expected_concentrations, atol=1e-12)
 
 # TODO: handle command line args, to run individual tests if desired
 def main():
     print("Running all test cases...")
-    pytest.main(["-v", "test_simulator.py::test_ffl_simulation", "test_simulator.py::test_xor_simulation", "test_simulator.py::test_i1_ffl_simulation"])
+    pytest.main(["-v", "test_simulator.py::test_ffl_simulation", "test_simulator.py::test_xor_simulation", "test_simulator.py::test_i1_ffl_simulation", "test_simulator.py::test_repressilator"])
 
 # Run the script
 if __name__ == '__main__':

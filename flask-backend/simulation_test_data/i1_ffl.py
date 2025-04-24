@@ -7,7 +7,7 @@ from scipy.interpolate import interp1d
 # biocircuits.apps.plot_ffl defined here: https://github.com/justinbois/biocircuits/blob/master/biocircuits/apps/ffl.py 
 
 # Parameter values
-beta = 1 # We have not yet implemented beta, but their example uses beta = 5
+beta = 3
 gamma = 1
 kappa = 1 # We will not use kappa, so set it to 1
 n_xy, n_yz = 3, 3

@@ -1,0 +1,214 @@
+Received json
+{
+    "circuitSettings": {
+        "projectName": "Untitled Project",
+        "simulationDuration": 20,
+        "numTimePoints": 10
+    },
+    "nodes": [
+        {
+            "id": "2",
+            "type": "custom",
+            "proteinName": "Input"
+        },
+        {
+            "id": "3",
+            "type": "custom",
+            "proteinName": "Intermediate"
+        },
+        {
+            "id": "4",
+            "type": "custom",
+            "proteinName": "Output"
+        },
+        {
+            "id": "g0",
+            "type": "and"
+        }
+    ],
+    "edges": [
+        {
+            "id": "edge-2-3",
+            "type": "promote",
+            "source": "2",
+            "target": "3"
+        },
+        {
+            "id": "edge-2-g0",
+            "type": "promote",
+            "source": "2",
+            "target": "g0"
+        },
+        {
+            "id": "edge-3-g0",
+            "type": "promote",
+            "source": "3",
+            "target": "g0"
+        },
+        {
+            "id": "edge-g0-4",
+            "type": "promote",
+            "source": "g0",
+            "target": "4"
+        }
+    ],
+    "proteins": {
+        "Input": {
+            "label": "Input",
+            "initialConcentration": 0,
+            "lossRate": 0.1,
+            "beta": 1,
+            "inputs": 0,
+            "outputs": 2,
+            "inputFunctionType": "pulse",
+            "inputFunctionData": {
+                "steadyStateValue": 0,
+                "timeStart": 1,
+                "timeEnd": 3,
+                "pulsePeriod": 10,
+                "amplitude": 1,
+                "dutyCycle": 0.5
+            }
+        },
+        "Intermediate": {
+            "label": "Intermediate",
+            "initialConcentration": 0,
+            "lossRate": 0.2,
+            "beta": 1,
+            "inputs": 1,
+            "outputs": 1,
+            "inputFunctionType": "steady-state",
+            "inputFunctionData": {
+                "steadyStateValue": 0,
+                "timeStart": 0,
+                "timeEnd": 1,
+                "pulsePeriod": 1,
+                "amplitude": 1,
+                "dutyCycle": 0.5
+            }
+        },
+        "Output": {
+            "label": "Output",
+            "initialConcentration": 0,
+            "lossRate": 0.3,
+            "beta": 1,
+            "inputs": 1,
+            "outputs": 0,
+            "inputFunctionType": "steady-state",
+            "inputFunctionData": {
+                "steadyStateValue": 0,
+                "timeStart": 0,
+                "timeEnd": 1,
+                "pulsePeriod": 1,
+                "amplitude": 1,
+                "dutyCycle": 0.5
+            }
+        }
+    },
+    "hillCoefficients": [
+        {
+            "id": "ProteinA-ProteinA",
+            "value": 1
+        },
+        {
+            "id": "ProteinA-ProteinB",
+            "value": 1
+        },
+        {
+            "id": "ProteinB-ProteinA",
+            "value": 1
+        },
+        {
+            "id": "ProteinB-ProteinB",
+            "value": 1
+        },
+        {
+            "id": "Input-Input",
+            "value": 1
+        },
+        {
+            "id": "Input-Intermediate",
+            "value": 1
+        },
+        {
+            "id": "Input-Output",
+            "value": 1
+        },
+        {
+            "id": "Input-ProteinA",
+            "value": 1
+        },
+        {
+            "id": "Input-ProteinB",
+            "value": 1
+        },
+        {
+            "id": "Intermediate-Input",
+            "value": 1
+        },
+        {
+            "id": "Intermediate-Intermediate",
+            "value": 1
+        },
+        {
+            "id": "Intermediate-Output",
+            "value": 1
+        },
+        {
+            "id": "Intermediate-ProteinA",
+            "value": 1
+        },
+        {
+            "id": "Intermediate-ProteinB",
+            "value": 1
+        },
+        {
+            "id": "Output-Input",
+            "value": 1
+        },
+        {
+            "id": "Output-Intermediate",
+            "value": 1
+        },
+        {
+            "id": "Output-Output",
+            "value": 1
+        },
+        {
+            "id": "Output-ProteinA",
+            "value": 1
+        },
+        {
+            "id": "Output-ProteinB",
+            "value": 1
+        },
+        {
+            "id": "ProteinA-Input",
+            "value": 1
+        },
+        {
+            "id": "ProteinA-Intermediate",
+            "value": 1
+        },
+        {
+            "id": "ProteinA-Output",
+            "value": 1
+        },
+        {
+            "id": "ProteinB-Input",
+            "value": 1
+        },
+        {
+            "id": "ProteinB-Intermediate",
+            "value": 1
+        },
+        {
+            "id": "ProteinB-Output",
+            "value": 1
+        }
+    ]
+}
+Output protein list:
+Protein ID: 0, Name: Input, Degradation: 0.1, Gates: []
+Protein ID: 1, Name: Intermediate, Degradation: 0.2, Gates: [('act_hill', 0, None)]
+Protein ID: 2, Name: Output, Degradation: 0.3, Gates: [('aa_and', 0, 1)]

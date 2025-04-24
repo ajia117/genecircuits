@@ -1,0 +1,139 @@
+{
+    "circuitSettings": {
+        "projectName": "Untitled Project",
+        "simulationDuration": 20,
+        "numTimePoints": 10
+    },
+    "nodes": [
+        {
+            "id": "3",
+            "type": "custom",
+            "proteinName": "a"
+        },
+        {
+            "id": "4",
+            "type": "custom",
+            "proteinName": "b"
+        },
+        {
+            "id": "5",
+            "type": "custom",
+            "proteinName": "c"
+        },
+        {
+            "id": "g1",
+            "type": "and"
+        }
+    ],
+    "edges": [
+        {
+            "id": "edge-3-g1",
+            "type": "promote",
+            "source": "3",
+            "target": "g1"
+        },
+        {
+            "id": "edge-4-g1",
+            "type": "promote",
+            "source": "4",
+            "target": "g1"
+        },
+        {
+            "id": "edge-g1-5",
+            "type": "promote",
+            "source": "g1",
+            "target": "5"
+        }
+    ],
+    "proteins": {
+        "a": {
+            "label": "a",
+            "initialConcentration": 1,
+            "lossRate": 1,
+            "beta": 1,
+            "inputs": 1,
+            "outputs": 1,
+            "inputFunctionType": "steady-state",
+            "inputFunctionData": {
+                "steadyStateValue": 0,
+                "timeStart": 0,
+                "timeEnd": 1,
+                "pulsePeriod": 1,
+                "amplitude": 1,
+                "dutyCycle": 0.5
+            }
+        },
+        "b": {
+            "label": "b",
+            "initialConcentration": 1,
+            "lossRate": 1,
+            "beta": 1,
+            "inputs": 1,
+            "outputs": 1,
+            "inputFunctionType": "steady-state",
+            "inputFunctionData": {
+                "steadyStateValue": 0,
+                "timeStart": 0,
+                "timeEnd": 1,
+                "pulsePeriod": 1,
+                "amplitude": 1,
+                "dutyCycle": 0.5
+            }
+        },
+        "c": {
+            "label": "c",
+            "initialConcentration": 1,
+            "lossRate": 1,
+            "beta": 1,
+            "inputs": 1,
+            "outputs": 1,
+            "inputFunctionType": "steady-state",
+            "inputFunctionData": {
+                "steadyStateValue": 0,
+                "timeStart": 0,
+                "timeEnd": 1,
+                "pulsePeriod": 1,
+                "amplitude": 1,
+                "dutyCycle": 0.5
+            }
+        }
+    },
+    "hillCoefficients": [
+        {
+            "id": "a-a",
+            "value": 1
+        },
+        {
+            "id": "a-b",
+            "value": 1
+        },
+        {
+            "id": "b-a",
+            "value": 1
+        },
+        {
+            "id": "b-b",
+            "value": 1
+        },
+        {
+            "id": "a-c",
+            "value": 1
+        },
+        {
+            "id": "b-c",
+            "value": 1
+        },
+        {
+            "id": "c-a",
+            "value": 1
+        },
+        {
+            "id": "c-b",
+            "value": 1
+        },
+        {
+            "id": "c-c",
+            "value": 1
+        }
+    ]
+}
