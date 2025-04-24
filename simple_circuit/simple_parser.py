@@ -11,7 +11,7 @@ def parse_circuit(json_data):
             raise ValueError("JSON must contain both 'nodes' and 'edges' fields.")
    
         # Write protein_array to a log file
-        with open("protein_log.txt", "w") as log_file:
+        with open("parser_log.txt", "w") as log_file:
             log_file.write("Received json" + "\n")
             log_file.write(json.dumps(json_data, indent=4) + "\n")
 
@@ -138,7 +138,7 @@ def parse_circuit(json_data):
                 protein.mExtConcFunc = extConcFunc
                 protein.mExtConcFuncArgs = extConcFuncArgs
                 
-        with open("protein_log.txt", "a") as log_file:
+        with open("parser_log.txt", "a") as log_file:
             log_file.write("Output protein list:" + "\n")
             for protein in protein_array:
                 log_file.write(f"Protein ID: {protein.mID}, Name: {protein.mName}, Degradation: {protein.mDegradation}, Gates: {[ (g.mType, g.mFirstInput, g.mSecondInput) for g in protein.mGates ]}\n")
