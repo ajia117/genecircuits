@@ -43,7 +43,7 @@ def parse_circuit(json_data):
                         gates=[],
                         extConcFunc=protein_data['inputFunctionType'],
                         extConcFuncArgs=protein_data['inputFunctionData'],
-                        beta=protein_data['beta'],
+                        beta=protein_data['beta']
                     )
 
                     if p.mExtConcFunc == "pulse":
