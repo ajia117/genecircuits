@@ -134,7 +134,7 @@ const TopRibbon: React.FC<TopRibbonProps> = ({
                         </IconButton>
                     </Tooltip>
 
-                    <Tooltip content="Save">
+                    <Tooltip content="Save Project">
                         <IconButton variant="outline" size="3" color="gray">
                         <Save size={20} />
                         </IconButton>

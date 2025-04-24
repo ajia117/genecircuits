@@ -409,7 +409,8 @@ export default function CircuitBuilderFlow() {
                 hillCoefficients={hillCoefficients}
                 setHillCoefficients={setHillCoefficients}
             />
-            
+
+            {/* TOOLBOX AND REACT FLOW */}
             <div className="bottom-container">
                 <PanelGroup className="circuit-builder-container" direction="horizontal">
                     {/* Left Pane (Toolbox + Properties Window) */}
