@@ -1,29 +1,8 @@
-# from flask import Flask, request, jsonify
-# from flask_cors import CORS
-# import random
-
-# app = Flask(__name__)
-# CORS(app)
-
-# @app.route('/test', methods=['POST'])
-# def test_server():
-#     try:
-#         random_number = random.randint(0, 100)
-#         print(f"Generated Random Number: {random_number}")  
-#         return jsonify({"message": f"Random Number: {random_number}"})  
-#     except Exception as e:
-#         print(f'Error: {e}')
-#         return jsonify({"error": str(e)}), 400
-
-# if __name__ == '__main__':
-#     app.run(debug=True, port=5000)
-
 import numpy as np
 import matplotlib
-matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import io
-import new_parser
+import parser
 from simulate import run_simulation
 # from protein import Protein, Gate
 from flask import Flask, request, jsonify, send_file
@@ -31,6 +10,7 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)
+matplotlib.use('Agg')
 
 def run_backend_simulation(proteinArray):
     """
@@ -44,6 +24,8 @@ def run_backend_simulation(proteinArray):
 
         # Run the simulation
         final_concentrations = run_simulation(t, proteinArray)
+        if not final_concentrations or len(final_concentrations) == 0:
+            return None
 
         # Plot results using matplotlib
         plt.figure()
@@ -73,12 +55,15 @@ def run_simulation_route():
         # Parse data into protein objects
         # TODO: add try / catch block to catch errors in parsing and return proper code
         try:
-            
-            protein_array = new_parser.parse_circuit(data)
+            protein_array = parser.parse_circuit(data)
         except Exception as parse_error:
             return jsonify({"error": f"Parse error: {str(parse_error)}"}), 400
 
         plot_image = run_backend_simulation(protein_array)
+        print('got plot image')
+        if not plot_image:
+            print('no plot image')
+            return jsonify({"bad request": f"No Circuit Provided"}), 200
 
         if isinstance(plot_image, str):
             return jsonify({"error": f"Simulation error: {plot_image}"}), 500

@@ -174,7 +174,7 @@ def parse_circuit(json_data):
         with open("parser_log.txt", "a") as log_file:
             log_file.write("Output protein list:" + "\n")
             for protein in protein_array:
-                log_file.write(f"Protein ID: {protein.mID}, Name: {protein.mName}, Degradation: {protein.mDegradation}, Gates: {[ (g.mType, g.mFirstInput, g.mSecondInput) for g in protein.mGates ]}\n")
+                log_file.write(f"Protein ID: {protein.mID}, Name: {protein.mName}, Degradation: {protein.mDegradation}, Beta: {protein.mBeta}, Gates: {[ (g.mType, g.mFirstInput, g.mSecondInput) for g in protein.mGates ]}\n")
 
         return protein_array
 

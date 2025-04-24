@@ -1,4 +1,4 @@
-import React, {useCallback, useState, useRef, useMemo, useEffect} from "react";
+import React, {useCallback, useRef, useMemo, useEffect} from "react";
 import {
     ReactFlow,
     Background,
@@ -6,17 +6,14 @@ import {
     Edge,
     Node,
     Connection,
-    useNodesState,
-    useEdgesState,
-    useReactFlow,
-    MarkerType
+    useReactFlow
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import './index.css';
 import { RepressMarker, PromoteMarker } from "./assets";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import SelfConnectingEdge from "./components/Edges/SelfConnectingEdge";
-import { syncNodeCounters, setRefs } from "./utils";
+import { syncNodeCounters } from "./utils";
 import { HillCoefficientData, ProteinData } from "./types";
 import { 
     Toolbox, 
@@ -31,43 +28,20 @@ import {
 import {
     Tabs,
     Box,
-    Text,
     ScrollArea
 } from '@radix-ui/themes'
 import PrebuiltCircuits from "./components/Circuits/PrebuiltCircuits";
 import {ApplyCircuitTemplateProps, CircuitTemplate} from "./types/PreBuiltCircuitTypes";
 
+import { useCircuitState } from './hooks/useCircuitState';
+import {useSelectionState} from "./hooks/useSelectionState";
+import {useHillCoefficients} from "./hooks/useHillCoefficients";
+import {useWindowState} from "./hooks/useWindowState";
+
 
 export default function CircuitBuilderFlow() {
     const reactFlowWrapper = useRef(null);
     const { screenToFlowPosition } = useReactFlow();
-
-    const [nodes, setNodes, onNodesChange] = useNodesState([]); // List of all nodes in workspace
-    const [edges, setEdges, onEdgesChange] = useEdgesState([]); // List of all edges in workspace
-    const [proteins, setProteins] = useState<{[label: string]: ProteinData}>({}); // List of all proteins created
-    const [usedProteins, setUsedProteins] = useState<Set<string>>(new Set());
-
-    const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null); // Stores clicked edge ID
-    const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null); // Stores clicked node ID
-    const [selectedNodeType, setSelectedNodeType] = useState<string | null>(null); // Stores gate type if the selected node was a logic gate
-    const [editingProtein, setEditingProtein] = useState<ProteinData | null>(null); // Store initial protein data for the protein user wants to edit
-
-    const [showOutputWindow, setShowOutputWindow] = useState<boolean>(false); // Toggle for output window
-    const [outputWindowSettings, setOutputWindowSettings] = useState({x: 0, y: 0, width: 300, height:200}) // Stores output window properties
-
-    const [showHillCoeffMatrix, setShowHillCoeffMatrix] = useState(false) // Track whether hill coefficient matrix window is open or not
-    const [hillCoefficients, setHillCoefficients] = useState<HillCoefficientData[]>([]); 
-
-    const [outputData, setOutputData] = useState(); // Holds data received from backend after simulation is ran
-    const [activeTab, setActiveTab] = useState('toolbox'); // Keeps track of which tab is open in the lefthand window
-
-    const [circuitSettings, setCircuitSettings] = useState({ // Stores all the circuit-wide setting data
-        projectName: "Untitled Project",
-        simulationDuration: 20,
-        numTimePoints: 10
-    });
-    
-
     const nodeTypes = useMemo(() => ({
         custom: CustomNode,
         and: AndGateNode,
@@ -77,29 +51,63 @@ export default function CircuitBuilderFlow() {
         selfConnecting: SelfConnectingEdge,
     }), []);
 
+    const circuit = useCircuitState();
+    const {
+        nodes, setNodes, onNodesChange,
+        edges, setEdges, onEdgesChange,
+        proteins, setProteins, getProteinData, setProteinData,
+        usedProteins, setUsedProteins,
+        nodeIdRef, gateIdRef, getId
+    } = circuit;
 
-    // Create new ids for nodes and gates
-    const nodeIdRef = useRef(0); // counter for protein nodes
-    const gateIdRef = useRef(0); // counter for gate nodes
-    const getId = (nodeType: string): string => {
-        if (nodeType === "and" || nodeType === "or") {
-          return `g${gateIdRef.current++}`;
-        } else if (nodeType === "custom") {
-          return `${nodeIdRef.current++}`;
-        }
-        return `unknown-${Math.random().toString(36).substr(2, 5)}`; // generate random id if there invalid node
-      };
-    useEffect(() => {
-        setRefs({ nodeIdRef, gateIdRef });
-    }, []);
 
-    // Function to reset selected state data used by the properties tab
-    const resetSelectedStateData= () => {
-        setSelectedEdgeId(null);
-        setSelectedNodeId(null);
-        setSelectedNodeType(null);
-        setEditingProtein(null);
-    }
+    const selection = useSelectionState();
+    const {
+        // State
+        selectedEdgeId,
+        selectedNodeId,
+        selectedNodeType,
+        editingProtein,
+
+        // Setters
+        setEditingProtein,
+
+        // Utility functions
+        resetSelectedStateData,
+        selectNode,
+        selectEdge
+    } = selection;
+
+    const hillCoeffs = useHillCoefficients(usedProteins);
+    const {
+        hillCoefficients,
+        setHillCoefficients
+    } = hillCoeffs;
+
+    const windowState = useWindowState();
+    const {
+        // Output window
+        showOutputWindow,
+        setShowOutputWindow,
+        outputWindowSettings,
+        setOutputWindowSettings,
+
+        // Hill coefficient matrix
+        showHillCoeffMatrix,
+        setShowHillCoeffMatrix,
+
+        // Tab state
+        activeTab,
+        setActiveTab,
+
+        // Output data
+        outputData,
+        setOutputData,
+
+        // Circuit settings
+        circuitSettings,
+        setCircuitSettings
+    } = windowState;
 
     // Handler for circuit imports
     useEffect(() => {
@@ -122,18 +130,6 @@ export default function CircuitBuilderFlow() {
             setNodes(importedNodes ?? []);
             setEdges(importedEdges ?? []);
             setProteins(importedProteins ?? {});
-    
-            // // Merge nodes (or do overwrite depending on behavior you want)
-            // setNodes(prev => [...prev, ...(importedNodes ?? [])]);
-    
-            // // Merge edges
-            // setEdges(prev => [...prev, ...(importedEdges ?? [])]);
-    
-            // // Merge proteins
-            // setProteins(prev => ({
-            //     ...prev,
-            //     ...(importedProteins ?? {})
-            // }));
     
             // Sync node ID counters to avoid ID conflict
             syncNodeCounters([...nodes, ...(importedNodes ?? [])]);
@@ -168,30 +164,18 @@ export default function CircuitBuilderFlow() {
         },
         [setEdges]
     );
-    
-    // Handler called when react flow pane clicked
-    const onPaneClick = useCallback(() => {
-        resetSelectedStateData();
-    }, []);
 
-    // Handler for clicking a node
-    const onNodeClick = (event: React.MouseEvent, node: Node) => {
-        resetSelectedStateData();
-        setSelectedNodeId(node.id); // Store the clicked node ID
-        setSelectedNodeType(node.type)
-
-        // Auto switch to "properties" tab
+    const onNodeClick = (_: React.MouseEvent, node: Node) => {
+        selectNode(node.id, node.type);
         setActiveTab("properties");
     };
-
-    // Handler for clicking an edge
-    const onEdgeClick = useCallback((event: React.MouseEvent, edge: Edge) => {
-        resetSelectedStateData();
-        setSelectedEdgeId(edge.id); // Store the clicked edge ID
-        console.log(edge)
-        // Auto switch to "properties" tab
+    const onEdgeClick = useCallback((_: React.MouseEvent, edge: Edge) => {
+        selectEdge(edge.id);
         setActiveTab("properties");
-    }, []);
+    }, [selection, setActiveTab]);
+    const onPaneClick = useCallback(() => {
+        resetSelectedStateData();
+    }, [selection]);
 
     // Handler for resetting logic when switching tabs
     useEffect(() => {
@@ -200,16 +184,6 @@ export default function CircuitBuilderFlow() {
         }
     }, [activeTab]);
 
-    // Return all data from a given protein label
-    const getProteinData = (label: string) => proteins[label] ?? null;
-
-    // Update or add a key value pair to a node's protein data (this will update the data for every node of the same protein)
-    const setProteinData = (label: string, data: ProteinData) => {
-        setProteins((prev) => ({
-          ...prev,
-          [label]: data,
-        }));
-    };
 
     // Returns entire Node object for the selected node (includes node ID)
     const getSelectedNode = () => {
@@ -272,9 +246,10 @@ export default function CircuitBuilderFlow() {
     
             if (nodeType === "custom") {
                 const rawData = JSON.parse(event.dataTransfer.getData("application/node-data")) as ProteinData;
-
+                delete rawData.id;
                 // Remove `id` if present — prevent conflict
-                const { id, ...nodeData } = rawData;
+                const nodeData = rawData;
+
 
                 newNode = {
                     id: getId(nodeType),
@@ -302,22 +277,12 @@ export default function CircuitBuilderFlow() {
             setNodes((nds) => [...nds, newNode]);
         }, [screenToFlowPosition, setNodes, setProteinData]);
 
-    // Updates the usedProteins list when nodes change
-    useEffect(() => { 
-        const labels = new Set(
-            nodes
-                .filter((node) => node.type === "custom" && typeof node.data?.label === "string")
-                .map((node) => node.data!.label as string)
-        );
-        setUsedProteins(labels);
-    }, [nodes]);
-
     // Initializes the hillCoefficients array values when new usedProteins list is updated
     useEffect(() => {
         const updated: HillCoefficientData[] = [];
-        
+
         const labels = Array.from(usedProteins).sort();
-        
+
         labels.forEach((source) => {
             labels.forEach((target) => {
             const id = `${source}-${target}`;
@@ -327,7 +292,7 @@ export default function CircuitBuilderFlow() {
             }
             });
         });
-        
+
         if (updated.length > 0) {
             setHillCoefficients(prev => [...prev, ...updated]);
         }
@@ -335,8 +300,6 @@ export default function CircuitBuilderFlow() {
 
     const applyCircuitTemplate = ({
                                       template,
-                                      nodes,
-                                      edges,
                                       proteins,
                                       nodeIdRef,
                                       gateIdRef,
@@ -348,7 +311,7 @@ export default function CircuitBuilderFlow() {
         const idMap: {[originalId: string]: string} = {};
 
         // Create new nodes with updated IDs and positions
-        const newNodes: Node<any>[] = template.nodes.map(node => {
+        const newNodes: Node[] = template.nodes.map(node => {
             // Generate new ID based on node type
             const newId: string = node.type === 'custom' ?
                 `${nodeIdRef.current++}` :
@@ -394,7 +357,7 @@ export default function CircuitBuilderFlow() {
         });
 
         // Update state
-        setNodes((prevNodes: Node<any>[]) => [...prevNodes, ...newNodes]);
+        setNodes((prevNodes: Node[]) => [...prevNodes, ...newNodes]);
         setEdges((prevEdges: Edge[]) => [...prevEdges, ...newEdges]);
         setProteins(() => mergedProteins);
     };
@@ -403,8 +366,6 @@ export default function CircuitBuilderFlow() {
         // Call the typed function with all required parameters
         applyCircuitTemplate({
             template,
-            nodes,
-            edges,
             proteins,
             nodeIdRef,
             gateIdRef,
