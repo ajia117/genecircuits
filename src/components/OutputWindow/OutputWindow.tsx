@@ -1,10 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { Rnd } from "react-rnd";
 import { Panel as ReactFlowPanel } from '@xyflow/react';
-import { X, Maximize2, Minimize2, Move } from 'lucide-react';
+import { X, Maximize2, Minimize2, Move, RefreshCw } from 'lucide-react';
+import {
+    Flex,
+    ScrollArea,
+    Text,
+    IconButton,
+    Tooltip,
+    Button
+} from "@radix-ui/themes"
 import './OutputWindowStyles.css';
 
-export default function OutputWindow({ onClose, windowSettings, setWindowSettings, outputData }: { onClose: () => void, windowSettings: any, setWindowSettings: any, outputData: any }) {
+export default function OutputWindow({ 
+    onClose, windowSettings, setWindowSettings, outputData 
+}: { 
+    onClose: () => void, 
+    windowSettings: any, 
+    setWindowSettings: any, 
+    outputData: any 
+}) {
     const [dimensions, setDimensions] = useState({
         width: windowSettings.width,
         height: windowSettings.height
@@ -59,8 +74,8 @@ export default function OutputWindow({ onClose, windowSettings, setWindowSetting
                     x: windowSettings.x,
                     y: windowSettings.y
                 }}
-                minWidth={300}
-                minHeight={268 /* size of min image */ + 32 /* padding */}
+                minWidth={400}
+                minHeight={300}
                 bounds="window"
                 dragHandleClassName="drag-handle"
                 className="output-overlay"
@@ -85,49 +100,56 @@ export default function OutputWindow({ onClose, windowSettings, setWindowSetting
                     });
                 }}
             >
-                {/* Header with drag handle */}
-                <div className="drag-handle">
-                    <div className="title-section">
-                        <Move size={16} strokeWidth={2} />
-                        <h3 className="title">Simulation Output</h3>
-                    </div>
+                <Flex direction="column" height="100%">
+                    {/* HEADER W/ DRAG HANDLE */}
+                    <Flex direction="row" align="center" justify="between" px="4" py="3" className="drag-handle">
+                        <Flex direction="row" align="center" gap="2" className="title-section">
+                            <Move size={16} strokeWidth={2} color="var(--accent-9)"/>
+                            <Text size="3" weight="bold">Simulation Output</Text>
+                        </Flex>
 
-                    <div className="button-group">
-                        <button
-                            onClick={handleMaximizeToggle}
-                            className="icon-button"
-                            title={isMaximized ? "Restore" : "Maximize"}
-                        >
-                            {isMaximized ?
-                                <Minimize2 size={16} strokeWidth={2} /> :
-                                <Maximize2 size={16} strokeWidth={2} />
-                            }
-                        </button>
+                        <Flex direction="row" justify="center" align="center" gap="3">
+                            <Tooltip content="Refresh">
+                                <IconButton variant="ghost" onClick={() => {}}> {/* TODO: handle rerun/refresh */}
+                                    <RefreshCw size={16} strokeWidth={2} />
+                                </IconButton>
+                            </Tooltip>
+                            <Tooltip content={isMaximized ? "Restore" : "Maximize"}>
+                                <IconButton
+                                    variant="ghost"
+                                    onClick={handleMaximizeToggle}
+                                >
+                                    {isMaximized ?
+                                        <Minimize2 size={16} strokeWidth={2} /> :
+                                        <Maximize2 size={16} strokeWidth={2} />
+                                    }
+                                </IconButton>
+                            </Tooltip>
+                            <IconButton variant="ghost" onClick={onClose}>
+                                <X size={16} strokeWidth={2} />
+                            </IconButton>
+                            
+                        </Flex>
+                    </Flex>
+                
 
-                        <button
-                            onClick={onClose}
-                            className="close-button"
-                            title="Close"
-                        >
-                            <X size={16} strokeWidth={2} />
-                        </button>
-                    </div>
-                </div>
-
-                {/* Content area */}
-                <div className="content-area">
-                    {outputData ? (
+                {/* OUTPUT CONTENT */}
+                {outputData ? (
+                    <Flex direction="column" justify="center" px="4" py="3" gap="3" className="content-area" height="100%">
                         <img
                             src={outputData.data}
                             alt="Simulation Output"
                             className="output-image"
                         />
-                    ) : (
-                        <div className="no-data-message">
+                    </Flex>
+                ) : (
+                    <Flex direction="column" justify="center" align="center" p="4" className="content-area" height="100%">
+                        <Text style={{ color: 'var(--gray-a9)', textAlign: 'center', fontSize: '13px' }}>
                             No simulation output available. Run a simulation to see results here.
-                        </div>
-                    )}
-                </div>
+                        </Text>
+                    </Flex>
+                )}
+                </Flex>
             </Rnd>
         </ReactFlowPanel>
     );
