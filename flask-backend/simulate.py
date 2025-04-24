@@ -20,7 +20,7 @@ def simulation_iter(concentrations, t, proteinArray):
 
 def run_simulation(t, proteinArray):
     # Initial concentrations each protein
-    if len(proteinArray) == 0:
+    if not proteinArray or (proteinArray) == 0:
         return None
     initial_concentrations = [0.0] * len(proteinArray)
     for protein in proteinArray:

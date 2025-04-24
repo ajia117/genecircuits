@@ -24,7 +24,7 @@ def run_backend_simulation(proteinArray):
 
         # Run the simulation
         final_concentrations = run_simulation(t, proteinArray)
-        if len(final_concentrations) == 0:
+        if not final_concentrations or len(final_concentrations) == 0:
             return None
 
         # Plot results using matplotlib
