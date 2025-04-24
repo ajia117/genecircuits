@@ -6,6 +6,7 @@ import {
     Text,
     Button,
     Card,
+    ScrollArea,
 } from "@radix-ui/themes";
 import {
     Upload,
@@ -98,7 +99,7 @@ export default function ImportWindow({ open, onOpenChange }: ImportWindowProps) 
             <Dialog.Content maxWidth="800px">
                 <Flex direction="column" mb="4">
                     <Dialog.Title>File Manager</Dialog.Title>
-                    <Dialog.Description>Open existing projects and import circuits.</Dialog.Description>
+                    <Dialog.Description>Open existing projects or import a project/circuit (.json file) from your local computer.</Dialog.Description>
                 </Flex>
 
                 <Tabs.Root defaultValue="open">
@@ -130,7 +131,7 @@ export default function ImportWindow({ open, onOpenChange }: ImportWindowProps) 
                         <Tabs.Trigger value="import">
                             <Flex gap="2" align="center">
                                 <FileJson size={16} />
-                                Import Circuit
+                                Import Project
                             </Flex>
                         </Tabs.Trigger>
                     </Tabs.List>
@@ -156,9 +157,9 @@ export default function ImportWindow({ open, onOpenChange }: ImportWindowProps) 
                                     </Flex>
                                 </Card>
                             ) : (
-                                <Box>
+                                <ScrollArea>
                                     {/* TODO: Project list here */}
-                                </Box>
+                                </ScrollArea>
                             )}
                         </Tabs.Content>
 
@@ -210,7 +211,7 @@ export default function ImportWindow({ open, onOpenChange }: ImportWindowProps) 
                                                     htmlFor="file-upload"
                                                     style={{
                                                         cursor: "pointer",
-                                                        color: "hsl(160, 100%, 36%)",
+                                                        color: "var(--accent-9)",
                                                         fontWeight: "500"
                                                     }}
                                                 >
@@ -243,7 +244,7 @@ export default function ImportWindow({ open, onOpenChange }: ImportWindowProps) 
                                         size="3"
                                         disabled={!selectedFile}
                                         style={{
-                                            backgroundColor: selectedFile ? "hsl(160, 100%, 36%)" : "hsl(240, 5%, 90%)",
+                                            backgroundColor: selectedFile ? "var(--accent-9)" : "hsl(240, 5%, 90%)",
                                             color: selectedFile ? "white" : "hsl(240, 5%, 60%)",
                                             transition: "all 0.2s ease"
                                         }}
