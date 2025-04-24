@@ -15,7 +15,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         node-version: [18.x]
-        python-version: ['3.9']
+        python-version: ['3.12.0']
 
     steps:
       - uses: actions/checkout@v4
@@ -41,10 +41,38 @@ jobs:
           pip install -r requirements.txt
           pip install pyinstaller
 
-      - name: Build Python backend with PyInstaller
+      - name: Set up Docker for Linux builds
+        if: matrix.os == 'ubuntu-latest'
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Python backend with PyInstaller (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          docker run --rm -v $(pwd):/app -w /app quay.io/pypa/manylinux2014_x86_64 bash -c "
+            /opt/python/cp310-cp310/bin/pip install -r flask-backend/requirements.txt pyinstaller
+            cd flask-backend
+            /opt/python/cp310-cp310/bin/pyinstaller \
+              --onefile \
+              --collect-all werkzeug \
+              --collect-all flask \
+              --hidden-import=flask.cli \
+              app.spec
+          "
+
+      - name: Build Python backend with PyInstaller (Windows/macOS)
+        if: matrix.os != 'ubuntu-latest'
         run: |
           cd flask-backend
-          pyinstaller app.spec
+          # Add runtime hooks to ensure library compatibility
+          mkdir -p runtime_hooks
+          echo 'import os, sys' > runtime_hooks/hook.py
+          echo 'sys.path.insert(0, os.path.join(sys._MEIPASS))' >> runtime_hooks/hook.py
+          
+          # Use PyInstaller with additional options for better compatibility
+          pyinstaller --onefile \
+            --runtime-hook=runtime_hooks/hook.py \
+            --hidden-import=flask.cli \
+            app.spec
 
       - name: Verify Python build output
         run: |
