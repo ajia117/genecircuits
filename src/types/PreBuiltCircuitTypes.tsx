@@ -6,7 +6,7 @@ export interface CircuitTemplate {
     id: string;
     name: string;
     description: string;
-    nodes: Node<any>[];
+    nodes: Node[];
     edges: Edge[];
     proteins: {[label: string]: ProteinData};
 }
@@ -14,12 +14,10 @@ export interface CircuitTemplate {
 // Input type for the function
 export interface ApplyCircuitTemplateProps {
     template: CircuitTemplate;
-    nodes: Node<any>[];
-    edges: Edge[];
     proteins: {[label: string]: ProteinData};
     nodeIdRef: MutableRefObject<number>;
     gateIdRef: MutableRefObject<number>;
-    setNodes: (updater: (nodes: Node<any>[]) => Node<any>[]) => void;
+    setNodes: (updater: (nodes: Node[]) => Node[]) => void;
     setEdges: (updater: (edges: Edge[]) => Edge[]) => void;
     setProteins: (updater: (proteins: {[label: string]: ProteinData}) => {[label: string]: ProteinData}) => void;
 }

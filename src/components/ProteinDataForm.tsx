@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 import { ProteinData } from "../types";
 import {
     Flex,
@@ -19,7 +19,6 @@ const ProteinDataForm: React.FC<ProteinDataProps> = ({
     proteinData,
     setProteinData,
 }: ProteinDataProps) => {
-    const [inputFunctionType, setInputFunctionType] = useState<'steady-state' | 'pulse'>(proteinData.inputFunctionType);
 
     const proteinDataProps: { key: keyof ProteinData; label: string; min: number; max: number; step: number }[] = [
         { key: 'initialConcentration', label: 'Initial Concentration', min: 0, max: 100, step: 1 },
@@ -245,10 +244,6 @@ const ProteinDataForm: React.FC<ProteinDataProps> = ({
             </Flex>
 
         {renderInputFunctionTypeFields()}
-
-        {/* Submit buttons */}
-
-
         </>
     )
 }

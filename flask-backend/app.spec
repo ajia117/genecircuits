@@ -3,7 +3,7 @@ import sys
 block_cipher = None
 
 a = Analysis(
-    ['app.py', 'simulate.py'],
+    ['app.py', 'simulate.py', 'parser.py'],
     pathex=[],
     binaries=[],
     datas=[

@@ -83,6 +83,22 @@ Received json
         {
             "id": "ProteinB-ProteinB",
             "value": 1
+        },
+        {
+            "id": "ProteinA-ProteinA",
+            "value": 1
+        },
+        {
+            "id": "ProteinA-ProteinB",
+            "value": 1
+        },
+        {
+            "id": "ProteinB-ProteinA",
+            "value": 1
+        },
+        {
+            "id": "ProteinB-ProteinB",
+            "value": 1
         }
     ]
 }

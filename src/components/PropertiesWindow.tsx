@@ -1,4 +1,3 @@
-import {MarkerType, Node} from "@xyflow/react";
 import React, {Dispatch, SetStateAction, useEffect, useState} from "react";
 import { ProteinData, EdgeData } from "../types";
 import {ProteinDataForm} from '../components'

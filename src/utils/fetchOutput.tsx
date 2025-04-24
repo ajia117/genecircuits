@@ -3,7 +3,6 @@ let controller = new AbortController();
 export const fetchOutput = async (circuitJson: any) => { //TODO: set type
     try {
         controller = new AbortController();
-        console.log("fetch body", circuitJson)
         const response = await fetch("http://127.0.0.1:5000/run-simulation", {
             method: "POST",
             mode: "cors",

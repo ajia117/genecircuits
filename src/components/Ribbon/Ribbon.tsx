@@ -1,12 +1,10 @@
-import React, { useState, useEffect, Dispatch, SetStateAction } from "react";
+import React, { useState, Dispatch, SetStateAction } from "react";
 import { Node, Edge } from "@xyflow/react";
 import { fetchOutput, abortFetch, formatBackendJson, formatCircuitExportJson } from "../../utils"
 import {
     Play,
-    Pause,
     Save,
     Trash2,
-    ChartArea,
     Settings,
     Download,
     FolderOpen,
@@ -28,7 +26,7 @@ import {
     DropdownMenu,
     Slider
 } from "@radix-ui/themes";
-import { ImportWindow, HillCoefficientMatrix } from "../../components";
+import { ImportWindow } from "../../components";
 import { HillCoefficientData, ProteinData, CircuitSettingsType } from "../../types";
 
 interface TopRibbonProps {
@@ -79,7 +77,12 @@ const TopRibbon: React.FC<TopRibbonProps> = ({
         setIsRunning(true);
         try {
             const res = await fetchOutput(circuitJson);
-            setOutputData(res);
+            if(res.type !== 'json') {
+                setOutputData(res);
+            }
+            else {
+                setOutputData(null);
+            }
             setShowOutputWindow(true);
         } catch (error) {
             console.error("Error fetching output:", error);

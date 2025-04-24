@@ -5,3 +5,9 @@ build
 __pycache__
 # removes any env the user creates
 *env
+
+protein_log.txt
+
+simulation_test_data/*.txt
+simulation_test_data/*.log
+simulation_test_data/*.html
