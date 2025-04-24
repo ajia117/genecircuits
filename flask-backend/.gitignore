@@ -5,3 +5,4 @@ build
 __pycache__
 # removes any env the user creates
 *env
+parser_log.txt
