@@ -21,19 +21,13 @@ let expectedLength: number | null = null;
 async function startBackend() {
   let executablePath: string;
   
-  if (app.isPackaged) {
-    // In production, use the packaged PyInstaller executable
-    executablePath = path.join(process.resourcesPath, 'ipc_server');
-    
-    // Add .exe extension on Windows
+  if (app.isPackaged) { // production
+    executablePath = path.join(process.resourcesPath, 'app');
     if (process.platform === 'win32') {
       executablePath += '.exe';
     }
-  } else {
-    // In development, use the PyInstaller build
-    executablePath = path.join(__dirname, '..', '..', 'flask-backend', 'dist', 'ipc_server');
-    
-    // Add .exe extension on Windows
+  } else { // development
+    executablePath = path.join(__dirname, '..', '..', 'flask-backend', 'dist', 'app');
     if (process.platform === 'win32') {
       executablePath += '.exe';
     }

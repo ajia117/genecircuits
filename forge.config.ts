@@ -17,7 +17,7 @@ const config: ForgeConfig = {
     asar: true,
     // Add extraResource to include PyInstaller executable
     extraResource: [
-      path.join(__dirname, 'flask-backend', 'dist', 'ipc_server')
+      path.join(__dirname, 'flask-backend', 'dist', 'app')
     ]
   },
   rebuildConfig: {},

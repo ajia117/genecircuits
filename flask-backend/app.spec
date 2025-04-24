@@ -26,7 +26,7 @@ exe = EXE(
     a.zipfiles,
     a.datas,
     [],
-    name='ipc_server',
+    name='app',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
