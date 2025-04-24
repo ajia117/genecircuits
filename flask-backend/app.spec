@@ -33,8 +33,7 @@ exe = EXE(
     upx=True,
     upx_exclude=[],
     runtime_tmpdir=None,
-    # For a GUI application change to False for Windows (hides console)
-    console=True,
+    console=False if sys.platform == 'win32' else True,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
