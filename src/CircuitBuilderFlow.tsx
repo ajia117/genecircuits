@@ -12,7 +12,6 @@ import '@xyflow/react/dist/style.css';
 import './index.css';
 import { RepressMarker, PromoteMarker } from "./assets";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
-import SelfConnectingEdge from "./components/Edges/SelfConnectingEdge";
 import { syncNodeCounters } from "./utils";
 import { HillCoefficientData, ProteinData } from "./types";
 import { 
@@ -23,20 +22,17 @@ import {
     AndGateNode, 
     OrGateNode, 
     CustomNode,
-    HillCoefficientMatrix
+    HillCoefficientMatrix,
+    PrebuiltCircuits,
+    SelfConnectingEdge
 } from './components';
 import {
     Tabs,
     Box,
     ScrollArea
 } from '@radix-ui/themes'
-import PrebuiltCircuits from "./components/Circuits/PrebuiltCircuits";
-import {ApplyCircuitTemplateProps, CircuitTemplate} from "./types/PreBuiltCircuitTypes";
-
-import { useCircuitState } from './hooks/useCircuitState';
-import {useSelectionState} from "./hooks/useSelectionState";
-import {useHillCoefficients} from "./hooks/useHillCoefficients";
-import {useWindowState} from "./hooks/useWindowState";
+import {ApplyCircuitTemplateProps, CircuitTemplate} from "./types";
+import { useCircuitState, useSelectionState, useHillCoefficients, useWindowState } from "./hooks";
 
 
 export default function CircuitBuilderFlow() {
@@ -409,7 +405,8 @@ export default function CircuitBuilderFlow() {
                 hillCoefficients={hillCoefficients}
                 setHillCoefficients={setHillCoefficients}
             />
-            
+
+            {/* TOOLBOX AND REACT FLOW */}
             <div className="bottom-container">
                 <PanelGroup className="circuit-builder-container" direction="horizontal">
                     {/* Left Pane (Toolbox + Properties Window) */}

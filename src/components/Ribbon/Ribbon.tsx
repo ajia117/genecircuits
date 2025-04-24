@@ -24,7 +24,8 @@ import {
     Dialog,
     Theme,
     DropdownMenu,
-    Slider
+    Slider,
+    AlertDialog
 } from "@radix-ui/themes";
 import { ImportWindow } from "../../components";
 import { HillCoefficientData, ProteinData, CircuitSettingsType } from "../../types";
@@ -134,7 +135,7 @@ const TopRibbon: React.FC<TopRibbonProps> = ({
                         </IconButton>
                     </Tooltip>
 
-                    <Tooltip content="Save">
+                    <Tooltip content="Save Project">
                         <IconButton variant="outline" size="3" color="gray">
                         <Save size={20} />
                         </IconButton>
@@ -201,26 +202,25 @@ const TopRibbon: React.FC<TopRibbonProps> = ({
             <ImportWindow open={showImportWindow} onOpenChange={setShowImportWindow} />
 
             {/* CLEAR CONFIRMATION WINDOW */}
-            <Dialog.Root open={showClearConfirmation} onOpenChange={setShowClearConfirmation}>
-                <Dialog.Content maxWidth="500px">
-                    <Flex justify="between">
-                        <Dialog.Title mt="1">Are you sure you want to clear the screen?</Dialog.Title>
-                        <Dialog.Close><IconButton variant="ghost" color="gray"><X /></IconButton></Dialog.Close>
+            <AlertDialog.Root open={showClearConfirmation} onOpenChange={setShowClearConfirmation}>
+                <AlertDialog.Content maxWidth="500px">
+                    <Flex direction="column" align="center" justify="center" my="2">
+                        <AlertDialog.Title mt="1">Are you sure you want to clear the screen?</AlertDialog.Title>
+                        <AlertDialog.Description mb="4">
+                            This action cannot be undone. All unsaved changes will be lost.
+                        </AlertDialog.Description>
+                    
+                        <Flex direction="row" justify="center" gap="3" mt="3">
+                            <AlertDialog.Action>
+                                <Button color="red" size="3" onClick={confirmClear}>Clear</Button>
+                            </AlertDialog.Action>
+                            <AlertDialog.Cancel>
+                                <Button variant="soft" color="gray" size="3" onClick={() => setShowClearConfirmation(false)}>Cancel</Button>
+                            </AlertDialog.Cancel>
+                        </Flex>
                     </Flex>
-                <Dialog.Description mb="4">
-                    This action cannot be undone. All unsaved changes will be lost.
-                </Dialog.Description>
-
-                <Flex justify="center" gap="3" mt="3">
-                    <Dialog.Close>
-                        <Button color="red" size="3" onClick={confirmClear}>Clear</Button>
-                    </Dialog.Close>
-                    <Dialog.Close>
-                        <Button variant="soft" color="gray" size="3" onClick={() => setShowClearConfirmation(false)}>Cancel</Button>
-                    </Dialog.Close>
-                </Flex>
-                </Dialog.Content>
-            </Dialog.Root>
+                </AlertDialog.Content>
+            </AlertDialog.Root>
 
 
             {/* SETTINGS WINDOW */}
