@@ -15,7 +15,7 @@ import * as path from "node:path";
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
-    // Add extraResource to include Flask backend
+    // Add extraResource to include PyInstaller executable
     extraResource: [
       path.join(__dirname, 'flask-backend', 'dist', 'app')
     ]

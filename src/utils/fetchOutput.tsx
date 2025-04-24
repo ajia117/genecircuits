@@ -1,46 +1,64 @@
-let controller = new AbortController();
+// Add TypeScript interface for the window object
+declare global {
+  interface Window {
+    electron: {
+      runSimulation: (circuitData: any) => Promise<any>;
+    };
+  }
+}
 
-export const fetchOutput = async (circuitJson: any) => { //TODO: set type
-    try {
-        controller = new AbortController();
-        const response = await fetch("http://127.0.0.1:5000/run-simulation", {
-            method: "POST",
-            mode: "cors",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(circuitJson),
-            signal: controller.signal
-        });
+let isCancelled = false;
 
-        // console.log(response)
-        if (!response.ok) {
-            throw new Error("Failed to fetch output");
-        }
+export const fetchOutput = async (circuitJson: any) => {
+  try {
+    isCancelled = false;
+    
+    // Call the IPC function exposed by preload.ts
+    const response = await window.electron.runSimulation(circuitJson);
 
-        // const data = await response.json();
-        // console.log("Simulation Output:", data);
-        // return data
-
-        const contentType = response.headers.get("content-type");
-
-        if (contentType.includes("image/png")) {
-            const blob = await response.blob(); // ✅ Handle image response
-            const imageUrl = URL.createObjectURL(blob);
-            return { type: "image", data: imageUrl };
-        } else {
-            const data = await response.json(); // ✅ Handle JSON response
-            return { type: "json", data };
-        }
-    } catch (error) {
-        if (error.name === "AbortError") {
-            console.log("Fetch request aborted");
-        } else {
-            console.error("Error fetching output:", error);
-        }
+    if (isCancelled) {
+      return { cancelled: true };
     }
+    
+    // Handle error responses
+    if (!response.success) {
+      console.error("Simulation error:", response.error);
+      return { 
+        type: "error", 
+        error: response.error,
+        details: response.traceback 
+      };
+    }
+
+    // Handle success with image
+    if (response.image) {
+      const imageUrl = `data:image/png;base64,${response.image}`;
+      return { 
+        type: "image", 
+        data: imageUrl,
+        rawData: response.data // Also return raw data for potentially using in client-side charts
+      };
+    }
+
+    // Return the data directly if no image
+    return { 
+      type: "data", 
+      data: response.data 
+    };
+    
+  } catch (error) {
+    if (isCancelled) {
+      return { cancelled: true };
+    } else {
+      console.error("Error in fetchOutput:", error);
+      return { 
+        type: "error", 
+        error: error.message || "Unknown error" 
+      };
+    }
+  }
 };
 
 export const abortFetch = () => {
-    controller.abort();
+  isCancelled = true;
 };

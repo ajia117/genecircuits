@@ -179,7 +179,7 @@ def parse_circuit(json_data):
         return protein_array
 
     except Exception as e:
-        print("Error during parsing:", str(e))
+        print("Error during parsing:", str(e), flush=True)
         raise
 
 #Example usage

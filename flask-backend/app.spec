@@ -3,12 +3,11 @@ import sys
 block_cipher = None
 
 a = Analysis(
-    ['app.py', 'simulate.py', 'parser.py'],
+    ['ipc_server.py', 'simulate.py', 'parser.py', 'protein.py'],
     pathex=[],
     binaries=[],
-    datas=[
-    ],
-    hiddenimports=['IPython', 'IPython.display', 'unicodedata'],
+    datas=[],
+    hiddenimports=['IPython', 'IPython.display', 'unicodedata', 'matplotlib', 'matplotlib.backends.backend_agg', 'numpy', 'scipy', 'scipy.integrate'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
@@ -35,7 +34,7 @@ exe = EXE(
     upx_exclude=[],
     runtime_tmpdir=None,
     # For a GUI application change to False for Windows (hides console)
-    console=False if sys.platform == 'win32' else True,
+    console=True,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,

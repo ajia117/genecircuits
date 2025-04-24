@@ -77,7 +77,7 @@ const TopRibbon: React.FC<TopRibbonProps> = ({
         setIsRunning(true);
         try {
             const res = await fetchOutput(circuitJson);
-            if(res.type !== 'json') {
+            if(res.type !== 'data') {
                 setOutputData(res);
             }
             else {
