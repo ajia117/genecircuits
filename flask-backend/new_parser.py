@@ -22,44 +22,51 @@ def parse_circuit(json_data):
         hill_table = {item['id']: item['value'] for item in json_data.get('hillCoefficients', [])}
         listOfNodes = json_data['nodes']
         protein_array = []
-        protein_map = {}
+        type_to_node_id = {}
+        node_id_to_protein = {}
 
-        # First pass: Create Protein instances
+        # First pass: Create unique Protein instances
         for node in listOfNodes:
             if node['type'] == 'custom':
                 name = node['proteinName']
-                protein_data = proteins_info[name]
-                p = Protein(
-                    id=currNodeID,
-                    name=name,
-                    initConc=protein_data['initialConcentration'],
-                    degrad=protein_data['lossRate'],
-                    gates=[],
-                    extConcFunc=protein_data['inputFunctionType'],
-                    #if type "steady-state"
-                    #return steady-state
-                    #if type "pulse"
-                    #return pulse function
-                    extConcFuncArgs=protein_data['inputFunctionData']
-                    #make sure args are in same order
-                )
-                if (p.mExtConcFunc == "pulse"):
-                    p.mExtConcFunc = x_pulse
-                    #print(p.mExtConcFuncArgs.values())
-                    temp = [val for val in list(p.mExtConcFuncArgs.values())[1:]]
-                    p.mExtConcFuncArgs = temp
-                    #print(p.mExtConcFuncArgs)
-                
-                if (p.mExtConcFunc == "steady-state"):
-                    p.mExtConcFunc = steady_state
-                    temp = [list(p.mExtConcFuncArgs.values())[0]]
-                    p.mExtConcFuncArgs = temp
-                    #print(p.mExtConcFuncArgs)
+                node_id = node['id']
 
-                protein_array.append(p)
-                protein_map[str(currNodeID)] = p
-                id_map[node['id']] = currNodeID
-                currNodeID += 1
+                # Check if this protein type was already instantiated
+                if name not in type_to_node_id:
+                    # Create new Protein
+                    protein_data = proteins_info[name]
+                    p = Protein(
+                        id=currNodeID,
+                        name=name,
+                        initConc=protein_data['initialConcentration'],
+                        degrad=protein_data['lossRate'],
+                        gates=[],
+                        extConcFunc=protein_data['inputFunctionType'],
+                        extConcFuncArgs=protein_data['inputFunctionData']
+                    )
+
+                    if p.mExtConcFunc == "pulse":
+                        p.mExtConcFunc = x_pulse
+                        temp = [val for val in list(p.mExtConcFuncArgs.values())[1:]]
+                        p.mExtConcFuncArgs = temp
+
+                    elif p.mExtConcFunc == "steady-state":
+                        p.mExtConcFunc = steady_state
+                        temp = [list(p.mExtConcFuncArgs.values())[0]]
+                        p.mExtConcFuncArgs = temp
+
+                    protein_array.append(p)
+                    type_to_node_id[name] = node_id
+                    node_id_to_protein[node_id] = p
+                    id_map[node_id] = currNodeID
+                    currNodeID += 1
+
+                else:
+                    # Reference existing protein object
+                    canonical_node_id = type_to_node_id[name]
+                    node_id_to_protein[node_id] = node_id_to_protein[canonical_node_id]
+                    id_map[node_id] = id_map[canonical_node_id]                    
+
 
         # Second pass: Prepare Gate placeholders
         gates = {}
@@ -94,18 +101,20 @@ def parse_circuit(json_data):
 
             (firstNodeId, firstType), (secondNodeId, secondType) = info['inputs']
             print(firstNodeId)
-            firstId = str(id_map[firstNodeId])
-            secondId = str(id_map[secondNodeId])
+            # firstId = str(id_map[firstNodeId])
+            # secondId = str(id_map[secondNodeId])
             
             gate_family = info['type']
 
             try:
-                print("FirstId: ", firstId)
-                print("SecondId: ", secondId)
-                print("Id map: ", id_map)
-                print("Protein map: ", protein_map)
-                first = protein_map[firstId]
-                second = protein_map[secondId]
+                # print("FirstId: ", firstId)
+                # print("SecondId: ", secondId)
+                # print("Id map: ", id_map)
+                # print("Protein map: ", protein_map)
+                first = node_id_to_protein[firstNodeId]
+                second = node_id_to_protein[secondNodeId]
+                firstId = id_map[firstNodeId]
+                secondId = id_map[secondNodeId]
             except KeyError as e:
                 raise ValueError(f"Error resolving gate inputs for '{gate_id}': {e}")
 
@@ -113,30 +122,30 @@ def parse_circuit(json_data):
             target_protein_ids = info['outputs']
             print(target_protein_ids)
             first_target_nodeid = target_protein_ids[0] if target_protein_ids else None
-            first_target = str(id_map[first_target_nodeid])
-            hill1 = hill_table.get(f"{protein_map[first_target].mName}-{first.mName}", 1) if first_target else 1
+            # first_target = str(id_map[first_target_nodeid])
+            hill1 = hill_table.get(f"{node_id_to_protein[first_target_nodeid].mName}-{first.mName}", 1) if first_target_nodeid else 1
             #print("Hill1: ", hill1)
-            hill2 = hill_table.get(f"{protein_map[first_target].mName}-{second.mName}", 1) if first_target else 1
+            hill2 = hill_table.get(f"{node_id_to_protein[first_target_nodeid].mName}-{second.mName}", 1) if first_target_nodeid else 1
             #print("Hill2: ", hill2)
 
             # Determine gate type based on edge types
             if firstType == 'promote' and secondType == 'promote':
                 gate_type = f"aa_{gate_family}"
-                gate = Gate(gate_type, firstInput=int(firstId), secondInput=int(secondId), firstHill=hill1, secondHill=hill2)
+                gate = Gate(gate_type, firstInput=firstId, secondInput=secondId, firstHill=hill1, secondHill=hill2)
             elif firstType == 'promote' and secondType == 'repress':
                 gate_type = f"ar_{gate_family}"
-                gate = Gate(gate_type, firstInput=int(firstId), secondInput=int(secondId), firstHill=hill1, secondHill=hill2)
+                gate = Gate(gate_type, firstInput=firstId, secondInput=secondId, firstHill=hill1, secondHill=hill2)
             elif firstType == 'repress' and secondType == 'promote':
                 gate_type = f"ar_{gate_family}"
-                gate = Gate(gate_type, firstInput=int(secondId), secondInput=int(firstId), firstHill=hill2, secondHill=hill1)
+                gate = Gate(gate_type, firstInput=secondId, secondInput=firstId, firstHill=hill2, secondHill=hill1)
             elif firstType == 'repress' and secondType == 'repress':
                 gate_type = f"rr_{gate_family}"
-                gate = Gate(gate_type, firstInput=int(secondId), secondInput=int(firstId), firstHill=hill2, secondHill=hill1)
+                gate = Gate(gate_type, firstInput=secondId, secondInput=firstId, firstHill=hill2, secondHill=hill1)
             else:
                 raise ValueError(f"Unknown edge types for gate '{gate_id}': {firstType}, {secondType}")
 
             for target in info['outputs']:
-                protein_map[str(id_map[target])].mGates.append(gate)
+                node_id_to_protein[target].mGates.append(gate)
         
         #print(single_input_edges)
 
@@ -144,19 +153,20 @@ def parse_circuit(json_data):
         # Handle single-input gates for custom/output nodes that do not go through gates
         for target, second in single_input_edges.items():
             source, edge_type = second[0], second[1]
-            sourcePid = str(id_map[str(source)])
-            targetPid = str(id_map[str(target)])
-            #print(protein_map[source].mName, protein_map[target].mName, edge_type)
-            if sourcePid not in protein_map:
+            if source not in node_id_to_protein:
                 raise ValueError(f"Input source '{source}' for node '{target}' is not a valid protein.")
-            hill = hill_table.get(f"{protein_map[sourcePid].mName}-{protein_map[targetPid].mName}", 1)
-            #print("Hill: ", hill)
+            
+            source_protein = node_id_to_protein[source]
+            target_protein = node_id_to_protein[target]
+            source_internal_id = id_map[source]
+            hill = hill_table.get(f"{target_protein.mName}-{source_protein.mName}", 1)
+            
             if edge_type == "promote":
-                gate = Gate("act_hill", firstInput=int(sourcePid), firstHill=hill)
-                protein_map[targetPid].mGates.append(gate)
+                gate = Gate("act_hill", firstInput=int(source_internal_id), firstHill=hill)
+                target_protein.mGates.append(gate)
             elif edge_type == "repress":
-                gate = Gate("rep_hill", firstInput=int(sourcePid), firstHill=hill)
-                protein_map[targetPid].mGates.append(gate)
+                gate = Gate("rep_hill", firstInput=int(source_internal_id), firstHill=hill)
+                target_protein.mGates.append(gate)
             else:
                 raise ValueError(f"Unknown edge type for gate '{target}': {edge_type}")
         
@@ -173,7 +183,7 @@ def parse_circuit(json_data):
 
 #Example usage
 if __name__ == "__main__":
-    with open("test_data/break_test.json") as f:
+    with open("test_data/new_format.json") as f:
         data = json.load(f)
 
     proteins = parse_circuit(data)
