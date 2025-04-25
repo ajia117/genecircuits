@@ -45,6 +45,24 @@ The application interface is divided into several main sections:
 
 ---
 
+## 🖥️ Frontend Architecture
+
+The frontend is built using **React**, **Electron**, and **TypeScript**.  
+The source code is organized into logical folders:
+
+### Folders
+
+| Folder | Purpose |
+|:-------|:--------|
+| `/components` | React components used in the UI (Ribbon, Toolbox, Node Editor, etc.). |
+| `/types` | TypeScript types and interfaces shared across the application (e.g., `NodeData`, `ProteinData`). |
+| `/hooks` | Custom React hooks for state management, fetching data, and user interactions. |
+| `/utils` | Reusable helper functions and utilities (e.g., formatting JSON, syncing counters). |
+
+Each folder is structured to keep related logic grouped together, improving maintainability and scalability.
+
+---
+
 ## Key Dependencies
 
 #### 🧩 Core Framework

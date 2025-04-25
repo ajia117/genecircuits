@@ -9,6 +9,8 @@ declare global {
 
 let isCancelled = false;
 
+// Function called when user clicks the 'Run Simulation' button. This function makes the API POST
+// request to the backend then receives and parses the response to display.
 export const fetchOutput = async (circuitJson: any) => {
   try {
     isCancelled = false;
