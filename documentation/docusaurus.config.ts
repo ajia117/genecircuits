@@ -43,7 +43,10 @@ const config: Config = {
           //   'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
         },
         theme: {
-          customCss: './src/css/custom.css',
+          customCss: [
+            './src/css/custom.css',
+            './src/css/header.css',
+          ],
         },
       } satisfies Preset.Options,
     ],
@@ -91,8 +94,9 @@ const config: Config = {
         },
         {
           href: 'https://github.com/Will-Dolan/genetic-circuit-tool',
-          label: 'GitHub',
           position: 'right',
+          className: 'header-github-link',
+          'aria-label': 'GitHub repository',
         },
       ],
     },

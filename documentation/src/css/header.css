@@ -1,0 +1,19 @@
+.header-github-link {
+  display: flex;
+  align-items: center;
+  margin-right: 1rem;
+  width: 24px;
+  height: 24px;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-image: url('../../static/img/github-mark/github-mark.png');
+}
+
+[data-theme='dark'] .header-github-link {
+  background-image: url('../../static/img/github-mark/github-mark-white.png');
+}
+
+.header-github-link:hover {
+  opacity: 0.8;
+} 
