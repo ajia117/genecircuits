@@ -95,12 +95,6 @@ The simulation engine:
 - Handles parameter optimization
 
 
-### Backend
-- Flask
-- NumPy
-- SciPy
-- Biological simulation libraries
-
 ## Contributing
 
 When contributing to the project:
