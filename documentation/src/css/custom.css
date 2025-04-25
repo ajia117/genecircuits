@@ -6,25 +6,94 @@
 
 /* You can override the default Infima variables here. */
 :root {
-  --ifm-color-primary: #2e8555;
-  --ifm-color-primary-dark: #29784c;
-  --ifm-color-primary-darker: #277148;
-  --ifm-color-primary-darkest: #205d3b;
-  --ifm-color-primary-light: #33925d;
-  --ifm-color-primary-lighter: #359962;
-  --ifm-color-primary-lightest: #3cad6e;
+  --ifm-color-primary: #059669; /* New main accent color (Teal-600) */
+  --ifm-color-primary-lightest: #ecfdf5; /* Teal-50 */
+  --ifm-color-primary-lighter: #d1fae5;  /* Teal-100 */
+  --ifm-color-primary-light: #a7f3d0;     /* Teal-200 */
+  --ifm-color-primary-dark: #047857;      /* Teal-700 */
+  --ifm-color-primary-darker: #065f46;    /* Teal-800 */
+  --ifm-color-primary-darkest: #064e3b;   /* Teal-900 */
+
   --ifm-code-font-size: 95%;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  --docusaurus-highlighted-code-line-bg: rgba(5, 150, 105, 0.1); /* light teal tint for code highlights */
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
 [data-theme='dark'] {
-  --ifm-color-primary: #25c2a0;
-  --ifm-color-primary-dark: #21af90;
-  --ifm-color-primary-darker: #1fa588;
-  --ifm-color-primary-darkest: #1a8870;
-  --ifm-color-primary-light: #29d5b0;
-  --ifm-color-primary-lighter: #32d8b4;
-  --ifm-color-primary-lightest: #4fddbf;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  --ifm-color-primary: #14b8a6;         /* Teal-500 (brighter, but controlled) */
+  --ifm-color-primary-dark: #0d9488;    /* Teal-600 */
+  --ifm-color-primary-darker: #0f766e;  /* Teal-700 */
+  --ifm-color-primary-darkest: #115e59; /* Teal-800 */
+  --ifm-color-primary-light: #2dd4bf;   /* Teal-400 */
+  --ifm-color-primary-lighter: #5eead4; /* Teal-300 */
+  --ifm-color-primary-lightest: #99f6e4;/* Teal-200 */
+
+  --docusaurus-highlighted-code-line-bg: rgba(20, 184, 166, 0.08); /* nice soft highlight */
+}
+
+/* Custom card styles */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+  transition: all 0.2s ease-in-out;
+  background: var(--ifm-card-background-color);
+  border: 1px solid var(--ifm-color-emphasis-200);
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  border-color: var(--ifm-color-primary);
+}
+
+.card__header {
+  padding: 1.5rem;
+  /* border-bottom: 1px solid var(--ifm-color-emphasis-200); */
+}
+
+.card__header h3 {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.25rem;
+  color: var(--ifm-heading-color);
+}
+
+.card__body {
+  padding: 1.5rem;
+  flex-grow: 1;
+}
+
+.card__body p {
+  margin: 0;
+  color: var(--ifm-color-emphasis-700);
+}
+
+.card__footer {
+  padding: 1.5rem;
+  /* border-top: 1px solid var(--ifm-color-emphasis-200); */
+}
+
+.card__footer .button {
+  width: 100%;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* Icon styles */
+.card__icon {
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 0.5rem;
 }
