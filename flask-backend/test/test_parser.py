@@ -12,7 +12,7 @@ def test_animals_json():
         Protein(2, "lobster", 0, 0, [Gate("aa_and", firstInput = 0, secondInput = 1), Gate("rep_hill", firstInput=0)], None, None),
     ]
 
-    with open("test_data/animals.json") as f:
+    with open("../test_data/animals.json") as f:
         data = json.load(f)
     actual_proteins = parse_circuit(data)
 
@@ -37,7 +37,7 @@ def test_colors_json():
         Protein(4, "giraffeeee", 0, 0, [Gate("ar_and", firstInput=0, secondInput=2)], None, None),
     ]
 
-    with open("test_data/colors.json") as f:
+    with open("../test_data/colors.json") as f:
         data = json.load(f)
     actual_proteins = parse_circuit(data)
 
