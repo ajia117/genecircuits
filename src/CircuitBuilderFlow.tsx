@@ -410,7 +410,7 @@ export default function CircuitBuilderFlow() {
             <div className="bottom-container">
                 <PanelGroup className="circuit-builder-container" direction="horizontal">
                     {/* Left Pane (Toolbox + Properties Window) */}
-                    <Panel className="left-pane min-w-128" defaultSize={30} maxSize={50}>
+                    <Panel className="left-pane min-w-128" defaultSize={30} minSize={23} maxSize={50}>
                         <div className="flex flex-col h-full">
                             {/* Tab Navigation */}
                             <Tabs.Root defaultValue="toolbox" value={activeTab} onValueChange={setActiveTab} className="h-full">
