@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Rnd } from "react-rnd";
 import { Panel as ReactFlowPanel } from '@xyflow/react';
-import { X, Maximize2, Minimize2, Move, RefreshCw } from 'lucide-react';
+import { X, Maximize2, Minimize2, Move, RefreshCw, Download } from 'lucide-react';
 import {
     Flex,
     ScrollArea,
@@ -72,6 +72,15 @@ export default function OutputWindow({
         }
     };
 
+    const handleDownloadOutput = () => {
+        if (outputData && outputData.data) {
+            const a = document.createElement('a');
+            a.href = outputData.data;
+            a.download = 'simulation_output.png';
+            a.click();
+        }
+    };
+
     return (
         <ReactFlowPanel>
             <Rnd
@@ -124,6 +133,11 @@ export default function OutputWindow({
                         </Flex>
 
                         <Flex direction="row" justify="center" align="center" gap="3">
+                            <Tooltip content="Export Output">
+                                <IconButton variant="ghost" onClick={handleDownloadOutput}>
+                                    <Download size={16} strokeWidth={2} />
+                                </IconButton>
+                            </Tooltip>
                             <Tooltip content="Refresh">
                                 <IconButton variant="ghost" onClick={handleRerunSimulation}>
                                     <RefreshCw size={16} strokeWidth={2} />
