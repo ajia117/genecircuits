@@ -1,6 +1,6 @@
-import React, {Dispatch, SetStateAction, useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import { ProteinData, EdgeData } from "../types";
-import {ProteinDataForm} from '../components'
+import { ProteinDataForm } from '../components'
 import {
     Flex,
     Text,
@@ -16,38 +16,7 @@ import {
     Pencil,
     Copy
 } from "lucide-react"
-
-interface PropertiesWindowProps {
-    selectedNodeId: string | null;
-    selectedNodeType: string | null;
-    proteinData: ProteinData | null;
-    setProteinData: (label: string, data: ProteinData) => void;
-    selectedEdgeId: string | null;
-    edgeData: EdgeData | null;
-    setEdgeType: (type: "promote" | "repress") => void;
-    editingProtein?: ProteinData | null;
-    setEditingProtein?: Dispatch<SetStateAction<ProteinData>>;
-    setActiveTab: Dispatch<SetStateAction<'toolbox' | 'properties' | 'circuits'>>;
-}
-
-// const PROTEIN_LABEL_MAP: { [key: string]: string } = {
-//     label: "Protein Name",
-//     initialConcentration: "Initial Concentration",
-//     lossRate: "Loss Rate",
-//     beta: "Beta",
-//     inputs: "Number of Inputs",
-//     outputs: "Number of Outputs",
-//     "inputFunctionData.steadyStateValue": "Steady State Value",
-//     "inputFunctionData.timeStart": "Pulse Start Time",
-//     "inputFunctionData.timeEnd": "Pulse End Time",
-//     "inputFunctionData.pulsePeriod": "Pulse Period",
-//     "inputFunctionData.amplitude": "Amplitude",
-//     "inputFunctionData.dutyCycle": "Duty Cycle",
-// };
-// const EDGE_LABEL_MAP: { [key: string]: string } = {
-//     source: "Source Node ID",
-//     target: "Target Node ID",
-// };
+import { useCircuitContext, useSelectionStateContext, useWindowStateContext } from '../context';
 
 const LABEL_MAP: Record<'protein' | 'edge', Record<string, string>> = {
     protein: {
@@ -73,18 +42,28 @@ const LABEL_MAP: Record<'protein' | 'edge', Record<string, string>> = {
 };
   
 
-const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
-    selectedNodeId,
-    selectedNodeType,
-    proteinData,
-    setProteinData,
-    selectedEdgeId,
-    edgeData,
-    setEdgeType,
-    editingProtein,
-    setEditingProtein,
-    setActiveTab
-}) => {
+const PropertiesWindow: React.FC = () => {
+    const {
+        nodes, setNodes, edges, setEdges, getProteinData, setProteinData
+    } = useCircuitContext();
+    const {
+        selectedNodeId,
+        selectedNodeType,
+        selectedEdgeId,
+        editingProtein,
+        setEditingProtein,
+        resetSelectedStateData
+    } = useSelectionStateContext();
+    const { setActiveTab } = useWindowStateContext();
+    const edgeData = edges.find(edge => edge.id === selectedEdgeId) ?? null;
+    const proteinData = (() => {
+        if (!selectedNodeId) return null;
+        const node = nodes.find(n => n.id === selectedNodeId);
+        if (!node || node.type !== 'custom') return null;
+        const label = (node.data as any).label;
+        if (typeof label !== 'string') return null;
+        return getProteinData(label);
+    })();
     const [localProteinData, setLocalProteinData] = useState<ProteinData | null>(null);
     const [showProteinEditor, setShowProteinEditor] = useState(false);
     const [localEdgeData, setLocalEdgeData] = useState<EdgeData | null>(null);
@@ -101,7 +80,7 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
     }, [proteinData]);
 
     // Reset edgeData when new edge clicked
-    useEffect(() => setLocalEdgeData(edgeData ?? null), [edgeData]);
+    useEffect(() => setLocalEdgeData((edgeData ?? null) as EdgeData | null), [edgeData]);
 
     // Reset proteinData when new node clicked
     useEffect(() => {
@@ -121,6 +100,18 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
             setShowProteinEditor(false);
             setActiveTab('toolbox')
         }
+    };
+
+    // Delete handler
+    const handleDelete = () => {
+        if (selectedNodeId) {
+            setNodes((prev: any[]) => prev.filter((node: any) => node.id !== selectedNodeId));
+            setEdges((prev: any[]) => prev.filter((edge: any) => edge.source !== selectedNodeId && edge.target !== selectedNodeId));
+        } else if (selectedEdgeId) {
+            setEdges((prev: any[]) => prev.filter((edge: any) => edge.id !== selectedEdgeId));
+        }
+        resetSelectedStateData();
+        setActiveTab('toolbox');
     };
 
     // Render box w/ styling that encloses properties data
@@ -188,7 +179,7 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
                 <DataList.Item>
                     <DataList.Label minWidth="88px">Edge Type</DataList.Label>
                     <DataList.Value>
-                    <SegmentedControl.Root value={localEdgeData?.markerEnd} onValueChange={(val) => setEdgeType(val as "promote" | "repress")}>
+                    <SegmentedControl.Root value={localEdgeData?.markerEnd} onValueChange={(val) => setEdges((prev: any[]) => prev.map((edge: any) => edge.id === selectedEdgeId ? { ...edge, markerEnd: val as "promote" | "repress" } : edge))}>
                         <SegmentedControl.Item value="promote">Promote</SegmentedControl.Item>
                         <SegmentedControl.Item value="repress">Repress</SegmentedControl.Item>
                     </SegmentedControl.Root>
@@ -201,7 +192,7 @@ const PropertiesWindow: React.FC<PropertiesWindowProps> = ({
     // Render delete and edit buttons
     const renderFunctionButtons = () => (
         <Flex direction="row" justify="between" align="center">
-            <Button variant="outline" color="red">
+            <Button variant="outline" color="red" onClick={handleDelete}>
                 <Trash2 size={20}/> <Text size="4" weight="bold">Delete</Text>
             </Button>
             <Button variant="outline" onClick={() => setShowProteinEditor((prev) => !prev)}>
