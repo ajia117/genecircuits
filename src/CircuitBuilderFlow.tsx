@@ -491,7 +491,7 @@ export default function CircuitBuilderFlow() {
                     <Panel className="flow-wrapper" ref={reactFlowWrapper} defaultSize={80} minSize={50} maxSize={90}>
                         {showOutputWindow && renderOutputWindow()}
                         
-                        <ReactFlow
+                        <ReactFlow className="react-flow"
                             nodes={nodes}
                             edges={edges}
                             onConnect={onConnect}

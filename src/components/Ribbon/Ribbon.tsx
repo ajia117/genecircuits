@@ -28,6 +28,7 @@ import {
     AlertDialog
 } from "@radix-ui/themes";
 import { ImportWindow } from "../../components";
+import { toPng, toJpeg } from 'html-to-image';
 
 const TopRibbon: React.FC = () => {
     const {
@@ -82,22 +83,29 @@ const TopRibbon: React.FC = () => {
     }
 
     // Exports the circuit displayed on the screen
-    const handleExport = (e: React.MouseEvent<HTMLDivElement>, type: string) => {
+    const handleExport = async (e: React.MouseEvent<HTMLDivElement>, type: string) => {
         e.preventDefault();
         if(nodes.length === 0 && edges.length === 0) { alert("Nothing to export."); return; }
-        if(type === "json") {
-            // const updatedNodes = updateNodesWithProteinData();
-            const circuitJson = formatCircuitExportJson(circuitSettings, nodes, edges, proteins);
-            const blob = new Blob([JSON.stringify(circuitJson, null, 2)], {
-                type: "application/json",
-            });
-    
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `${circuitSettings.projectName || "circuit"}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
+        if (type === "png" || type === "jpeg") {
+            const circuit = document.querySelector('.flow-wrapper') as HTMLElement;
+            if (!circuit) {
+                alert('Could not find the circuit area to export.');
+                return;
+            }
+            try {
+                let dataUrl;
+                if (type === 'png') {
+                    dataUrl = await toPng(circuit, { cacheBust: true });
+                } else {
+                    dataUrl = await toJpeg(circuit, { quality: 0.95, cacheBust: true });
+                }
+                const a = document.createElement('a');
+                a.href = dataUrl;
+                a.download = `${circuitSettings.projectName || 'circuit'}.${type}`;
+                a.click();
+            } catch (err) {
+                alert('Failed to export image.');
+            }
         }
     }
 
@@ -149,7 +157,6 @@ const TopRibbon: React.FC = () => {
                         <DropdownMenu.Content align="end">
                             <DropdownMenu.Item onClick={(e) => handleExport(e, 'png')}>Export as PNG</DropdownMenu.Item>
                             <DropdownMenu.Item onClick={(e) => handleExport(e, 'jpeg')}>Export as JPEG</DropdownMenu.Item>
-                            {/* <DropdownMenu.Item onClick={(e) => handleExport(e, 'json')}>Export as JSON</DropdownMenu.Item> */}
                         </DropdownMenu.Content>
                     </DropdownMenu.Root>
                     </Flex>
