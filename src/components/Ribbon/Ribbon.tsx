@@ -1,5 +1,5 @@
-import React, { useState, Dispatch, SetStateAction } from "react";
-import { Node, Edge } from "@xyflow/react";
+import React, { useState } from "react";
+import { useCircuitContext, useHillCoefficientContext, useWindowStateContext } from '../../context';
 import { fetchOutput, abortFetch, formatBackendJson, formatCircuitExportJson } from "../../utils"
 import {
     Play,
@@ -28,43 +28,26 @@ import {
     AlertDialog
 } from "@radix-ui/themes";
 import { ImportWindow } from "../../components";
-import { HillCoefficientData, ProteinData, CircuitSettingsType } from "../../types";
 
-interface TopRibbonProps {
-    proteins: { [label: string]: ProteinData };
-    setProteins: Dispatch<SetStateAction<{ [label: string]: ProteinData }>>;
-    nodes: Node<ProteinData>[];
-    setNodes: Dispatch<SetStateAction<Node<ProteinData>[]>>;
-    edges: Edge[];
-    setEdges: Dispatch<SetStateAction<Edge[]>>;
-    showOutputWindow: boolean;
-    setShowOutputWindow: (show: boolean) => void;
-    circuitSettings: CircuitSettingsType;
-    setCircuitSettings: Dispatch<SetStateAction<CircuitSettingsType>>;
-    setOutputData: (data: any) => void;
-    showHillCoefficientMatrix: boolean;
-    setShowHillCoefficientMatrix: Dispatch<SetStateAction<boolean>>;
-    hillCoefficients: HillCoefficientData[]
-}
+const TopRibbon: React.FC = () => {
+    const {
+        nodes, setNodes, edges, setEdges, proteins, setProteins
+    } = useCircuitContext();
+    const {
+        hillCoefficients
+    } = useHillCoefficientContext();
+    const {
+        showOutputWindow, setShowOutputWindow,
+        circuitSettings, setCircuitSettings,
+        setOutputData,
+        showHillCoeffMatrix, setShowHillCoeffMatrix
+    } = useWindowStateContext();
 
-
-const TopRibbon: React.FC<TopRibbonProps> = ({ 
-    nodes, setNodes, 
-    edges, setEdges, 
-    showOutputWindow, setShowOutputWindow, 
-    circuitSettings, setCircuitSettings, 
-    proteins, setProteins,
-    setOutputData, 
-    showHillCoefficientMatrix,
-    setShowHillCoefficientMatrix,
-    hillCoefficients
-}) => {
     const [showClearConfirmation, setShowClearConfirmation] = useState(false); // Track whether clear confirmation window is open or not
     const [isRunning, setIsRunning] = useState(false) // Track if simulation is running or not
     const [showSettingsWindow, setShowSettingsWindow] = useState(false); // Track whether settings window is open or not
     const [showImportWindow, setShowImportWindow] = useState(false); // Track whether import window is open or not
     
-
     // Handler called when user confirms clearing the screen
     const confirmClear = () => {
         setNodes([])
@@ -168,7 +151,7 @@ const TopRibbon: React.FC<TopRibbonProps> = ({
 
                 <Flex gap="2" align="center">
                     <Tooltip content="Hill Coefficient Matrix">
-                        <IconButton variant="outline" size="3" color="gray" onClick={() => setShowHillCoefficientMatrix(!showHillCoefficientMatrix)}>
+                        <IconButton variant="outline" size="3" color="gray" onClick={() => setShowHillCoeffMatrix(!showHillCoeffMatrix)}>
                         <Grid3X3 size={20} />
                         </IconButton>
                     </Tooltip>
