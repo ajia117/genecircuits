@@ -101,6 +101,20 @@ const TopRibbon: React.FC = () => {
         }
     }
 
+    const handleSaveProject = () => {
+        if(nodes.length === 0 && edges.length === 0) { alert("Nothing to save."); return; }
+            const circuitJson = formatCircuitExportJson(circuitSettings, nodes, edges, proteins);
+            const blob = new Blob([JSON.stringify(circuitJson, null, 2)], {
+                type: "application/json",
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${circuitSettings.projectName || "circuit"}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
     return (
         <Theme>
             <Flex direction="row" align="center" justify="between" p="3" style={{ borderBottom: '1px solid #ccc' }}>
@@ -119,7 +133,7 @@ const TopRibbon: React.FC = () => {
                     </Tooltip>
 
                     <Tooltip content="Save Project">
-                        <IconButton variant="outline" size="3" color="gray">
+                        <IconButton variant="outline" size="3" color="gray" onClick={() => {handleSaveProject()}}>
                         <Save size={20} />
                         </IconButton>
                     </Tooltip>
@@ -135,7 +149,7 @@ const TopRibbon: React.FC = () => {
                         <DropdownMenu.Content align="end">
                             <DropdownMenu.Item onClick={(e) => handleExport(e, 'png')}>Export as PNG</DropdownMenu.Item>
                             <DropdownMenu.Item onClick={(e) => handleExport(e, 'jpeg')}>Export as JPEG</DropdownMenu.Item>
-                            <DropdownMenu.Item onClick={(e) => handleExport(e, 'json')}>Export as JSON</DropdownMenu.Item>
+                            {/* <DropdownMenu.Item onClick={(e) => handleExport(e, 'json')}>Export as JSON</DropdownMenu.Item> */}
                         </DropdownMenu.Content>
                     </DropdownMenu.Root>
                     </Flex>
