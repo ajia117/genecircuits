@@ -89,3 +89,11 @@ def test_malformed_gate_connections():
 
     with pytest.raises(ValueError, match=r"must have exactly two inputs"):
         parse_circuit(bad_json)
+
+def test_missing_gate_connections():
+    bad_json = load_json("test_data/new_format.json")
+    # Add a gate input source that doesn't exist
+    bad_json['edges'] = [edge for edge in bad_json['edges'] if not (edge['id'] == "edge-1-g0")]
+
+    with pytest.raises(ValueError, match=r"must have exactly two inputs"):
+        parse_circuit(bad_json)
