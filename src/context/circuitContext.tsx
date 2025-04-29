@@ -56,11 +56,16 @@ export const CircuitProvider: React.FC<{ children: ReactNode }> = ({ children })
     }, [nodes]);
 
     const getProteinData = useCallback((label: string) => proteins[label] ?? null, [proteins]);
-    const setProteinData = useCallback((label: string, data: ProteinData) => {
-        setProteins((prev) => ({
-            ...prev,
-            [label]: data,
-            }));
+    const setProteinData = useCallback((label: string, data?: ProteinData) => {
+        setProteins((prev) => {
+            const newProteins = { ...prev };
+            if (data === undefined) {
+                delete newProteins[label];
+            } else {
+                newProteins[label] = data;
+            }
+            return newProteins;
+        });
     }, []);
 
     return (

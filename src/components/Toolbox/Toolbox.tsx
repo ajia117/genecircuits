@@ -23,7 +23,7 @@ import {
 } from 'lucide-react'
 
 export const Toolbox: React.FC = () => {
-    const { proteins, setProteinData, getProteinData } = useCircuitContext();
+    const { proteins, setProteinData, getProteinData, setNodes, nodes } = useCircuitContext();
     const { editingProtein, setEditingProtein } = useSelectionStateContext();
     const { setActiveTab } = useWindowStateContext();
 
@@ -76,6 +76,14 @@ export const Toolbox: React.FC = () => {
             .filter(([label]) => label.toLowerCase().includes(searchTerm.toLowerCase()))
             .map(([label, data]) => ({ id: label, label, ...data }));
     }, [proteins, searchTerm]);
+
+    // Handler to delete a protein and its associated node(s)
+    const handleDeleteProtein = (label: string) => {
+        // Remove protein from proteins object
+        setProteinData(label, undefined as any); // Remove from proteins
+        // Remove nodes with this protein label
+        setNodes((prevNodes) => prevNodes.filter(node => !(node.data && typeof node.data === 'object' && 'label' in node.data && node.data.label === label)));
+    };
 
     return (
         <Flex direction="column">
@@ -178,7 +186,7 @@ export const Toolbox: React.FC = () => {
                                             setEditingProtein && setEditingProtein(protein)
                                             setActiveTab('properties')
                                         }}>Edit</DropdownMenu.Item>
-                                        <DropdownMenu.Item color="red">Delete</DropdownMenu.Item>
+                                        <DropdownMenu.Item color="red" onClick={() => handleDeleteProtein(protein.label)}>Delete</DropdownMenu.Item>
                                     </DropdownMenu.Content>
                                 </DropdownMenu.Root>
                                 
