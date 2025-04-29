@@ -11,6 +11,8 @@ import {
     Button
 } from "@radix-ui/themes"
 import './OutputWindowStyles.css';
+import { useCircuitContext, useHillCoefficientContext, useWindowStateContext } from '../../context';
+import { fetchOutput, formatBackendJson } from '../../utils';
 
 export default function OutputWindow({ 
     onClose, windowSettings, setWindowSettings, outputData 
@@ -26,6 +28,9 @@ export default function OutputWindow({
     });
     const [isMaximized, setIsMaximized] = useState(false);
     const [preMaximizeSettings, setPreMaximizeSettings] = useState(null);
+    const { nodes, edges, proteins } = useCircuitContext();
+    const { hillCoefficients } = useHillCoefficientContext();
+    const { circuitSettings, setOutputData } = useWindowStateContext();
 
     useEffect(() => {
         setDimensions({
@@ -54,6 +59,16 @@ export default function OutputWindow({
             });
 
             setIsMaximized(true);
+        }
+    };
+
+    const handleRerunSimulation = async () => {
+        const circuitJson = formatBackendJson(circuitSettings, nodes, edges, proteins, hillCoefficients);
+        const res = await fetchOutput(circuitJson);
+        if (res.type !== 'data') {
+            setOutputData(res);
+        } else {
+            setOutputData(null);
         }
     };
 
@@ -110,7 +125,7 @@ export default function OutputWindow({
 
                         <Flex direction="row" justify="center" align="center" gap="3">
                             <Tooltip content="Refresh">
-                                <IconButton variant="ghost" onClick={() => {}}> {/* TODO: handle rerun/refresh */}
+                                <IconButton variant="ghost" onClick={handleRerunSimulation}>
                                     <RefreshCw size={16} strokeWidth={2} />
                                 </IconButton>
                             </Tooltip>
