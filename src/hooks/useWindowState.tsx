@@ -1,7 +1,10 @@
 import { useState, useCallback } from 'react';
+import { FetchOutputImage} from "../types/FetchOutputReturnType";
+import WindowSettingsType from "../types/WindowSettingsType";
+
 export function useWindowState() {
     const [showOutputWindow, setShowOutputWindow] = useState<boolean>(false);
-    const [outputWindowSettings, setOutputWindowSettings] = useState({
+    const [outputWindowSettings, setOutputWindowSettings] = useState<WindowSettingsType>({
         x: 0,
         y: 0,
         width: 300,
@@ -10,7 +13,7 @@ export function useWindowState() {
 
     const [showHillCoeffMatrix, setShowHillCoeffMatrix] = useState<boolean>(false);
     const [activeTab, setActiveTab] = useState('toolbox');
-    const [outputData, setOutputData] = useState();
+    const [outputData, setOutputData] = useState<FetchOutputImage | null>();
 
     const [circuitSettings, setCircuitSettings] = useState({
         projectName: "Untitled Project",

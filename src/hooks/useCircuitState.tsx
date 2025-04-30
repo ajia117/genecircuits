@@ -23,7 +23,7 @@ export function useCircuitState() {
         } else if (nodeType === "custom") {
             return `${nodeIdRef.current++}`;
         }
-        return `unknown-${Math.random().toString(36).substr(2, 5)}`;
+        return `unknown-${Math.random().toString(36).substring(2, 5)}`;
     }, []);
 
     useEffect(() => {
@@ -51,3 +51,4 @@ export function useCircuitState() {
         nodeIdRef, gateIdRef, getId
     };
 }
+export type CircuitState = ReturnType<typeof useCircuitState>;

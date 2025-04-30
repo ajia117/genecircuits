@@ -1,4 +1,5 @@
 import { Node } from '@xyflow/react';
+import React from "react";
 
 let nodeIdRef: React.MutableRefObject<number>;
 let gateIdRef: React.MutableRefObject<number>;

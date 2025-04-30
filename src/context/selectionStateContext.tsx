@@ -1,9 +1,7 @@
 import React, { createContext, useContext, ReactNode } from 'react';
-import { useSelectionState } from '../hooks/useSelectionState';
+import { useSelectionState } from '../hooks';
 
-interface SelectionStateContextType extends ReturnType<typeof useSelectionState> {}
-
-const SelectionStateContext = createContext<SelectionStateContextType | null>(null);
+const SelectionStateContext = createContext<ReturnType<typeof useSelectionState> | null>(null);
 
 export const SelectionStateProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const selectionState = useSelectionState();

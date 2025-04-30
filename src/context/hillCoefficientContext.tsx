@@ -1,5 +1,5 @@
 import React, { createContext, useContext, ReactNode, useMemo } from 'react';
-import { useHillCoefficients } from '../hooks/useHillCoefficients';
+import { useHillCoefficients } from '../hooks';
 import { HillCoefficientData } from '../types';
 
 interface HillCoefficientContextType {

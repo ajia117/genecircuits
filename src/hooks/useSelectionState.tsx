@@ -1,12 +1,13 @@
 // hooks/useSelectionState.tsx
 import { useState, useCallback } from 'react';
+import {ProteinData} from "../types";
 
 export function useSelectionState() {
     // State for tracking selected elements
     const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null);
     const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
     const [selectedNodeType, setSelectedNodeType] = useState<string | null>(null);
-    const [editingProtein, setEditingProtein] = useState<any | null>(null);
+    const [editingProtein, setEditingProtein] = useState<ProteinData | null>(null);
 
     const resetSelectedStateData = useCallback(() => {
         setSelectedEdgeId(null);

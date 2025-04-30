@@ -1,9 +1,7 @@
 import React, { createContext, useContext, ReactNode } from 'react';
-import { useWindowState } from '../hooks/useWindowState';
+import { useWindowState } from '../hooks';
 
-interface WindowStateContextType extends ReturnType<typeof useWindowState> {}
-
-const WindowStateContext = createContext<WindowStateContextType | null>(null);
+const WindowStateContext = createContext<ReturnType<typeof useWindowState> | null>(null);
 
 export const WindowStateProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const windowState = useWindowState();

@@ -3,7 +3,7 @@ import './index.css';
 import CircuitBuilderFlow from "./CircuitBuilderFlow";
 import { ReactFlowProvider } from "@xyflow/react";
 import { ToolboxProvider } from "./components/Toolbox/ToolboxContext";
-import { Theme, ThemePanel } from "@radix-ui/themes";
+import { Theme } from "@radix-ui/themes";
 import "@radix-ui/themes/styles.css";
 import { CircuitProvider, SelectionStateProvider, WindowStateProvider, HillCoefficientProvider, useCircuitContext } from './context';
 import React from 'react';

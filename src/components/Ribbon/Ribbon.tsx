@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useCircuitContext, useHillCoefficientContext, useWindowStateContext } from '../../context';
-import { fetchOutput, abortFetch, formatBackendJson, formatCircuitExportJson } from "../../utils"
+import { fetchOutput, formatBackendJson, formatCircuitExportJson } from "../../utils"
 import {
     Play,
     Save,
@@ -32,7 +32,7 @@ import { toPng, toJpeg } from 'html-to-image';
 
 const TopRibbon: React.FC = () => {
     const {
-        nodes, setNodes, edges, setEdges, proteins, setProteins
+        nodes, setNodes, edges, setEdges, proteins
     } = useCircuitContext();
     const {
         hillCoefficients
@@ -62,7 +62,7 @@ const TopRibbon: React.FC = () => {
         setIsRunning(true);
         try {
             const res = await fetchOutput(circuitJson);
-            if(res.type !== 'data') {
+            if('type' in res && res.type === 'image') {
                 setOutputData(res);
             }
             else {
@@ -75,12 +75,6 @@ const TopRibbon: React.FC = () => {
             setIsRunning(false);
         }
     };
-
-    // Handler for when user pauses the simulation process
-    const handlePauseClick = () => {
-        abortFetch()
-        setIsRunning(false)
-    }
 
     // Exports the circuit displayed on the screen
     const handleExport = async (e: React.MouseEvent<HTMLDivElement>, type: string) => {
@@ -155,8 +149,8 @@ const TopRibbon: React.FC = () => {
                             </DropdownMenu.Trigger>
                         </Tooltip>
                         <DropdownMenu.Content align="end">
-                            <DropdownMenu.Item onClick={(e) => handleExport(e, 'png')}>Export as PNG</DropdownMenu.Item>
-                            <DropdownMenu.Item onClick={(e) => handleExport(e, 'jpeg')}>Export as JPEG</DropdownMenu.Item>
+                            <DropdownMenu.Item onClick={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleExport(e, 'png')}>Export as PNG</DropdownMenu.Item>
+                            <DropdownMenu.Item onClick={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleExport(e, 'jpeg')}>Export as JPEG</DropdownMenu.Item>
                         </DropdownMenu.Content>
                     </DropdownMenu.Root>
                     </Flex>
@@ -166,7 +160,7 @@ const TopRibbon: React.FC = () => {
                 <Box maxWidth="400px" flexGrow="1" mx="4">  
                     <TextField.Root size="2" variant="surface" style={{textAlign: "center"}}
                         value={circuitSettings.projectName}
-                        onChange={(e: any) => setCircuitSettings({ ...circuitSettings, projectName: e.target.value })}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCircuitSettings({ ...circuitSettings, projectName: e.target.value })}
                     />
                 </Box>
 

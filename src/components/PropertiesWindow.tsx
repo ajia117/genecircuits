@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ProteinData, EdgeData } from "../types";
+import {ProteinData, EdgeData, AppNodeData} from "../types";
 import { ProteinDataForm } from '../components'
 import {
     Flex,
@@ -60,7 +60,7 @@ const PropertiesWindow: React.FC = () => {
         if (!selectedNodeId) return null;
         const node = nodes.find(n => n.id === selectedNodeId);
         if (!node || node.type !== 'custom') return null;
-        const label = (node.data as any).label;
+        const label = (node.data).label;
         if (typeof label !== 'string') return null;
         return getProteinData(label);
     })();
@@ -105,10 +105,10 @@ const PropertiesWindow: React.FC = () => {
     // Delete handler
     const handleDelete = () => {
         if (selectedNodeId) {
-            setNodes((prev: any[]) => prev.filter((node: any) => node.id !== selectedNodeId));
-            setEdges((prev: any[]) => prev.filter((edge: any) => edge.source !== selectedNodeId && edge.target !== selectedNodeId));
+            setNodes((prev: AppNodeData[]) => prev.filter((node: AppNodeData) => node.id !== selectedNodeId));
+            setEdges((prev: AppNodeData[]) => prev.filter((edge: AppNodeData) => edge.source !== selectedNodeId && edge.target !== selectedNodeId));
         } else if (selectedEdgeId) {
-            setEdges((prev: any[]) => prev.filter((edge: any) => edge.id !== selectedEdgeId));
+            setEdges((prev: AppNodeData[]) => prev.filter((edge: AppNodeData) => edge.id !== selectedEdgeId));
         }
         resetSelectedStateData();
         setActiveTab('toolbox');
@@ -132,7 +132,7 @@ const PropertiesWindow: React.FC = () => {
     );
 
     // Render properties data for nodes and edges
-    const renderDataList = (data: Record<string, any>, type: 'protein' | 'edge') => (
+    const renderDataList = (data: EdgeData | ProteinData, type: 'protein' | 'edge') => (
         <DataList.Root>
             {/* ID */}
             <DataList.Item>
@@ -179,7 +179,7 @@ const PropertiesWindow: React.FC = () => {
                 <DataList.Item>
                     <DataList.Label minWidth="88px">Edge Type</DataList.Label>
                     <DataList.Value>
-                    <SegmentedControl.Root value={localEdgeData?.markerEnd} onValueChange={(val) => setEdges((prev: any[]) => prev.map((edge: any) => edge.id === selectedEdgeId ? { ...edge, markerEnd: val as "promote" | "repress" } : edge))}>
+                    <SegmentedControl.Root value={localEdgeData?.markerEnd} onValueChange={(val) => setEdges((prev: EdgeData[]) => prev.map((edge: EdgeData) => edge.id === selectedEdgeId ? { ...edge, markerEnd: val as "promote" | "repress" } : edge))}>
                         <SegmentedControl.Item value="promote">Promote</SegmentedControl.Item>
                         <SegmentedControl.Item value="repress">Repress</SegmentedControl.Item>
                     </SegmentedControl.Root>

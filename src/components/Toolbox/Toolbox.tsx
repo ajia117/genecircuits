@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useCircuitContext, useSelectionStateContext, useWindowStateContext } from '../../context';
 import { ProteinData } from "../../types";
 import '../../index.css';
@@ -23,29 +23,10 @@ import {
 } from 'lucide-react'
 
 export const Toolbox: React.FC = () => {
-    const { proteins, setProteinData, getProteinData, setNodes, nodes } = useCircuitContext();
-    const { editingProtein, setEditingProtein } = useSelectionStateContext();
+    const { proteins, setProteinData, setNodes } = useCircuitContext();
+    const { setEditingProtein } = useSelectionStateContext();
     const { setActiveTab } = useWindowStateContext();
 
-    const genericNodeData: ProteinData = {
-        label: null,
-        initialConcentration: 1,
-        lossRate: 1,
-        beta: 1,
-        // delay: 0,
-        inputs: 1,
-        outputs: 1,
-        inputFunctionType: 'steady-state',
-        inputFunctionData: {
-            steadyStateValue: 0,
-            timeStart: 0,
-            timeEnd: 1,
-            pulsePeriod: 1,
-            amplitude: 1,
-            dutyCycle: 0.5,
-        }
-    };
-    const [nodeData, setNodeData] = useState<ProteinData>(genericNodeData);
     const [searchTerm, setSearchTerm] = useState(''); // Stores user input from the protein search bar
     const [showCreateProteinWindow, setShowCreateProteinWindow] = useState(false);
 
@@ -80,7 +61,7 @@ export const Toolbox: React.FC = () => {
     // Handler to delete a protein and its associated node(s)
     const handleDeleteProtein = (label: string) => {
         // Remove protein from proteins object
-        setProteinData(label, undefined as any); // Remove from proteins
+        setProteinData(label, undefined);
         // Remove nodes with this protein label
         setNodes((prevNodes) => prevNodes.filter(node => !(node.data && typeof node.data === 'object' && 'label' in node.data && node.data.label === label)));
     };

@@ -15,8 +15,7 @@ import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { syncNodeCounters } from "./utils";
 import HillCoefficientData from "./types/HillCoefficientType";
 import ProteinData from "./types/ProteinData";
-import { AppNode } from "./types";
-import { 
+import {
     Toolbox, 
     PropertiesWindow, 
     OutputWindow, 
@@ -33,7 +32,7 @@ import {
     Box,
     ScrollArea
 } from '@radix-ui/themes'
-import {ApplyCircuitTemplateProps, CircuitTemplate} from "./types/PreBuiltCircuitTypes";
+import {ApplyCircuitTemplateProps, CircuitTemplate, AppNode} from "./types";
 import { useCircuitContext, useSelectionStateContext, useHillCoefficientContext, useWindowStateContext } from "./context";
 
 
@@ -53,7 +52,7 @@ export default function CircuitBuilderFlow() {
     const {
         nodes, setNodes, onNodesChange,
         edges, setEdges, onEdgesChange,
-        proteins, setProteins, getProteinData, setProteinData,
+        proteins, setProteins, setProteinData,
         usedProteins, setUsedProteins,
         nodeIdRef, gateIdRef, getId
     } = circuit;
@@ -61,15 +60,6 @@ export default function CircuitBuilderFlow() {
 
     const selection = useSelectionStateContext();
     const {
-        // State
-        selectedEdgeId,
-        selectedNodeId,
-        selectedNodeType,
-        editingProtein,
-
-        // Setters
-        setEditingProtein,
-
         // Utility functions
         resetSelectedStateData,
         selectNode,
@@ -84,9 +74,6 @@ export default function CircuitBuilderFlow() {
     const {
         // Output window
         showOutputWindow,
-        setShowOutputWindow,
-        outputWindowSettings,
-        setOutputWindowSettings,
 
         // Hill coefficient matrix
         showHillCoeffMatrix,
@@ -96,12 +83,7 @@ export default function CircuitBuilderFlow() {
         activeTab,
         setActiveTab,
 
-        // Output data
-        outputData,
-        setOutputData,
-
         // Circuit settings
-        circuitSettings,
         setCircuitSettings
     } = useWindowStateContext();
 
@@ -123,7 +105,7 @@ export default function CircuitBuilderFlow() {
             });
 
             // Overwrite old data on import
-            setNodes((importedNodes ?? []).map((node: any) => {
+            setNodes((importedNodes ?? []).map((node: AppNode) => {
                 if (node.type === 'custom') {
                     // Ensure all ProteinData fields are present
                     return {
@@ -146,7 +128,7 @@ export default function CircuitBuilderFlow() {
                     } as AppNode;
                 }
             }) as AppNode[]);
-            setEdges((importedEdges ?? []).map((edge: any) => ({
+            setEdges((importedEdges ?? []).map((edge: Edge) => ({
                 ...edge,
                 sourceHandle: edge.sourceHandle ?? undefined
             })) as Edge[]);
@@ -205,43 +187,6 @@ export default function CircuitBuilderFlow() {
         }
     }, [activeTab]);
 
-
-    // Returns entire Node object for the selected node (includes node ID)
-    const getSelectedNode = () => {
-        return nodes.find(node => node.id === selectedNodeId) as AppNode;
-    };
-
-    // Returns protein data from the selected node
-    const getSelectedProteinData = () => {
-        const node = getSelectedNode();
-        if (node && node.data && typeof node.data === 'object' && 'label' in node.data) {
-            return getProteinData(node.data.label);
-        }
-        return null;
-    };
-
-    // Returns data from the selected edge
-    const getSelectedEdgeData = () => {
-        return edges.find((edge: Edge) => edge.id === selectedEdgeId) ?? null;
-    };
-
-    // Function to change edge type of the selected edge
-    const changeEdgeType = useCallback((markerType: string) => {
-        if (!selectedEdgeId) return; // No edge selected
-
-        setEdges((eds: Edge[]) =>
-            eds.map((edge: Edge) =>
-                edge.id === selectedEdgeId
-                    ? {
-                        ...edge,
-                        markerEnd: markerType === "repress"
-                            ? "repress"
-                            : "promote"
-                    }
-                    : edge
-            )
-        );
-    }, [selectedEdgeId]);
 
     // Handler for dragging a component from toolbox to workspace
     const onDragOver = useCallback((event: React.DragEvent) => {
@@ -397,7 +342,7 @@ export default function CircuitBuilderFlow() {
 
     // Display output window
     const renderOutputWindow = () => {
-        return <OutputWindow onClose={() => setShowOutputWindow(false)} outputData={outputData} windowSettings={outputWindowSettings} setWindowSettings={setOutputWindowSettings} />;
+        return <OutputWindow/>;
     };
 
     return (
@@ -408,17 +353,6 @@ export default function CircuitBuilderFlow() {
 
             {/* TOP MENU FUNCTION BUTTONS */}
             <Ribbon
-                proteins={proteins} setProteins={setProteins}
-                nodes={nodes} setNodes={setNodes}
-                edges={edges} setEdges={setEdges}
-                showOutputWindow={showOutputWindow} 
-                setShowOutputWindow={setShowOutputWindow}
-                circuitSettings={circuitSettings}
-                setCircuitSettings={setCircuitSettings}
-                setOutputData={setOutputData}
-                showHillCoefficientMatrix={showHillCoeffMatrix} 
-                setShowHillCoefficientMatrix={setShowHillCoeffMatrix}
-                hillCoefficients={hillCoefficients}
             />
 
             {/* HILL COEFFICIENT MATRIX WINDOW */}
@@ -456,14 +390,7 @@ export default function CircuitBuilderFlow() {
                                 <Box px="4" mt="6" className="h-full overflow-y-auto">
                                     {/* TOOLBOX */}
                                     <Tabs.Content value="toolbox">
-                                        <Toolbox
-                                            proteins={proteins}
-                                            setProteinData={setProteinData}
-                                            getProteinData={getProteinData}
-                                            editingProtein={editingProtein}
-                                            setEditingProtein={setEditingProtein}
-                                            setActiveTab={setActiveTab}
-                                        />
+                                        <Toolbox/>
                                     </Tabs.Content>
 
                                     {/* PROPERTIES */}

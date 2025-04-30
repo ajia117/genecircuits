@@ -1,57 +1,49 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Rnd } from "react-rnd";
 import { Panel as ReactFlowPanel } from '@xyflow/react';
 import { X, Maximize2, Minimize2, Move, RefreshCw, Download } from 'lucide-react';
 import {
     Flex,
-    ScrollArea,
     Text,
     IconButton,
     Tooltip,
-    Button
 } from "@radix-ui/themes"
 import './OutputWindowStyles.css';
 import { useCircuitContext, useHillCoefficientContext, useWindowStateContext } from '../../context';
 import { fetchOutput, formatBackendJson } from '../../utils';
+import CircuitDataType from "../../types/CircuitDataType";
+import WindowSettingsType from "../../types/WindowSettingsType";
 
-export default function OutputWindow({ 
-    onClose, windowSettings, setWindowSettings, outputData 
-}: { 
-    onClose: () => void, 
-    windowSettings: any, 
-    setWindowSettings: any, 
-    outputData: any 
-}) {
-    const [dimensions, setDimensions] = useState({
-        width: windowSettings.width,
-        height: windowSettings.height
-    });
+const OutputWindow = () =>  {
+
+    const {
+        setShowOutputWindow,
+        outputWindowSettings,
+        setOutputWindowSettings,
+
+        outputData,
+    } = useWindowStateContext();
+
     const [isMaximized, setIsMaximized] = useState(false);
     const [preMaximizeSettings, setPreMaximizeSettings] = useState(null);
     const { nodes, edges, proteins } = useCircuitContext();
     const { hillCoefficients } = useHillCoefficientContext();
     const { circuitSettings, setOutputData } = useWindowStateContext();
 
-    useEffect(() => {
-        setDimensions({
-            width: windowSettings.width,
-            height: windowSettings.height
-        });
-    }, [windowSettings.width, windowSettings.height]);
 
     const handleMaximizeToggle = () => {
         if (isMaximized) {
-            setWindowSettings(preMaximizeSettings);
+            setOutputWindowSettings(preMaximizeSettings);
             setIsMaximized(false);
         } else {
-            setPreMaximizeSettings({...windowSettings});
+            setPreMaximizeSettings({...outputWindowSettings});
 
             const maxWidth = window.innerWidth * 0.95;
             const maxHeight = window.innerHeight * 0.9;
             const x = window.innerWidth * 0.025;
             const y = window.innerHeight * 0.05;
 
-            setWindowSettings({
+            setOutputWindowSettings({
                 width: maxWidth,
                 height: maxHeight,
                 x: x,
@@ -63,9 +55,9 @@ export default function OutputWindow({
     };
 
     const handleRerunSimulation = async () => {
-        const circuitJson = formatBackendJson(circuitSettings, nodes, edges, proteins, hillCoefficients);
+        const circuitJson: CircuitDataType = formatBackendJson(circuitSettings, nodes, edges, proteins, hillCoefficients);
         const res = await fetchOutput(circuitJson);
-        if (res.type !== 'data') {
+        if ('type' in res && res.type === 'image') {
             setOutputData(res);
         } else {
             setOutputData(null);
@@ -85,18 +77,18 @@ export default function OutputWindow({
         <ReactFlowPanel>
             <Rnd
                 default={{
-                    x: windowSettings.x,
-                    y: windowSettings.y,
-                    width: windowSettings.width,
-                    height: windowSettings.height,
+                    x: outputWindowSettings.x,
+                    y: outputWindowSettings.y,
+                    width: outputWindowSettings.width,
+                    height: outputWindowSettings.height,
                 }}
                 size={{
-                    width: windowSettings.width,
-                    height: windowSettings.height
+                    width: outputWindowSettings.width,
+                    height: outputWindowSettings.height
                 }}
                 position={{
-                    x: windowSettings.x,
-                    y: windowSettings.y
+                    x: outputWindowSettings.x,
+                    y: outputWindowSettings.y
                 }}
                 minWidth={400}
                 minHeight={300}
@@ -104,7 +96,7 @@ export default function OutputWindow({
                 dragHandleClassName="drag-handle"
                 className="output-overlay"
                 onDragStop={(_, data) => {
-                    setWindowSettings((prev: any) => ({
+                    setOutputWindowSettings((prev: WindowSettingsType) => ({
                         ...prev,
                         x: data.x,
                         y: data.y
@@ -117,11 +109,7 @@ export default function OutputWindow({
                         x: position.x,
                         y: position.y,
                     };
-                    setWindowSettings(newSettings);
-                    setDimensions({
-                        width: ref.offsetWidth,
-                        height: ref.offsetHeight
-                    });
+                    setOutputWindowSettings(newSettings);
                 }}
             >
                 <Flex direction="column" height="100%">
@@ -154,7 +142,7 @@ export default function OutputWindow({
                                     }
                                 </IconButton>
                             </Tooltip>
-                            <IconButton variant="ghost" onClick={onClose}>
+                            <IconButton variant="ghost" onClick={() => setShowOutputWindow(false)}>
                                 <X size={16} strokeWidth={2} />
                             </IconButton>
                             
@@ -183,3 +171,4 @@ export default function OutputWindow({
         </ReactFlowPanel>
     );
 }
+export default OutputWindow;

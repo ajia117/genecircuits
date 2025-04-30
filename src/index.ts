@@ -124,7 +124,7 @@ function sendToPython(message: any): Promise<any> {
     }
     
     // Add request ID to track responses
-    const requestId = Date.now().toString() + Math.random().toString(36).substr(2, 5);
+    const requestId = Date.now().toString() + Math.random().toString(36).substring(2, 5);
     message.requestId = requestId;
     
     // Store callback in pending requests
