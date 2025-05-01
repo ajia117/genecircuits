@@ -38,16 +38,16 @@ const OutputWindow = () =>  {
         } else {
             setPreMaximizeSettings({...outputWindowSettings});
 
-            const maxWidth = window.innerWidth * 0.95;
-            const maxHeight = window.innerHeight * 0.9;
+            const maxWidth = window.innerWidth * 0.722;
+            const maxHeight = window.innerHeight * 0.78;
             const x = window.innerWidth * 0.025;
             const y = window.innerHeight * 0.05;
 
             setOutputWindowSettings({
                 width: maxWidth,
                 height: maxHeight,
-                x: x,
-                y: y
+                x: x > 0 ? x : 0,
+                y: y > 0 ? y : 0
             });
 
             setIsMaximized(true);
@@ -98,8 +98,8 @@ const OutputWindow = () =>  {
                 onDragStop={(_, data) => {
                     setOutputWindowSettings((prev: WindowSettingsType) => ({
                         ...prev,
-                        x: data.x,
-                        y: data.y
+                        x: data.x > 0 ? data.x : 0,
+                        y: data.y > 0 ? data.y : 0
                     }));
                 }}
                 onResize={(_, __, ref, ___, position) => {
@@ -161,9 +161,9 @@ const OutputWindow = () =>  {
                     </Flex>
                 ) : (
                     <Flex direction="column" justify="center" align="center" p="4" className="content-area" height="100%">
-                        <Text style={{ color: 'var(--gray-a9)', textAlign: 'center', fontSize: '13px' }}>
+                        <div className={'no-data-message'}>
                             No simulation output available. Run a simulation to see results here.
-                        </Text>
+                        </div>
                     </Flex>
                 )}
                 </Flex>

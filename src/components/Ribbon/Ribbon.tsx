@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useCircuitContext, useHillCoefficientContext, useWindowStateContext } from '../../context';
 import { fetchOutput, formatBackendJson, formatCircuitExportJson } from "../../utils"
+import { saveCircuitAsImage } from "./SaveImage"; // Import our new function
 import {
     Play,
     Save,
@@ -28,7 +29,7 @@ import {
     AlertDialog
 } from "@radix-ui/themes";
 import { ImportWindow } from "../../components";
-import { toPng, toJpeg } from 'html-to-image';
+import { useAlert } from "../Alerts/AlertProvider";
 
 const TopRibbon: React.FC = () => {
     const {
@@ -43,12 +44,14 @@ const TopRibbon: React.FC = () => {
         setOutputData,
         showHillCoeffMatrix, setShowHillCoeffMatrix
     } = useWindowStateContext();
+    const { showAlert } = useAlert();
 
     const [showClearConfirmation, setShowClearConfirmation] = useState(false); // Track whether clear confirmation window is open or not
     const [isRunning, setIsRunning] = useState(false) // Track if simulation is running or not
     const [showSettingsWindow, setShowSettingsWindow] = useState(false); // Track whether settings window is open or not
     const [showImportWindow, setShowImportWindow] = useState(false); // Track whether import window is open or not
-    
+    const [open, setOpen] = useState(false);
+
     // Handler called when user confirms clearing the screen
     const confirmClear = () => {
         setNodes([])
@@ -57,7 +60,7 @@ const TopRibbon: React.FC = () => {
     };
 
     // Handler for when user clicks the run simulation button
-    const handlePlayClick = async () => {        
+    const handlePlayClick = async () => {
         const circuitJson = formatBackendJson(circuitSettings, nodes, edges, proteins, hillCoefficients);
         setIsRunning(true);
         try {
@@ -79,35 +82,25 @@ const TopRibbon: React.FC = () => {
     // Exports the circuit displayed on the screen
     const handleExport = async (e: React.MouseEvent<HTMLDivElement>, type: string) => {
         e.preventDefault();
-        if(nodes.length === 0 && edges.length === 0) { alert("Nothing to export."); return; }
-        if (type === "png" || type === "jpeg") {
-            const circuit = document.querySelector('.flow-wrapper') as HTMLElement;
-            if (!circuit) {
-                alert('Could not find the circuit area to export.');
-                return;
-            }
-            try {
-                let dataUrl;
-                if (type === 'png') {
-                    dataUrl = await toPng(circuit, { cacheBust: true });
-                } else {
-                    dataUrl = await toJpeg(circuit, { quality: 0.95, cacheBust: true });
-                }
-                const a = document.createElement('a');
-                a.href = dataUrl;
-                a.download = `${circuitSettings.projectName || 'circuit'}.${type}`;
-                a.click();
-            } catch (err) {
-                alert('Failed to export image.');
-            }
+        setOpen(false);
+        if(nodes.length === 0 && edges.length === 0) {
+            showAlert("Nothing to export.");
+            return;
+        }
+
+        try {
+            await saveCircuitAsImage(type as 'png' | 'jpeg', circuitSettings);
+        } catch (error) {
+            console.error("Export error:", error);
+            showAlert(error instanceof Error ? error.message : 'Failed to export image.');
         }
     }
 
     const handleSaveProject = () => {
         if(nodes.length === 0 && edges.length === 0) { alert("Nothing to save."); return; }
-            const circuitJson = formatCircuitExportJson(circuitSettings, nodes, edges, proteins);
-            const blob = new Blob([JSON.stringify(circuitJson, null, 2)], {
-                type: "application/json",
+        const circuitJson = formatCircuitExportJson(circuitSettings, nodes, edges, proteins);
+        const blob = new Blob([JSON.stringify(circuitJson, null, 2)], {
+            type: "application/json",
         });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
@@ -128,46 +121,46 @@ const TopRibbon: React.FC = () => {
                     </Text>
 
                     <Flex gap="2" align="center">
-                    <Tooltip content="Open File">
-                        <IconButton variant="outline" size="3" color="gray" onClick={() => setShowImportWindow(true)}>
-                        <FolderOpen size={20} />
-                        </IconButton>
-                    </Tooltip>
-
-                    <Tooltip content="Save Project">
-                        <IconButton variant="outline" size="3" color="gray" onClick={() => {handleSaveProject()}}>
-                        <Save size={20} />
-                        </IconButton>
-                    </Tooltip>
-
-                    <DropdownMenu.Root>
-                        <Tooltip content="Export Circuit">
-                            <DropdownMenu.Trigger>
-                            <IconButton variant="outline" size="3" color="gray">
-                                <Download size={20} />
+                        <Tooltip content="Open File">
+                            <IconButton variant="outline" size="3" color="gray" onClick={() => setShowImportWindow(true)}>
+                                <FolderOpen size={20} />
                             </IconButton>
-                            </DropdownMenu.Trigger>
                         </Tooltip>
-                        <DropdownMenu.Content align="end">
-                            <DropdownMenu.Item onClick={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleExport(e, 'png')}>Export as PNG</DropdownMenu.Item>
-                            <DropdownMenu.Item onClick={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleExport(e, 'jpeg')}>Export as JPEG</DropdownMenu.Item>
-                        </DropdownMenu.Content>
-                    </DropdownMenu.Root>
+
+                        <Tooltip content="Save Project">
+                            <IconButton variant="outline" size="3" color="gray" onClick={() => {handleSaveProject()}}>
+                                <Save size={20} />
+                            </IconButton>
+                        </Tooltip>
+
+                        <DropdownMenu.Root open={open}>
+                            <Tooltip content="Export Circuit">
+                                <DropdownMenu.Trigger onClick={() => setOpen(true)}>
+                                    <IconButton variant="outline" size="3" color="gray">
+                                        <Download size={20} />
+                                    </IconButton>
+                                </DropdownMenu.Trigger>
+                            </Tooltip>
+                            <DropdownMenu.Content align="end">
+                                <DropdownMenu.Item onClick={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleExport(e, 'png')}>Export as PNG</DropdownMenu.Item>
+                                <DropdownMenu.Item onClick={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleExport(e, 'jpeg')}>Export as JPEG</DropdownMenu.Item>
+                            </DropdownMenu.Content>
+                        </DropdownMenu.Root>
                     </Flex>
                 </Flex>
 
                 {/* PROJECT NAME FIELD */}
-                <Box maxWidth="400px" flexGrow="1" mx="4">  
+                <Box maxWidth="400px" flexGrow="1" mx="4">
                     <TextField.Root size="2" variant="surface" style={{textAlign: "center"}}
-                        value={circuitSettings.projectName}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCircuitSettings({ ...circuitSettings, projectName: e.target.value })}
+                                    value={circuitSettings.projectName}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCircuitSettings({ ...circuitSettings, projectName: e.target.value })}
                     />
                 </Box>
 
                 <Flex gap="2" align="center">
                     <Tooltip content="Hill Coefficient Matrix">
                         <IconButton variant="outline" size="3" color="gray" onClick={() => setShowHillCoeffMatrix(!showHillCoeffMatrix)}>
-                        <Grid3X3 size={20} />
+                            <Grid3X3 size={20} />
                         </IconButton>
                     </Tooltip>
 
@@ -177,24 +170,24 @@ const TopRibbon: React.FC = () => {
 
                     <Tooltip content={showOutputWindow ? "Close Output" : "Show Output"}>
                         <IconButton variant="outline" size="3" color="gray" onClick={() => setShowOutputWindow(!showOutputWindow)}>
-                        {showOutputWindow ? <X size={20} /> : <AreaChart size={20} />}
+                            {showOutputWindow ? <X size={20} /> : <AreaChart size={20} />}
                         </IconButton>
                     </Tooltip>
 
                     <Tooltip content="Clear Canvas">
                         <IconButton variant="outline" size="3" color="gray" onClick={() => setShowClearConfirmation(true)}>
-                        <Trash2 size={20} />
+                            <Trash2 size={20} />
                         </IconButton>
                     </Tooltip>
 
                     <Tooltip content="Settings">
                         <IconButton variant="outline" size="3" color="gray" onClick={() => setShowSettingsWindow(!showSettingsWindow)}>
-                        <Settings size={20} />
+                            <Settings size={20} />
                         </IconButton>
                     </Tooltip>
                 </Flex>
             </Flex>
-            
+
 
             {/* IMPORT WINDOW */}
             <ImportWindow open={showImportWindow} onOpenChange={setShowImportWindow} />
@@ -207,7 +200,7 @@ const TopRibbon: React.FC = () => {
                         <AlertDialog.Description mb="4">
                             This action cannot be undone. All unsaved changes will be lost.
                         </AlertDialog.Description>
-                    
+
                         <Flex direction="row" justify="center" gap="3" mt="3">
                             <AlertDialog.Action>
                                 <Button color="red" size="3" onClick={confirmClear}>Clear</Button>
@@ -229,7 +222,7 @@ const TopRibbon: React.FC = () => {
                         <Dialog.Close><IconButton variant="ghost" color="gray"><X /></IconButton></Dialog.Close>
                     </Flex>
                     <Dialog.Description mb="3">Make changes to your project settings.</Dialog.Description>
-                
+
                     <Flex direction="column" gap="3" mt="4">
                         <Text as="div" weight="bold">Project Name</Text>
                         <TextField.Root
@@ -238,7 +231,7 @@ const TopRibbon: React.FC = () => {
                             value={circuitSettings.projectName ?? ""}
                             onChange={(e) => setCircuitSettings({ ...circuitSettings, projectName: e.target.value })}
                         />
-                        
+
                         {/* simulation duration */}
                         <Text as="div" weight="bold">Simulation Duration (seconds)</Text>
                         <Flex gap="3" align="center">
@@ -279,15 +272,14 @@ const TopRibbon: React.FC = () => {
                             />
                         </Flex>
                     </Flex>
-                
+
                     <Flex justify="end" mt="5"><Dialog.Close><Button size="3">Close</Button></Dialog.Close></Flex>
                 </Dialog.Content>
             </Dialog.Root>
-            
+
 
         </Theme>
     );
 };
 
 export default TopRibbon;
-

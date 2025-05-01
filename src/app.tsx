@@ -7,19 +7,22 @@ import { Theme } from "@radix-ui/themes";
 import "@radix-ui/themes/styles.css";
 import { CircuitProvider, SelectionStateProvider, WindowStateProvider, HillCoefficientProvider, useCircuitContext } from './context';
 import React from 'react';
+import {AlertProvider} from "./components/Alerts/AlertProvider";
 
 const rootElement = document.getElementById('root');
 
 function ProvidersWrapper({ children }: { children: React.ReactNode }) {
     return (
         <CircuitProvider>
-            <SelectionStateProvider>
-                <WindowStateProvider>
-                    <HillCoefficientProviderWrapper>
-                        {children}
-                    </HillCoefficientProviderWrapper>
-                </WindowStateProvider>
-            </SelectionStateProvider>
+            <AlertProvider>
+                <SelectionStateProvider>
+                    <WindowStateProvider>
+                        <HillCoefficientProviderWrapper>
+                            {children}
+                        </HillCoefficientProviderWrapper>
+                    </WindowStateProvider>
+                </SelectionStateProvider>
+            </AlertProvider>
         </CircuitProvider>
     );
 }
