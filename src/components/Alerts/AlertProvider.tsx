@@ -1,10 +1,6 @@
-import * as AlertDialog from '@radix-ui/react-alert-dialog';
 import React, { useState, useContext, createContext, ReactNode, FC } from 'react';
-import { Rnd } from "react-rnd";
 import './AlertsStyles.css';
-import {Button, Flex, IconButton, Text, Tooltip} from "@radix-ui/themes";
-import {Download, Maximize2, Minimize2, Move, RefreshCw, X} from "lucide-react";
-import WindowSettingsType from "../../types/WindowSettingsType";
+import {TriangleAlert, X} from "lucide-react";
 
 // Define the alert context type
 interface AlertContextType {
@@ -46,7 +42,7 @@ export const AlertProvider: FC<AlertProviderProps> = ({ children }) => {
                             {/* Header */}
                             <div className="alert-header">
                                 <div className="alert-title">
-                                    <Move size={16} strokeWidth={2} color="var(--accent-9)" />
+                                    <TriangleAlert size={16} strokeWidth={2} color="var(--accent-9)" />
                                     <span className="alert-title-text">Alert</span>
                                 </div>
                                 <button
