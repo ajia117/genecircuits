@@ -37,18 +37,18 @@ jobs:
 
       - name: Install Python dependencies
         run: |
-          cd flask-backend
+          cd backend
           pip install -r requirements.txt
           pip install pyinstaller
 
       - name: Build Python backend with PyInstaller
         run: |
-          cd flask-backend
+          cd backend
           pyinstaller app.spec
 
       - name: Verify Python build output
         run: |
-          ls -la flask-backend/dist
+          ls -la backend/dist
         shell: bash
 
       - name: Fix Windows executable path (Windows only)
@@ -60,7 +60,7 @@ jobs:
       - name: Create copy for Windows
         if: matrix.os == 'windows-latest'
         run: |
-          copy flask-backend\dist\app.exe flask-backend\dist\app
+          copy backend\dist\app.exe backend\dist\app
         shell: cmd
 
       - name: Build Electron app

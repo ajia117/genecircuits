@@ -27,7 +27,7 @@ async function startBackend() {
       executablePath += '.exe';
     }
   } else { // development
-    executablePath = path.join(__dirname, '..', '..', 'flask-backend', 'dist', 'app');
+    executablePath = path.join(__dirname, '..', '..', 'backend', 'dist', 'app');
     if (process.platform === 'win32') {
       executablePath += '.exe';
     }

@@ -16,8 +16,8 @@
     "productName": "Genetic Circuit Simulator",
     "extraResources": [
       {
-        "from": "flask-backend/dist/app",
-        "to": "flask-backend"
+        "from": "backend/dist/app",
+        "to": "backend"
       }
     ],
     "files": [

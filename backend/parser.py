@@ -10,7 +10,7 @@ def parse_circuit(json_data):
         if 'nodes' not in json_data or 'edges' not in json_data or 'proteins' not in json_data:
             raise ValueError("JSON must contain 'nodes', 'edges', and 'proteins' fields.")
 
-        with open("flask-backend_parser_log.txt", "w") as log_file:
+        with open("backend_parser_log.txt", "w") as log_file:
             log_file.write("Received json" + "\n")
             log_file.write(json.dumps(json_data, indent=4) + "\n")
 
@@ -171,7 +171,7 @@ def parse_circuit(json_data):
             else:
                 raise ValueError(f"Unknown edge type for gate '{target}': {edge_type}")
         
-        with open("flask-backend/parser_log.txt", "a") as log_file:
+        with open("backend/parser_log.txt", "a") as log_file:
             log_file.write("Output protein list:" + "\n")
             for protein in protein_array:
                 log_file.write(f"Protein ID: {protein.mID}, Name: {protein.mName}, Degradation: {protein.mDegradation}, Beta: {protein.mBeta}, Gates: {[ (g.mType, g.mFirstInput, g.mSecondInput) for g in protein.mGates ]}\n")
