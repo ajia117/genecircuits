@@ -71,7 +71,6 @@ export default function ImportWindow({ open, onOpenChange }: ImportWindowProps) 
         if (e.dataTransfer.files && e.dataTransfer.files[0]) {
             const file = e.dataTransfer.files[0];
             setSelectedFile(file);
-            processFile(file);
         }
     };
 
@@ -148,6 +147,7 @@ export default function ImportWindow({ open, onOpenChange }: ImportWindowProps) 
                         </Box>
                     </Flex>
 
+
                     {/* Import UI */}
                     {showImportUI && (
                         <Flex direction="column" gap="4" style={{ flex: 1 }}>
@@ -158,10 +158,10 @@ export default function ImportWindow({ open, onOpenChange }: ImportWindowProps) 
                                 onDrop={handleDrop}
                                 style={{
                                     border: dragActive
-                                        ? "dashed 2px hsl(160, 100%, 36%)"
-                                        : "dashed 2px hsl(240, 5%, 80%)",
+                                        ? "dashed 1px hsl(160, 100%, 36%)"
+                                        : "dashed 1px hsl(240, 5%, 80%)",
                                     borderRadius: "12px",
-                                    padding: "32px 24px",
+                                    padding: "80px 24px",
                                     marginTop: "16px",
                                     transition: "all 0.2s ease",
                                     backgroundColor: dragActive
