@@ -184,7 +184,7 @@ def parse_circuit(json_data):
 
 #Example usage
 if __name__ == "__main__":
-    with open("test_data/new_format.json") as f:
+    with open("test/parser_test_data/new_format.json") as f:
         data = json.load(f)
 
     proteins = parse_circuit(data)
