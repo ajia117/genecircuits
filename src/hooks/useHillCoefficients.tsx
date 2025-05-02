@@ -4,6 +4,7 @@ import { HillCoefficientData } from '../types';
 export function useHillCoefficients(usedProteins: Set<string>) {
     const [hillCoefficients, setHillCoefficients] = useState<HillCoefficientData[]>([]);
 
+    // Handler to ensure deduplication of ids
     useEffect(() => {
         // Create a new array to hold updated coefficients
         const updated: HillCoefficientData[] = [];
@@ -15,7 +16,6 @@ export function useHillCoefficients(usedProteins: Set<string>) {
             labels.forEach((target) => {
                 const id = `${source}-${target}`;
                 const existingCoeff = hillCoefficients.find(h => h.id === id);
-
                 if (!existingCoeff) {
                     // Create new coefficient with default value
                     updated.push({ id, value: 1 });
@@ -24,9 +24,25 @@ export function useHillCoefficients(usedProteins: Set<string>) {
         });
 
         if (updated.length > 0) {
-            setHillCoefficients(prev => [...prev, ...updated]);
+            setHillCoefficients(prev => {
+                // Use a Map to deduplicate by id
+                const map = new Map<string, HillCoefficientData>();
+                [...prev, ...updated].forEach(h => {
+                    map.set(h.id, h);
+                });
+                return Array.from(map.values());
+            });
+        } else {
+            // Always deduplicate, even if no new updates
+            setHillCoefficients(prev => {
+                const map = new Map<string, HillCoefficientData>();
+                prev.forEach(h => {
+                    map.set(h.id, h);
+                });
+                return Array.from(map.values());
+            });
         }
-    }, [usedProteins, hillCoefficients]);
+    }, [usedProteins]);
 
     const updateCoefficient = (id: string, value: number) => {
         setHillCoefficients(prev =>
