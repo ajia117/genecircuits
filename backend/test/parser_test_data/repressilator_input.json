@@ -1,6 +1,6 @@
 {
     "circuitSettings": {
-        "projectName": "Title",
+        "projectName": "Untitled Project",
         "simulationDuration": 20,
         "numTimePoints": 10
     },
@@ -100,28 +100,12 @@
             "value": 1
         },
         {
-            "id": "Protein 0-Protein 0",
-            "value": 1
-        },
-        {
             "id": "Protein 0-Protein 1",
             "value": 1
         },
         {
             "id": "Protein 1-Protein 0",
             "value": 3
-        },
-        {
-            "id": "Protein 1-Protein 1",
-            "value": 1
-        },
-        {
-            "id": "Protein 0-Protein 1",
-            "value": 1
-        },
-        {
-            "id": "Protein 1-Protein 0",
-            "value": 1
         },
         {
             "id": "Protein 1-Protein 1",
@@ -142,26 +126,6 @@
         {
             "id": "Protein 2-Protein 1",
             "value": 3
-        },
-        {
-            "id": "Protein 2-Protein 2",
-            "value": 1
-        },
-        {
-            "id": "Protein 0-Protein 2",
-            "value": 1
-        },
-        {
-            "id": "Protein 1-Protein 2",
-            "value": 1
-        },
-        {
-            "id": "Protein 2-Protein 0",
-            "value": 1
-        },
-        {
-            "id": "Protein 2-Protein 1",
-            "value": 1
         },
         {
             "id": "Protein 2-Protein 2",
