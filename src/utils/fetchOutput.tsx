@@ -23,6 +23,7 @@ export const fetchOutput = async (circuitJson: CircuitDataType): Promise<FetchOu
     isCancelled = false;
     
     // Call the IPC function exposed by preload.ts
+    console.log("calling runSimulation with circuitJson", circuitJson);
     const response: SimulationResponse = await window.electron.runSimulation(circuitJson);
 
     if (isCancelled) {

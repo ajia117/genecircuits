@@ -31,16 +31,25 @@ export function useCircuitState() {
             nodes
                 .filter((node) => node.type === "custom" && typeof node.data?.label === "string")
                 .map((node) => node.data?.label as string)
+                .filter((label) => label in proteins)
         );
         setUsedProteins(labels);
-    }, [nodes]);
+    }, [nodes, proteins]);
 
     const getProteinData = useCallback((label: string) => proteins[label] ?? null, [proteins]);
-    const setProteinData = useCallback((label: string, data: ProteinData) => {
-        setProteins((prev) => ({
-            ...prev,
-            [label]: data,
-        }));
+    const setProteinData = useCallback((label: string, data: ProteinData | undefined) => {
+        setProteins((prev) => {
+            if (data === undefined) {
+                // Remove the protein from the object
+                const { [label]: _, ...rest } = prev;
+                return rest;
+            } else {
+                return {
+                    ...prev,
+                    [label]: data,
+                };
+            }
+        });
     }, []);
 
     return {
