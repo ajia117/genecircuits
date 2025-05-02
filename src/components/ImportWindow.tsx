@@ -1,43 +1,35 @@
 import {
     Dialog,
     Flex,
-    Tabs,
     Box,
     Text,
     Button,
-    Card,
     ScrollArea,
 } from "@radix-ui/themes";
 import {
     Upload,
     Import,
     FolderOpen,
-    FileJson,
-    AlertCircle
+    AlertCircle,
+    X
 } from "lucide-react";
 import React, { useState } from "react";
 
 interface ImportWindowProps {
-    open: boolean
-    onOpenChange: (open: boolean) => void,
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
 }
 
 export default function ImportWindow({ open, onOpenChange }: ImportWindowProps) {
     const [dragActive, setDragActive] = useState(false);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [showImportUI, setShowImportUI] = useState(false);
 
-    const savedProjects = [
-        // TODO: store
-    ];
-
-    const handleSelectImport = () => {
-        processFile(selectedFile);
-    }
+    const savedProjects: any[] = []; // Replace with actual saved data
 
     const handleCircuitImport = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
-
         setSelectedFile(file);
     };
 
@@ -46,23 +38,13 @@ export default function ImportWindow({ open, onOpenChange }: ImportWindowProps) 
         reader.onload = (event) => {
             try {
                 const result = JSON.parse(event.target?.result as string);
-
                 const { circuitSettings, nodes, edges, proteins } = result;
-
-                // TODO: import validation: make sure files have valid nodes, edges, and protein data. no corrupt files
-                // if (!circuitSettings || !Array.isArray(nodes) || !Array.isArray(edges) || !Array.isArray(proteins)) {
-                //   alert("Invalid circuit file format.");
-                //   return;
-                // }
-
-                // Send parsed values to the global handler
                 window.dispatchEvent(
                     new CustomEvent("circuitImport", {
                         detail: { circuitSettings, nodes, edges, proteins },
                     })
                 );
-
-
+                setSelectedFile(null);
             } catch (err) {
                 console.error("Error parsing file:", err);
                 alert("Failed to parse JSON file.");
@@ -71,22 +53,21 @@ export default function ImportWindow({ open, onOpenChange }: ImportWindowProps) 
         reader.readAsText(file);
     };
 
+    const handleSelectImport = () => {
+        if (selectedFile) processFile(selectedFile);
+        setShowImportUI(false);
+    };
+
     const handleDrag = (e: React.DragEvent) => {
         e.preventDefault();
         e.stopPropagation();
-
-        if (e.type === "dragenter" || e.type === "dragover") {
-            setDragActive(true);
-        } else if (e.type === "dragleave") {
-            setDragActive(false);
-        }
+        setDragActive(e.type === "dragenter" || e.type === "dragover");
     };
 
     const handleDrop = (e: React.DragEvent) => {
         e.preventDefault();
         e.stopPropagation();
         setDragActive(false);
-
         if (e.dataTransfer.files && e.dataTransfer.files[0]) {
             const file = e.dataTransfer.files[0];
             setSelectedFile(file);
@@ -94,90 +75,98 @@ export default function ImportWindow({ open, onOpenChange }: ImportWindowProps) 
         }
     };
 
-    return(
+    return (
         <Dialog.Root open={open} onOpenChange={onOpenChange}>
-            <Dialog.Content maxWidth="800px">
-                <Flex direction="column" mb="4">
+            <Dialog.Content maxWidth="800px" style={{ padding: "2em" }}>
+                <Flex direction="column" mb="6">
                     <Dialog.Title>File Manager</Dialog.Title>
-                    <Dialog.Description>Open existing projects or import a project/circuit (.json file) from your local computer.</Dialog.Description>
+                    <Dialog.Description>
+                        Open an existing project or import one (.json file) from your local computer.
+                    </Dialog.Description>
                 </Flex>
 
-                <Tabs.Root defaultValue="open">
-                    <Tabs.List justify="center"
-                               style={{
-                                   display: 'flex',
-                                   justifyContent: 'center',
-                                   backgroundColor: 'hsl(240, 5%, 96%)',
-                                   borderRadius: '8px',
-                                   padding: '6px',
-                                   gap: '6px'
-                               }}
+                <Flex direction="row" justify="between">
+                    <Text size="4" weight="bold">Recent Projects</Text>
+                    <Button
+                        variant="ghost"
+                        size="3" mr="2"
+                        color={showImportUI ? "red" : undefined}
+                        onClick={() => {
+                            setShowImportUI(!showImportUI);
+                            setSelectedFile(null);
+                        }}
                     >
-                        <Tabs.Trigger value="open"
-                                      style={{
-                                          padding: '8px 16px',
-                                          borderRadius: '6px',
-                                          fontWeight: '500',
-                                          backgroundColor: 'transparent',
-                                          color: 'hsl(240, 5%, 40%)',
-                                          transition: 'all 0.2s ease-in-out'
-                                      }}
+                        {!showImportUI ? (
+                            <>
+                                <FolderOpen size={20} />
+                                <Text size="3" weight="medium">Browse Files</Text>
+                            </>
+                        ) : (
+                            <>
+                                <X size={20} color="red" />
+                                <Text size="3" weight="medium" color="red">Cancel</Text>
+                            </>
+                        )}
+                    </Button>
+                </Flex>
+
+                <Flex
+                    direction={showImportUI ? "row" : "column"}
+                    gap="4"
+                    align={showImportUI ? "start" : "center"}
+                    style={{ width: "100%" }}
+                >
+                    {/* Recent Projects */}
+                    <Flex direction="column" gap="3" justify="start" style={showImportUI ? { flex: 1 } : { width: "100%" }} >
+                        <Box // Recent Projects box border
+                            p="3"
+                            style={{
+                                color: "var(--gray-a9)",
+                                padding: "100px 32px",
+                                textAlign: "center",
+                                border: "1px solid var(--gray-a6)",
+                                borderRadius: "12px",
+                                marginTop: "16px",
+                                fontSize: "13px",
+                                width: "100%",
+                            }}
                         >
-                            <Flex gap="2" align="center">
-                                <FolderOpen size={16} />
-                                Open Project
-                            </Flex>
-                        </Tabs.Trigger>
-                        <Tabs.Trigger value="import">
-                            <Flex gap="2" align="center">
-                                <FileJson size={16} />
-                                Import Project
-                            </Flex>
-                        </Tabs.Trigger>
-                    </Tabs.List>
 
-                    {/* START TABS CONTENT */}
-                    <Box pt="3">
-                        {/* OPEN PROJECT */}
-                        <Tabs.Content value="open">
-                            {savedProjects.length === 0 ? (
-                                <Card style={{
-                                    padding: "32px",
-                                    backgroundColor: "hsl(240, 5%, 96%)",
-                                    textAlign: "center",
-                                    borderRadius: "8px",
-                                    marginTop: "16px"
-                                }}>
-                                    <Flex direction="column" align="center" gap="3">
-                                        <AlertCircle size={32} color="hsl(240, 5%, 60%)" />
-                                        <Text size="3" weight="medium" color="gray">No saved projects found</Text>
-                                        <Text size="2" color="gray">
-                                            Create a new project or import a circuit to get started.
-                                        </Text>
-                                    </Flex>
-                                </Card>
-                            ) : (
-                                <ScrollArea>
-                                    {/* TODO: Project list here */}
-                                </ScrollArea>
-                            )}
-                        </Tabs.Content>
+                        {savedProjects.length === 0 ? (
+                            <Flex direction="column" align="center" gap="3">
+                                <AlertCircle size={32} color="hsl(240, 5%, 60%)" />
+                                <Text size="3" weight="medium" color="gray">No saved projects found</Text>
+                                <Text size="2" color="gray">
+                                    Create a new project or import a circuit to get started.
+                                </Text>
+                            </Flex>
+                        ) : (
+                            <ScrollArea>
+                                {/* TODO: Project list */}
+                            </ScrollArea>
+                        )}
+                        </Box>
+                    </Flex>
 
-                        {/* IMPORT CIRCUIT */}
-                        <Tabs.Content value="import">
+                    {/* Import UI */}
+                    {showImportUI && (
+                        <Flex direction="column" gap="4" style={{ flex: 1 }}>
                             <Box
                                 onDragEnter={handleDrag}
                                 onDragOver={handleDrag}
                                 onDragLeave={handleDrag}
                                 onDrop={handleDrop}
                                 style={{
-                                    border: dragActive ? "dashed 2px hsl(160, 100%, 36%)" : "dashed 2px hsl(240, 5%, 80%)",
+                                    border: dragActive
+                                        ? "dashed 2px hsl(160, 100%, 36%)"
+                                        : "dashed 2px hsl(240, 5%, 80%)",
                                     borderRadius: "12px",
                                     padding: "32px 24px",
                                     marginTop: "16px",
-                                    marginBottom: "24px",
                                     transition: "all 0.2s ease",
-                                    backgroundColor: dragActive ? "hsla(160, 100%, 36%, 0.05)" : "hsl(240, 5%, 98%)"
+                                    backgroundColor: dragActive
+                                        ? "hsla(160, 100%, 36%, 0.05)"
+                                        : "hsl(240, 5%, 98%)"
                                 }}
                             >
                                 <Flex direction="column" align="center" justify="center" gap="3">
@@ -191,7 +180,7 @@ export default function ImportWindow({ open, onOpenChange }: ImportWindowProps) 
                                             justifyContent: "center"
                                         }}
                                     >
-                                        <Upload color={selectedFile ? "hsl(160, 100%, 36%)" : "hsl(240, 5%, 60%)"} width="24px" height="24px" />
+                                        <Upload width="24px" height="24px" color={selectedFile ? "hsl(160, 100%, 36%)" : "hsl(240, 5%, 60%)"} />
                                     </Box>
 
                                     {selectedFile ? (
@@ -200,8 +189,9 @@ export default function ImportWindow({ open, onOpenChange }: ImportWindowProps) 
                                                 {selectedFile.name}
                                             </Text>
                                             <Text size="1" color="gray">
-                                                {selectedFile.size > 100000 ? `${(selectedFile.size / 1024 / 1024).toFixed(2)} MB` :
-                                                                              `${(selectedFile.size / 1024).toFixed(2)} KB`}
+                                                {selectedFile.size > 100000
+                                                    ? `${(selectedFile.size / 1024 / 1024).toFixed(2)} MB`
+                                                    : `${(selectedFile.size / 1024).toFixed(2)} KB`}
                                             </Text>
                                         </Flex>
                                     ) : (
@@ -226,9 +216,7 @@ export default function ImportWindow({ open, onOpenChange }: ImportWindowProps) 
                                                         style={{ display: "none" }}
                                                     />
                                                 </label>
-                                                <Text size="2" color="gray">
-                                                    or drag and drop
-                                                </Text>
+                                                <Text size="2" color="gray">or drag and drop</Text>
                                             </Flex>
                                             <Text size="1" color="gray">Supports .json files up to 10MB</Text>
                                         </Flex>
@@ -236,12 +224,10 @@ export default function ImportWindow({ open, onOpenChange }: ImportWindowProps) 
                                 </Flex>
                             </Box>
 
-                            {/* import button */}
                             <Flex justify="end" mb="2">
                                 <Dialog.Close>
                                     <Button
-                                        variant="solid"
-                                        size="3"
+                                        variant="solid" size="3"
                                         disabled={!selectedFile}
                                         style={{
                                             backgroundColor: selectedFile ? "var(--accent-9)" : "hsl(240, 5%, 90%)",
@@ -255,10 +241,12 @@ export default function ImportWindow({ open, onOpenChange }: ImportWindowProps) 
                                     </Button>
                                 </Dialog.Close>
                             </Flex>
-                        </Tabs.Content>
-                    </Box>
-                </Tabs.Root>
+
+
+                        </Flex>
+                    )}
+                </Flex>
             </Dialog.Content>
         </Dialog.Root>
-    )
+    );
 }
