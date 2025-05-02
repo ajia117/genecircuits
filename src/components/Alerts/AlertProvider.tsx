@@ -1,6 +1,6 @@
 import React, { useState, useContext, createContext, ReactNode, FC } from 'react';
-import './AlertsStyles.css';
-import {TriangleAlert, X} from "lucide-react";
+import { TriangleAlert, X } from "lucide-react";
+import { AlertDialog, Button, Flex, Text } from "@radix-ui/themes";
 
 // Define the alert context type
 interface AlertContextType {
@@ -31,49 +31,24 @@ export const AlertProvider: FC<AlertProviderProps> = ({ children }) => {
     return (
         <AlertContext.Provider value={value}>
             {children}
-            {open && (
-                <>
-                    {/* Overlay */}
-                    <div className="alert-overlay" onClick={() => setOpen(false)} />
-
-                    {/* Alert Container */}
-                    <div className="alert-container">
-                        <div className="alert-content">
-                            {/* Header */}
-                            <div className="alert-header">
-                                <div className="alert-title">
-                                    <TriangleAlert size={16} strokeWidth={2} color="var(--accent-9)" />
-                                    <span className="alert-title-text">Alert</span>
-                                </div>
-                                <button
-                                    className="alert-close-button"
-                                    onClick={() => setOpen(false)}
-                                    aria-label="Close"
-                                >
-                                    <X size={16} strokeWidth={2} />
-                                </button>
-                            </div>
-
-                            {/* Content */}
-                            <div className="alert-body">
-                                <div className="alert-message">
-                                    {message || 'An error occurred'}
-                                </div>
-                            </div>
-
-                            {/* Footer */}
-                            <div className="alert-footer">
-                                <button
-                                    className="alert-ok-button"
-                                    onClick={() => setOpen(false)}
-                                >
-                                    OK
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </>
-            )}
+            <AlertDialog.Root open={open} onOpenChange={setOpen}>
+                <AlertDialog.Content maxWidth="300px">
+                    <Flex direction="column" justify="center" gap="5" my="3">
+                        <Flex direction="row" align="center" justify="center" gap="3">
+                            <TriangleAlert size={24} strokeWidth={2} color="var(--accent-9)" />
+                            <AlertDialog.Title style={{ margin: 0, paddingTop: 5 }}>Alert</AlertDialog.Title>
+                        </Flex>
+                        <Flex direction="column" align="center" gap="5">
+                            <AlertDialog.Description>
+                                <Text>{message || 'An error occurred'}</Text>
+                            </AlertDialog.Description>
+                            <AlertDialog.Action>
+                                <Button variant='solid' style={{ maxWidth: "200px" }}>OK</Button>
+                            </AlertDialog.Action>
+                        </Flex>
+                    </Flex>
+                </AlertDialog.Content>
+            </AlertDialog.Root>
         </AlertContext.Provider>
     );
 };

@@ -133,9 +133,9 @@ const TopRibbon: React.FC = () => {
                             </IconButton>
                         </Tooltip>
 
-                        <DropdownMenu.Root open={open}>
+                        <DropdownMenu.Root open={open} onOpenChange={setOpen}>
                             <Tooltip content="Export Circuit">
-                                <DropdownMenu.Trigger onClick={() => setOpen(true)}>
+                                <DropdownMenu.Trigger>
                                     <IconButton variant="outline" size="3" color="gray">
                                         <Download size={20} />
                                     </IconButton>
