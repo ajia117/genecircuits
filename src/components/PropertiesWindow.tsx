@@ -94,9 +94,19 @@ const PropertiesWindow: React.FC = () => {
     const handleUpdate = () => {
         if (localProteinData) {
             setProteinData(localProteinData.label, localProteinData);
+
+            // Update the nodes array so React Flow re-renders the node with new data
+            setNodes((prevNodes) =>
+                prevNodes.map((node) =>
+                    node.type === "custom" && node.data.label === localProteinData.label
+                        ? { ...node, data: { ...localProteinData } }
+                        : node
+                )
+            );
+
             setShowProteinEditor(false); // exit edit mode after update
         }
-        if(editingProtein) {
+        if(editingProtein) { // if editing protein directly from toolbox, not properties window
             setShowProteinEditor(false);
             setActiveTab('toolbox')
         }
