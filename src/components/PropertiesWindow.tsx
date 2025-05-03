@@ -16,7 +16,7 @@ import {
     Pencil,
     Copy
 } from "lucide-react"
-import { useCircuitContext, useSelectionStateContext, useWindowStateContext } from '../context';
+import { useCircuitContext, useSelectionStateContext, useWindowStateContext } from '../hooks';
 
 const LABEL_MAP: Record<'protein' | 'edge', Record<string, string>> = {
     protein: {

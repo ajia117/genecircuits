@@ -9,7 +9,7 @@ import {
     Tooltip,
 } from "@radix-ui/themes"
 import './OutputWindowStyles.css';
-import { useCircuitContext, useHillCoefficientContext, useWindowStateContext } from '../../context';
+import { useCircuitContext, useHillCoefficientContext, useWindowStateContext } from '../../hooks';
 import { fetchOutput, formatBackendJson } from '../../utils';
 import CircuitDataType from "../../types/CircuitDataType";
 import WindowSettingsType from "../../types/WindowSettingsType";

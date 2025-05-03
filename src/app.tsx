@@ -5,7 +5,7 @@ import { ReactFlowProvider } from "@xyflow/react";
 import { ToolboxProvider } from "./components/Toolbox/ToolboxContext";
 import { Theme } from "@radix-ui/themes";
 import "@radix-ui/themes/styles.css";
-import { CircuitProvider, SelectionStateProvider, WindowStateProvider, HillCoefficientProvider, useCircuitContext } from './context';
+import { CircuitProvider, SelectionStateProvider, WindowStateProvider, HillCoefficientProvider, useCircuitContext } from './hooks';
 import React from 'react';
 import {AlertProvider} from "./components/Alerts/AlertProvider";
 

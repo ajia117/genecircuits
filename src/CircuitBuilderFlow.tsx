@@ -33,7 +33,7 @@ import {
     ScrollArea
 } from '@radix-ui/themes'
 import {ApplyCircuitTemplateProps, CircuitTemplate, AppNode} from "./types";
-import { useCircuitContext, useSelectionStateContext, useHillCoefficientContext, useWindowStateContext } from "./context";
+import { useCircuitContext, useSelectionStateContext, useHillCoefficientContext, useWindowStateContext } from "./hooks";
 
 
 export default function CircuitBuilderFlow() {
@@ -371,7 +371,12 @@ export default function CircuitBuilderFlow() {
                     <Panel className="left-pane min-w-128" defaultSize={30} minSize={23} maxSize={50}>
                         <div className="flex flex-col h-full">
                             {/* Tab Navigation */}
-                            <Tabs.Root defaultValue="toolbox" value={activeTab} onValueChange={setActiveTab} className="h-full">
+                            <Tabs.Root
+                                defaultValue="toolbox"
+                                value={activeTab}
+                                onValueChange={setActiveTab as (value: string) => void}
+                                className="h-full"
+                            >
                                 <Tabs.List>
                                     <Tabs.Trigger value="toolbox">Toolbox</Tabs.Trigger>
                                     <Tabs.Trigger value="properties">Properties</Tabs.Trigger>
