@@ -253,7 +253,7 @@ export default function CircuitBuilderFlow() {
         labels.forEach((source) => {
             labels.forEach((target) => {
             const id = `${source}-${target}`;
-            const alreadyExists = hillCoefficients.some(h => h.id === id);
+            const alreadyExists = hillCoefficients.some((h: HillCoefficientData) => h.id === id);
             if (!alreadyExists) {
                 updated.push({ id, value: 1 }); // default value
             }
