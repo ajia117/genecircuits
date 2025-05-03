@@ -14,6 +14,8 @@ import {
     X
 } from "lucide-react";
 import React, { useState } from "react";
+import { validateProjectJson } from "../utils";
+import { useAlert } from "../components/Alerts/AlertProvider";
 
 interface ImportWindowProps {
     open: boolean;
@@ -24,6 +26,7 @@ export default function ImportWindow({ open, onOpenChange }: ImportWindowProps) 
     const [dragActive, setDragActive] = useState(false);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [showImportUI, setShowImportUI] = useState(false);
+    const { showAlert } = useAlert();
 
     const savedProjects: any[] = []; // Replace with actual saved data
 
@@ -37,17 +40,23 @@ export default function ImportWindow({ open, onOpenChange }: ImportWindowProps) 
         const reader = new FileReader();
         reader.onload = (event) => {
             try {
-                const result = JSON.parse(event.target?.result as string);
-                const { circuitSettings, nodes, edges, proteins } = result;
-                window.dispatchEvent(
-                    new CustomEvent("circuitImport", {
-                        detail: { circuitSettings, nodes, edges, proteins },
-                    })
-                );
-                setSelectedFile(null);
+            const result = JSON.parse(event.target?.result as string);
+            const errorMessage = validateProjectJson(result);
+            if (errorMessage) {
+                showAlert(errorMessage);
+                return;
+            }
+        
+            const { circuitSettings, nodes, edges, proteins, hillCoefficients } = result;
+            window.dispatchEvent(
+                new CustomEvent("circuitImport", {
+                detail: { circuitSettings, nodes, edges, proteins, hillCoefficients }
+                })
+            );
+            setSelectedFile(null);
             } catch (err) {
-                console.error("Error parsing file:", err);
-                alert("Failed to parse JSON file.");
+            console.error("Error parsing file:", err);
+            showAlert("Failed to parse JSON file.");
             }
         };
         reader.readAsText(file);
@@ -250,3 +259,4 @@ export default function ImportWindow({ open, onOpenChange }: ImportWindowProps) 
         </Dialog.Root>
     );
 }
+
