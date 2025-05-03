@@ -30,6 +30,7 @@ import {
 } from "@radix-ui/themes";
 import { ImportWindow } from "../../components";
 import { useAlert } from "../Alerts/AlertProvider";
+import { ProjectDataType } from "../../types";
 
 const TopRibbon: React.FC = () => {
     const {
@@ -98,7 +99,7 @@ const TopRibbon: React.FC = () => {
 
     const handleSaveProject = () => {
         if(nodes.length === 0 && edges.length === 0) { alert("Nothing to save."); return; }
-        const circuitJson = formatCircuitExportJson(circuitSettings, nodes, edges, proteins);
+        const circuitJson: ProjectDataType = formatCircuitExportJson(circuitSettings, nodes, edges, proteins, hillCoefficients);
         const blob = new Blob([JSON.stringify(circuitJson, null, 2)], {
             type: "application/json",
         });

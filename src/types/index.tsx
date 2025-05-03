@@ -7,3 +7,4 @@ export { default as EdgeData } from './EdgeData';
 export type GateNodeData = null;
 export type AppNodeData = import('./ProteinData').default | GateNodeData;
 export type AppNode = Node<AppNodeData>;
+export { default as ProjectDataType } from './ProjectDataType';
