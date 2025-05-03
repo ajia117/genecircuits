@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { useCircuitContext, useSelectionStateContext, useWindowStateContext } from '../../hooks';
+import { useCircuitContext, useSelectionStateContext, useWindowStateContext, useHillCoefficientContext } from '../../hooks';
 import { ProteinData } from "../../types";
 import '../../index.css';
 import CreateProteinWindow from '../CreateProteinWindow';
@@ -26,6 +26,7 @@ export const Toolbox: React.FC = () => {
     const { proteins, setProteinData, setNodes } = useCircuitContext();
     const { setEditingProtein } = useSelectionStateContext();
     const { setActiveTab } = useWindowStateContext();
+    const { setHillCoefficients, hillCoefficients } = useHillCoefficientContext();
 
     const [searchTerm, setSearchTerm] = useState(''); // Stores user input from the protein search bar
     const [showCreateProteinWindow, setShowCreateProteinWindow] = useState(false);
@@ -64,6 +65,8 @@ export const Toolbox: React.FC = () => {
         setProteinData(label, undefined);
         // Remove nodes with this protein label
         setNodes((prevNodes) => prevNodes.filter(node => !(node.data && typeof node.data === 'object' && 'label' in node.data && node.data.label === label)));
+        // Remove all hill coefficients involving this protein
+        setHillCoefficients((prev) => prev.filter(h => !h.id.startsWith(label + '-') && !h.id.endsWith('-' + label)));
     };
 
     return (
