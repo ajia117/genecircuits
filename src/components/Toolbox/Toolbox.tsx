@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { useCircuitContext, useSelectionStateContext, useWindowStateContext } from '../../context';
+import { useCircuitContext, useSelectionStateContext, useWindowStateContext } from '../../hooks';
 import { ProteinData } from "../../types";
 import '../../index.css';
 import CreateProteinWindow from '../CreateProteinWindow';

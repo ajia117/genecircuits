@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useCircuitContext, useHillCoefficientContext, useWindowStateContext } from '../../context';
+import { useCircuitContext, useHillCoefficientContext, useWindowStateContext } from '../../hooks';
 import { fetchOutput, formatBackendJson, formatCircuitExportJson } from "../../utils"
 import { saveCircuitAsImage } from "./SaveImage"; // Import our new function
 import {
