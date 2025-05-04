@@ -59,7 +59,7 @@ This parser converts a JSON circuit passed from the frontend into an array of `P
 
 ## 🛠️ Debugging Tips
 
-* ✅ Unit tests are located in the `/test` directory.
+* ✅ Unit tests are located in the `/test` directory. Run with `pytest filename.py`.
 * 📄 Logs of parsed JSON and resulting protein arrays are written to `backend_parser_log.txt`.
 
 ---
