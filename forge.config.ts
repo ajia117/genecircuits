@@ -18,14 +18,26 @@ const config: ForgeConfig = {
     // Add extraResource to include PyInstaller executable
     extraResource: [
       path.join(__dirname, 'backend', 'dist', 'app')
-    ]
+    ],
+    icon: './icons/icon',
+    executableName: 'genetic-circuit-simulator'
   },
   rebuildConfig: {},
   makers: [
-    new MakerSquirrel({}),
+      new MakerSquirrel({
+        setupIcon: './icons/icon.ico',
+      }),
     new MakerZIP({}, ['darwin']),
-    new MakerRpm({}),
-    new MakerDeb({})
+    new MakerRpm({
+      options: {
+        icon: './icons/icon.png'
+      }
+    }),
+    new MakerDeb({
+      options: {
+        icon: './icons/icon.png'
+      }
+    }),
   ],
   plugins: [
     new AutoUnpackNativesPlugin({}),

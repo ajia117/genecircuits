@@ -142,7 +142,7 @@ const TopRibbon: React.FC = () => {
                 <Flex gap="3" align="center">
                     <Dna color="var(--accent-9)" />
                     <Text weight="bold" size="3">
-                        Genetic Circuits Builder
+                        Genetic Circuits Simulator
                     </Text>
 
                     <Flex gap="2" align="center">

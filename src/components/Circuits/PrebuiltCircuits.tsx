@@ -1,6 +1,5 @@
 import React from 'react';
-import { Node, Edge } from '@xyflow/react';
-import { ProteinData } from '../../types';
+import {CircuitTemplate} from '../../types';
 import {
     Box,
     Text,
@@ -15,23 +14,10 @@ import {
 } from 'lucide-react';
 import { prebuiltCircuitTemplates } from './prebuiltCircuitTemplates';
 
-
-// Define interface for a circuit template
-interface CircuitTemplate {
-    id: string;
-    name: string;
-    description: string;
-    nodes: Node[];
-    edges: Edge[];
-    proteins: {[label: string]: ProteinData};
-}
-
 // Props for the PrebuiltCircuits component
 interface PrebuiltCircuitsProps {
     applyCircuitTemplate: (template: CircuitTemplate) => void;
 }
-
-
 
 const PrebuiltCircuits: React.FC<PrebuiltCircuitsProps> = ({ applyCircuitTemplate }) => {
     return (
@@ -72,7 +58,10 @@ const PrebuiltCircuits: React.FC<PrebuiltCircuitsProps> = ({ applyCircuitTemplat
                             <Tooltip content="Add to workspace">
                                 <Button
                                     variant="soft"
-                                    onClick={() => applyCircuitTemplate(template)}
+                                    onClick={() => {
+                                        console.log(template.hillCoefficients)
+                                        applyCircuitTemplate(template)
+                                    }}
                                 >
                                     <Plus size={16} />
                                     Add

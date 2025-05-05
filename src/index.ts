@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, globalShortcut } from 'electron';
 import * as path from 'path';
 import { spawn, ChildProcess } from 'child_process';
 
@@ -172,7 +172,9 @@ const createWindow = (): void => {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
       contextIsolation: true,
       nodeIntegration: false,
-      devTools: !app.isPackaged
+      devTools: !app.isPackaged,
+      spellcheck: false,
+
     },
     autoHideMenuBar: true
   });
@@ -201,6 +203,25 @@ app.on('ready', async () => {
     console.error('Python backend failed to start');
     const win = BrowserWindow.getAllWindows()[0];
     win?.webContents.send('backend-ready', false);
+  }
+});
+
+// Disable reloading of window with Ctrl + R when packaged
+app.on('browser-window-focus', function () {
+  if(app.isPackaged) {
+    globalShortcut.register("CommandOrControl+R", () => {
+      console.log("CommandOrControl+R is pressed: Shortcut Disabled");
+    });
+    globalShortcut.register("F5", () => {
+      console.log("F5 is pressed: Shortcut Disabled");
+    });
+
+  }
+});
+app.on('browser-window-blur', function () {
+  if(app.isPackaged) {
+    globalShortcut.unregister('CommandOrControl+R');
+    globalShortcut.unregister('F5');
   }
 });
 

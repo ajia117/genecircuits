@@ -28,7 +28,7 @@
       "output": "dist"
     },
     "mac": {
-      "category": "TODO:change this your.app.category"
+      "category": "TODO:change this x.app.category"
     },
     "win": {
       "target": [
@@ -63,7 +63,7 @@
     "@vercel/webpack-asset-relocator-loader": "^1.7.3",
     "concurrently": "^9.1.2",
     "css-loader": "^6.11.0",
-    "electron": "34.0.2",
+    "electron": "^34.0.2",
     "eslint": "^8.57.1",
     "eslint-plugin-import": "^2.31.0",
     "fork-ts-checker-webpack-plugin": "^7.3.0",
@@ -92,6 +92,7 @@
     "react-dom": "^18.0.0",
     "react-resizable-panels": "^2.1.7",
     "react-rnd": "^10.5.2",
-    "react-select": "^5.10.1"
+    "react-select": "^5.10.1",
+    "rpmbuild": "^0.0.23"
   }
 }

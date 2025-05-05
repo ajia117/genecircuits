@@ -34,6 +34,7 @@ import {
 } from '@radix-ui/themes'
 import {ApplyCircuitTemplateProps, CircuitTemplate, AppNode} from "./types";
 import { useCircuitContext, useSelectionStateContext, useHillCoefficientContext, useWindowStateContext } from "./hooks";
+import hillCoefficientType from "./types/HillCoefficientType";
 
 
 export default function CircuitBuilderFlow() {
@@ -272,7 +273,8 @@ export default function CircuitBuilderFlow() {
         gateIdRef,
         setNodes,
         setEdges,
-        setProteins
+        setProteins,
+        setHillCoefficients
     }: ApplyCircuitTemplateProps): void => {
         // Track original ID to new ID mapping
         const idMap: {[originalId: string]: string} = {};
@@ -313,6 +315,7 @@ export default function CircuitBuilderFlow() {
             };
         });
 
+
         // Add the new proteins
         const mergedProteins: {[label: string]: ProteinData} = {...proteins};
 
@@ -325,6 +328,7 @@ export default function CircuitBuilderFlow() {
         setNodes((prevNodes: AppNode[]) => [...prevNodes, ...newNodes]);
         setEdges((prevEdges: Edge[]) => [...prevEdges, ...newEdges]);
         setProteins(() => mergedProteins);
+        setHillCoefficients((prevCoeffs: hillCoefficientType[]) => [...prevCoeffs, ...template.hillCoefficients]);
     };
 
     const handleApplyCircuitTemplate = useCallback((template: CircuitTemplate): void => {
@@ -337,6 +341,7 @@ export default function CircuitBuilderFlow() {
             setNodes,
             setEdges,
             setProteins,
+            setHillCoefficients
         });
     }, [nodes, edges, proteins, nodeIdRef, gateIdRef, setNodes, setEdges, setProteins]);
 
