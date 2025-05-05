@@ -19,7 +19,7 @@ const config: ForgeConfig = {
     extraResource: [
       path.join(__dirname, 'backend', 'dist', 'app')
     ],
-    icon: './icons/icon',
+    icon: './icons/icon.ico',
     executableName: 'genetic-circuit-simulator'
   },
   rebuildConfig: {},
@@ -61,7 +61,7 @@ const config: ForgeConfig = {
   ],
 };
 if (process.env.NODE_ENV !== 'development') {
-  config.plugins.push(
+  config.plugins!.push(
       new FusesPlugin({
         version: FuseVersion.V1,
         [FuseV1Options.RunAsNode]: false,
