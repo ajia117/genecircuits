@@ -6,7 +6,7 @@ import { ToolboxProvider } from "./context";
 import { Theme } from "@radix-ui/themes";
 import "@radix-ui/themes/styles.css";
 import { CircuitProvider, SelectionStateProvider, WindowStateProvider, HillCoefficientProvider, useCircuitContext } from './hooks';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {AlertProvider} from "./components/Alerts/AlertProvider";
 
 const rootElement = document.getElementById('root');
@@ -32,6 +32,35 @@ function HillCoefficientProviderWrapper({ children }: { children: React.ReactNod
     return <HillCoefficientProvider usedProteins={usedProteins}>{children}</HillCoefficientProvider>;
 }
 
+function LoadingScreen() {
+    return (
+        <div style={{ padding: '2rem', textAlign: 'center' }}>
+            <h2>Starting backend...</h2>
+            <p>Please wait while the simulator initializes.</p>
+        </div>
+    );
+}
+
+function AppContent() {
+    const [backendReady, setBackendReady] = useState<boolean | null>(null);
+
+    useEffect(() => {
+        window.electron.onBackendReady((ready: boolean) => {
+            setBackendReady(ready);
+        });
+
+        return () => {
+            // Cannot removeListener since preload only gave us onBackendReady as a wrapper
+        };
+    }, []);
+
+    if (backendReady === null) return <LoadingScreen />;
+    if (!backendReady) return <div>Error starting backend server</div>;
+
+    return <CircuitBuilderFlow />;
+}
+
+
 if (rootElement) {
     const root = createRoot(rootElement);
     root.render(
@@ -39,8 +68,9 @@ if (rootElement) {
             <ToolboxProvider>
                 <Theme appearance='light' accentColor='jade' radius='large' scaling='95%'>
                     <ProvidersWrapper>
-                        <CircuitBuilderFlow />
+                        {/* <CircuitBuilderFlow /> */}
                         {/* <ThemePanel /> */}
+                        <AppContent />
                     </ProvidersWrapper>
                 </Theme>
             </ToolboxProvider>

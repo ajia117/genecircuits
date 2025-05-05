@@ -65,8 +65,10 @@ async function startBackend() {
   try {
     const pingResult = await sendToPython({ command: 'ping' });
     console.log('Python IPC connection established:', pingResult);
+    return true;
   } catch (error) {
     console.error('Failed to establish Python IPC connection:', error);
+    return false;
   }
 }
 
@@ -162,7 +164,7 @@ function setupIPC() {
 }
 
 const createWindow = (): void => {
-  // Create the browser window.
+  console.log('Creating window');
   const mainWindow = new BrowserWindow({
     height: 600,
     width: 1000,
@@ -174,8 +176,6 @@ const createWindow = (): void => {
     },
     autoHideMenuBar: true
   });
-
-  // and load the index.html of the app.
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 };
 
@@ -184,17 +184,31 @@ const createWindow = (): void => {
 // Some APIs can only be used after this event occurs.
 app.on('ready', async () => {
   setupIPC();
-  await startBackend();
-  createWindow();
+  const backendStarted = await startBackend();
+
+  const allWindows = BrowserWindow.getAllWindows();
+  if (allWindows.length === 0) {
+    createWindow();
+  }
+
+  if (backendStarted !== false) {
+    // Let renderer know backend is ready
+    setTimeout(() => {
+      const win = BrowserWindow.getAllWindows()[0];
+      win?.webContents.send('backend-ready', true);
+    }, 100); // slight delay ensures renderer is listening
+  } else {
+    console.error('Python backend failed to start');
+    const win = BrowserWindow.getAllWindows()[0];
+    win?.webContents.send('backend-ready', false);
+  }
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
+  app.quit();
   if (pythonProcess) {
     pythonProcess.kill();
   }

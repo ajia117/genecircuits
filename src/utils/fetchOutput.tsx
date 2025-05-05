@@ -3,14 +3,6 @@ import CircuitDataType from "../types/CircuitDataType";
 import SimulationResponse, {SimulationErrorResponse} from "../types/SimulationResponse";
 import { FetchOutputResult } from "../types/FetchOutputReturnType";
 
-declare global {
-  interface Window {
-    electron: {
-      runSimulation: (circuitData: CircuitDataType) => Promise<SimulationResponse>;
-    };
-  }
-}
-
 let isCancelled = false;
 function isErrorResponse(response: SimulationResponse): response is SimulationErrorResponse {
   return response.success === false;
