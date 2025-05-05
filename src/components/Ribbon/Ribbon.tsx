@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useCircuitContext, useHillCoefficientContext, useWindowStateContext } from '../../hooks';
-import { fetchOutput, formatBackendJson, formatCircuitExportJson } from "../../utils"
+import { fetchOutput, formatBackendJson, formatCircuitExportJson, abortFetch } from "../../utils"
 import { saveCircuitAsImage } from "./SaveImage"; // Import our new function
 import {
     Play,
@@ -52,6 +52,7 @@ const TopRibbon: React.FC = () => {
     const [showSettingsWindow, setShowSettingsWindow] = useState(false); // Track whether settings window is open or not
     const [showImportWindow, setShowImportWindow] = useState(false); // Track whether import window is open or not
     const [open, setOpen] = useState(false);
+    const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
 
     // Handler called when user confirms clearing the screen
     const confirmClear = () => {
@@ -62,20 +63,43 @@ const TopRibbon: React.FC = () => {
 
     // Handler for when user clicks the run simulation button
     const handlePlayClick = async () => {
+        if (isRunning) {
+            // Abort the running simulation
+            abortFetch();
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+                setTimeoutId(null);
+            }
+            setIsRunning(false);
+            return;
+        }
         const circuitJson = formatBackendJson(circuitSettings, nodes, edges, proteins, hillCoefficients);
         setIsRunning(true);
+        // Set a timeout (e.g., 30 seconds)
+        const tId = setTimeout(() => {
+            abortFetch();
+            setIsRunning(false);
+        }, 30000);
+        setTimeoutId(tId);
         try {
             const res = await fetchOutput(circuitJson);
-            if('type' in res && res.type === 'image') {
+            if ('type' in res && res.type === 'image') {
                 setOutputData(res);
-            }
-            else {
+            } else {
                 setOutputData(null);
             }
             setShowOutputWindow(true);
         } catch (error) {
-            console.error("Error fetching output:", error);
+            if (error.name === 'AbortError') {
+                console.error("Fetch aborted");
+            } else {
+                console.error("Error fetching output:", error);
+            }
         } finally {
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+                setTimeoutId(null);
+            }
             setIsRunning(false);
         }
     };
@@ -165,8 +189,14 @@ const TopRibbon: React.FC = () => {
                         </IconButton>
                     </Tooltip>
 
-                    <Button variant="solid" size="3" onClick={handlePlayClick} disabled={isRunning}>
-                        <Play size={20} /> Run Simulation
+                    <Button
+                        variant="solid"
+                        size="3"
+                        onClick={handlePlayClick}
+                        disabled={false}
+                        style={isRunning ? { backgroundColor: '#e74c3c', borderColor: '#e74c3c' } : {}}
+                    >
+                        {isRunning ? (<><X size={20} /> Stop</>) : (<><Play size={20} /> Run Simulation</>)}
                     </Button>
 
                     <Tooltip content={showOutputWindow ? "Close Output" : "Show Output"}>
