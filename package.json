@@ -1,8 +1,8 @@
 {
-  "name": "electron-react-flask-app",
-  "productName": "electron-react-flask-app",
+  "name": "genetic-circuit-simulator",
+  "productName": "Genetic Circuit Simulator",
   "version": "1.0.0",
-  "description": "My Electron application description",
+  "description": "Build and simulate biological genetic circuits.",
   "main": ".webpack/main",
   "scripts": {
     "start": "electron-forge start",
@@ -86,7 +86,6 @@
     "dom-to-image": "^2.6.0",
     "electron-forge-maker-appimage": "^25.1.8",
     "electron-squirrel-startup": "^1.0.1",
-    "html-to-image": "^1.11.11",
     "jsonschema": "^1.5.0",
     "lucide-react": "^0.475.0",
     "react": "^18.0.0",
