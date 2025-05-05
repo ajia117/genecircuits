@@ -8,6 +8,7 @@ import "@radix-ui/themes/styles.css";
 import { CircuitProvider, SelectionStateProvider, WindowStateProvider, HillCoefficientProvider, useCircuitContext } from './hooks';
 import React, { useEffect, useState } from 'react';
 import {AlertProvider} from "./components/Alerts/AlertProvider";
+import LoadingScreen from './LoadingScreen';
 
 const rootElement = document.getElementById('root');
 
@@ -32,19 +33,15 @@ function HillCoefficientProviderWrapper({ children }: { children: React.ReactNod
     return <HillCoefficientProvider usedProteins={usedProteins}>{children}</HillCoefficientProvider>;
 }
 
-function LoadingScreen() {
-    return (
-        <div style={{ padding: '2rem', textAlign: 'center' }}>
-            <h2>Starting backend...</h2>
-            <p>Please wait while the simulator initializes.</p>
-        </div>
-    );
-}
-
 function AppContent() {
     const [backendReady, setBackendReady] = useState<boolean | null>(null);
 
     useEffect(() => {
+        window.electron.getBackendStatus().then((status: boolean) => {
+            if (status) {
+                setBackendReady(true);
+            }
+        });
         window.electron.onBackendReady((ready: boolean) => {
             setBackendReady(ready);
         });

@@ -17,6 +17,7 @@ let pythonProcess: ChildProcess | null = null;
 const pendingRequests: Map<string, { resolve: (value: any) => void, reject: (reason: any) => void }> = new Map();
 let messageBuffer: Buffer = Buffer.alloc(0);
 let expectedLength: number | null = null;
+let backendRunning = false;
 
 async function startBackend() {
   let executablePath: string;
@@ -161,6 +162,7 @@ function setupIPC() {
       };
     }
   });
+  ipcMain.handle('get-backend-status', () => backendRunning);
 }
 
 const createWindow = (): void => {
@@ -187,13 +189,13 @@ const createWindow = (): void => {
 app.on('ready', async () => {
   setupIPC();
   const backendStarted = await startBackend();
-
+  backendRunning = backendStarted !== false;
   const allWindows = BrowserWindow.getAllWindows();
   if (allWindows.length === 0) {
     createWindow();
   }
 
-  if (backendStarted !== false) {
+  if (backendRunning !== false) {
     // Let renderer know backend is ready
     setTimeout(() => {
       const win = BrowserWindow.getAllWindows()[0];

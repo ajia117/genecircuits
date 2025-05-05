@@ -7,5 +7,7 @@ contextBridge.exposeInMainWorld('electron', {
   // NEW: Listen for backend-ready signal from main process
   onBackendReady: (callback: (ready: boolean) => void) => {
     ipcRenderer.on('backend-ready', (_, ready: boolean) => callback(ready));
-  }
+  },
+
+  getBackendStatus: (): Promise<boolean> => ipcRenderer.invoke('get-backend-status'),
 });
