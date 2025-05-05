@@ -15,9 +15,9 @@ export const repressilator: CircuitTemplate =
             },
             data: {
                 label: "Gene1",
-                initialConcentration: 0,
-                lossRate: 0.2,
-                beta: 1,
+                initialConcentration: 1,
+                lossRate: 1,
+                beta: 5,
                 inputs: 1,
                 outputs: 1,
                 inputFunctionType: "steady-state",
@@ -46,9 +46,9 @@ export const repressilator: CircuitTemplate =
             },
             data: {
                 label: "Gene2",
-                initialConcentration: 0,
-                lossRate: 0.2,
-                beta: 1,
+                initialConcentration: 1,
+                lossRate: 1,
+                beta: 5,
                 inputs: 1,
                 outputs: 1,
                 inputFunctionType: "steady-state",
@@ -77,9 +77,9 @@ export const repressilator: CircuitTemplate =
             },
             data: {
                 label: "Gene3",
-                initialConcentration: 1,
-                lossRate: 0.2,
-                beta: 1,
+                initialConcentration: 1.2,
+                lossRate: 1,
+                beta: 5,
                 inputs: 1,
                 outputs: 1,
                 inputFunctionType: "steady-state",
@@ -135,9 +135,9 @@ export const repressilator: CircuitTemplate =
     proteins: {
         Gene1: {
             label: "Gene1",
-            initialConcentration: 0,
-            lossRate: 0.2,
-            beta: 1,
+            initialConcentration: 1,
+            lossRate: 1,
+            beta: 5,
             inputs: 1,
             outputs: 1,
             inputFunctionType: "steady-state",
@@ -152,9 +152,9 @@ export const repressilator: CircuitTemplate =
         },
         Gene2: {
             label: "Gene2",
-            initialConcentration: 0,
-            lossRate: 0.2,
-            beta: 1,
+            initialConcentration: 1,
+            lossRate: 1,
+            beta: 5,
             inputs: 1,
             outputs: 1,
             inputFunctionType: "steady-state",
@@ -169,9 +169,9 @@ export const repressilator: CircuitTemplate =
         },
         Gene3: {
             label: "Gene3",
-            initialConcentration: 1,
-            lossRate: 0.2,
-            beta: 1,
+            initialConcentration: 1.2,
+            lossRate: 1,
+            beta: 5,
             inputs: 1,
             outputs: 1,
             inputFunctionType: "steady-state",
@@ -184,7 +184,45 @@ export const repressilator: CircuitTemplate =
                 dutyCycle: 0.5
             }
         }
-    }
+    },
+    hillCoefficients: [
+        {
+            id: "Gene1-Gene1",
+            value: 1
+        },
+        {
+            id: "Gene1-Gene2",
+            value: 1
+        },
+        {
+            id: "Gene2-Gene1",
+            value: 3
+        },
+        {
+            id: "Gene2-Gene2",
+            value: 1
+        },
+        {
+            id: "Gene1-Gene3",
+            value: 3
+        },
+        {
+            id: "Gene2-Gene3",
+            value: 1
+        },
+        {
+            id: "Gene3-Gene1",
+            value: 1
+        },
+        {
+            id: "Gene3-Gene2",
+            value: 3
+        },
+        {
+            id: "Gene3-Gene3",
+            value: 1
+        }
+    ]
 };
 
 export default repressilator;
