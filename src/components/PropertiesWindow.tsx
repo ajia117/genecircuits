@@ -205,10 +205,12 @@ const PropertiesWindow: React.FC = () => {
             <Button variant="outline" color="red" onClick={handleDelete}>
                 <Trash2 size={20}/> <Text size="4" weight="bold">Delete</Text>
             </Button>
-            <Button variant="outline" onClick={() => setShowProteinEditor((prev) => !prev)}>
-                <Pencil size={20} />
-                <Text size="4" weight="bold">{showProteinEditor ? "Cancel" : "Edit"}</Text>
-            </Button>
+            {selectedNodeId && selectedNodeType === "custom" && proteinData && (
+                <Button variant="outline" onClick={() => setShowProteinEditor((prev) => !prev)}>
+                    <Pencil size={20} />
+                    <Text size="4" weight="bold">{showProteinEditor ? "Cancel" : "Edit"}</Text>
+                </Button>
+            )}
         </Flex>
     )
 
@@ -283,20 +285,24 @@ const PropertiesWindow: React.FC = () => {
             {/* -------------------------------------------------------------------------------------------- */}
             {/* EDGE PROPERTIES */}
             {selectedEdgeId && edgeData && (
-                commonBox("Edge Properties", (<>
-                    <DataList.Root>
-                        {renderDataList(edgeData, 'edge')}
-                    </DataList.Root>
-                </>)
-            ))}
+                <>
+                    {commonBox("Edge Properties", (
+                        <DataList.Root>
+                            {renderDataList(edgeData, 'edge')}
+                        </DataList.Root>
+                    ))}
+                    {renderFunctionButtons()}
+                </>
+            )}
 
             {/* -------------------------------------------------------------------------------------------- */}
             {/* LOGIC GATE PROPERTIES */}
             {selectedNodeId && (selectedNodeType === "and" || selectedNodeType === "or") && (
-                commonBox("Logic Gate Properties", (
-                    <DataList.Root>
-                        <DataList.Item>
-                            <DataList.Label minWidth="88px">Gate ID</DataList.Label>
+                <>
+                    {commonBox("Logic Gate Properties", (
+                        <DataList.Root>
+                            <DataList.Item>
+                                <DataList.Label minWidth="88px">Gate ID</DataList.Label>
                             <DataList.Value>
                                 <Flex align="center" gap="2">
                                     <Code variant="ghost">{selectedNodeId}</Code>
@@ -311,9 +317,11 @@ const PropertiesWindow: React.FC = () => {
                             <DataList.Value>
                                 <Code variant="ghost">{(selectedNodeType === "and") ? "AND" : "OR"}</Code>
                             </DataList.Value>
-                        </DataList.Item>
-                    </DataList.Root>
-                ))
+                            </DataList.Item>
+                        </DataList.Root>
+                    ))}
+                    {renderFunctionButtons()}
+                </>
             )}
 
         </Flex>

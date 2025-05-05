@@ -43,7 +43,8 @@ const TopRibbon: React.FC = () => {
         showOutputWindow, setShowOutputWindow,
         circuitSettings, setCircuitSettings,
         setOutputData,
-        showHillCoeffMatrix, setShowHillCoeffMatrix
+        showHillCoeffMatrix, setShowHillCoeffMatrix,
+        activeTab, setActiveTab
     } = useWindowStateContext();
     const { showAlert } = useAlert();
 
@@ -58,6 +59,9 @@ const TopRibbon: React.FC = () => {
     const confirmClear = () => {
         setNodes([])
         setEdges([])
+        if (activeTab === "properties") {
+            setActiveTab("toolbox");
+        }
         setShowClearConfirmation(false);
     };
 
