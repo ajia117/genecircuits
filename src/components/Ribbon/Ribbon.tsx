@@ -79,7 +79,6 @@ const TopRibbon: React.FC = () => {
         const tId = setTimeout(() => {
             abortFetch();
             setIsRunning(false);
-            showAlert("Simulation timed out. Please try again.");
         }, 10000);
         setTimeoutId(tId);
         try {
