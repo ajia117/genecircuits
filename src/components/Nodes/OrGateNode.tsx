@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 import * as XYFlow from '@xyflow/react';
 import { Position } from '@xyflow/react';
-import OrGate from "../../assets/OrGate";
+import { OrGate } from "../../assets";
 
 const OrGateNode = memo(() => {
     const handleLeftOffset = 2;

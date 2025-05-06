@@ -1,5 +1,5 @@
 import {Node, Edge} from "@xyflow/react";
-import {ProteinData} from "./index";
+import {HillCoefficientData, ProteinData} from "./index";
 import {MutableRefObject} from "react";
 
 export interface CircuitTemplate {
@@ -9,6 +9,7 @@ export interface CircuitTemplate {
     nodes: Node[];
     edges: Edge[];
     proteins: {[label: string]: ProteinData};
+    hillCoefficients: HillCoefficientData[];
 }
 
 // Input type for the function
@@ -20,4 +21,5 @@ export interface ApplyCircuitTemplateProps {
     setNodes: (updater: (nodes: Node[]) => Node[]) => void;
     setEdges: (updater: (edges: Edge[]) => Edge[]) => void;
     setProteins: (updater: (proteins: {[label: string]: ProteinData}) => {[label: string]: ProteinData}) => void;
+    setHillCoefficients: (updater: (coeffs: HillCoefficientData[]) => HillCoefficientData[]) => void;
 }

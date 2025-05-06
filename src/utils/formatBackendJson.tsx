@@ -1,6 +1,7 @@
 import { Node, Edge } from "@xyflow/react";
 import { ProteinData, HillCoefficientData, CircuitSettingsType } from "../types";
 
+// Used to create the json sent to the backend
 export const formatBackendJson = (
     circuitSettings: CircuitSettingsType,
     nodes: Node[],
@@ -32,18 +33,18 @@ export const formatBackendJson = (
             return {
                 id: node.id,
                 type: node.type || "default",
-                ...(isCustom && label
+                ...(isCustom && label // if node is a gate, exclude the 'data' fields
                     ? { proteinName: label }
                     : {})
             };
         }),
         edges: edges.map((edge: Edge) => ({
-            id: edge.id,
-            type: edge.markerEnd,
-            source: edge.source,
-            target: edge.target,
+            id: edge.id, // edge id
+            type: edge.markerEnd, // refers to 'promote' or 'repress' marker
+            source: edge.source, // id of the source node
+            target: edge.target, // id of the target node
         })),
-        proteins: includedProteins,
-        hillCoefficients
+        proteins: includedProteins, // list of all proteins being used
+        hillCoefficients // list of hill coefficient values for each protein connection
     };
 };

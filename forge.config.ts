@@ -17,15 +17,27 @@ const config: ForgeConfig = {
     asar: true,
     // Add extraResource to include PyInstaller executable
     extraResource: [
-      path.join(__dirname, 'flask-backend', 'dist', 'app')
-    ]
+      path.join(__dirname, 'backend', 'dist', 'app')
+    ],
+    icon: './icons/icon.ico',
+    executableName: 'genetic-circuit-simulator'
   },
   rebuildConfig: {},
   makers: [
-    new MakerSquirrel({}),
+      new MakerSquirrel({
+        setupIcon: './icons/icon.ico',
+      }),
     new MakerZIP({}, ['darwin']),
-    new MakerRpm({}),
-    new MakerDeb({})
+    new MakerRpm({
+      options: {
+        icon: './icons/icon.png'
+      }
+    }),
+    new MakerDeb({
+      options: {
+        icon: './icons/icon.png'
+      }
+    }),
   ],
   plugins: [
     new AutoUnpackNativesPlugin({}),
@@ -49,7 +61,7 @@ const config: ForgeConfig = {
   ],
 };
 if (process.env.NODE_ENV !== 'development') {
-  config.plugins.push(
+  config.plugins!.push(
       new FusesPlugin({
         version: FuseVersion.V1,
         [FuseV1Options.RunAsNode]: false,

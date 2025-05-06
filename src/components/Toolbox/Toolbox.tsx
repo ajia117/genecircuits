@@ -1,4 +1,5 @@
-import React, {Dispatch, SetStateAction, useEffect, useMemo, useState} from 'react';
+import React, { useMemo, useState } from 'react';
+import { useCircuitContext, useSelectionStateContext, useWindowStateContext, useHillCoefficientContext } from '../../hooks';
 import { ProteinData } from "../../types";
 import '../../index.css';
 import CreateProteinWindow from '../CreateProteinWindow';
@@ -20,54 +21,25 @@ import {
     Search,
     Ellipsis
 } from 'lucide-react'
+import {useAlert} from "../Alerts/AlertProvider";
 
-interface ToolboxProps {
-    proteins: { [label: string]: ProteinData };
-    setProteinData: (label: string, data: ProteinData) => void;
-    getProteinData: (label: string) => ProteinData | null;
-    editingProtein?: ProteinData | null;
-    setEditingProtein?: Dispatch<SetStateAction<ProteinData>>;
-    setActiveTab: Dispatch<SetStateAction<'toolbox' | 'properties' | 'circuits'>>;
-}
+export const Toolbox: React.FC = () => {
+    const { proteins, setProteinData, setNodes } = useCircuitContext();
+    const { setEditingProtein } = useSelectionStateContext();
+    const { setActiveTab } = useWindowStateContext();
+    const { setHillCoefficients, hillCoefficients } = useHillCoefficientContext();
 
-export const Toolbox: React.FC<ToolboxProps> = ({
-        proteins,
-        setProteinData,
-        getProteinData,
-        editingProtein,
-        setEditingProtein,
-        setActiveTab
-    }) => {
-
-    const genericNodeData: ProteinData = {
-        label: null,
-        initialConcentration: 1,
-        lossRate: 1,
-        beta: 1,
-        // delay: 0,
-        inputs: 1,
-        outputs: 1,
-        inputFunctionType: 'steady-state',
-        inputFunctionData: {
-            steadyStateValue: 0,
-            timeStart: 0,
-            timeEnd: 1,
-            pulsePeriod: 1,
-            amplitude: 1,
-            dutyCycle: 0.5,
-        }
-    };
-    const [nodeData, setNodeData] = useState<ProteinData>(genericNodeData);
     const [searchTerm, setSearchTerm] = useState(''); // Stores user input from the protein search bar
     const [showCreateProteinWindow, setShowCreateProteinWindow] = useState(false);
-
+    const { showAlert } = useAlert();
 
     // Called when the create protein button is clicked
     const handleCreateProtein = (data: ProteinData) => {
         if (proteins[data.label]) {
-            alert("That protein already exists!");
+            showAlert("That protein already exists!");
             return;
         }
+        console.log(data)
         setProteinData(data.label, data); // adds new protein to the list
     };
 
@@ -89,6 +61,16 @@ export const Toolbox: React.FC<ToolboxProps> = ({
             .filter(([label]) => label.toLowerCase().includes(searchTerm.toLowerCase()))
             .map(([label, data]) => ({ id: label, label, ...data }));
     }, [proteins, searchTerm]);
+
+    // Handler to delete a protein and its associated node(s)
+    const handleDeleteProtein = (label: string) => {
+        // Remove protein from proteins object
+        setProteinData(label, undefined);
+        // Remove nodes with this protein label
+        setNodes((prevNodes) => prevNodes.filter(node => !(node.data && typeof node.data === 'object' && 'label' in node.data && node.data.label === label)));
+        // Remove all hill coefficients involving this protein
+        setHillCoefficients((prev) => prev.filter(h => !h.id.startsWith(label + '-') && !h.id.endsWith('-' + label)));
+    };
 
     return (
         <Flex direction="column">
@@ -188,10 +170,10 @@ export const Toolbox: React.FC<ToolboxProps> = ({
                                     </DropdownMenu.Trigger>
                                     <DropdownMenu.Content>
                                         <DropdownMenu.Item onClick={() => {
-                                            setEditingProtein(protein)
+                                            setEditingProtein && setEditingProtein(protein)
                                             setActiveTab('properties')
                                         }}>Edit</DropdownMenu.Item>
-                                        <DropdownMenu.Item color="red">Delete</DropdownMenu.Item>
+                                        <DropdownMenu.Item color="red" onClick={() => handleDeleteProtein(protein.label)}>Delete</DropdownMenu.Item>
                                     </DropdownMenu.Content>
                                 </DropdownMenu.Root>
                                 

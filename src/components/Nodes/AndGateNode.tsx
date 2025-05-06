@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 import * as XYFlow from '@xyflow/react';
 import { Position } from '@xyflow/react';
-import AndGate from "../../assets/AndGate";
+import { AndGate } from "../../assets";
 
 const AndGateNode = memo(() => {
     const handleOffset = -4;

@@ -1,9 +1,10 @@
 import { Node } from '@xyflow/react';
+import React from "react";
 
 let nodeIdRef: React.MutableRefObject<number>;
 let gateIdRef: React.MutableRefObject<number>;
 
-// updates id counters when circuits are imported
+// updates id counters when circuits are imported. don't want the counters to start at 0, want the ids to start at the next available number
 export const setRefs = (refs: {
   nodeIdRef: React.MutableRefObject<number>,
   gateIdRef: React.MutableRefObject<number>

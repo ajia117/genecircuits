@@ -1,44 +1,75 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Rnd } from "react-rnd";
 import { Panel as ReactFlowPanel } from '@xyflow/react';
-import { X, Maximize2, Minimize2, Move } from 'lucide-react';
+import { X, Maximize2, Minimize2, Move, RefreshCw, Download } from 'lucide-react';
+import {
+    Flex,
+    Text,
+    IconButton,
+    Tooltip,
+} from "@radix-ui/themes"
 import './OutputWindowStyles.css';
+import { useCircuitContext, useHillCoefficientContext, useWindowStateContext } from '../../hooks';
+import { fetchOutput, formatBackendJson } from '../../utils';
+import CircuitDataType from "../../types/CircuitDataType";
+import WindowSettingsType from "../../types/WindowSettingsType";
 
-export default function OutputWindow({ onClose, windowSettings, setWindowSettings, outputData }: { onClose: () => void, windowSettings: any, setWindowSettings: any, outputData: any }) {
-    const [dimensions, setDimensions] = useState({
-        width: windowSettings.width,
-        height: windowSettings.height
-    });
+const OutputWindow = () =>  {
+
+    const {
+        setShowOutputWindow,
+        outputWindowSettings,
+        setOutputWindowSettings,
+
+        outputData,
+    } = useWindowStateContext();
+
     const [isMaximized, setIsMaximized] = useState(false);
     const [preMaximizeSettings, setPreMaximizeSettings] = useState(null);
+    const { nodes, edges, proteins } = useCircuitContext();
+    const { hillCoefficients } = useHillCoefficientContext();
+    const { circuitSettings, setOutputData } = useWindowStateContext();
 
-    useEffect(() => {
-        setDimensions({
-            width: windowSettings.width,
-            height: windowSettings.height
-        });
-    }, [windowSettings.width, windowSettings.height]);
 
     const handleMaximizeToggle = () => {
         if (isMaximized) {
-            setWindowSettings(preMaximizeSettings);
+            setOutputWindowSettings(preMaximizeSettings);
             setIsMaximized(false);
         } else {
-            setPreMaximizeSettings({...windowSettings});
+            setPreMaximizeSettings({...outputWindowSettings});
 
-            const maxWidth = window.innerWidth * 0.95;
-            const maxHeight = window.innerHeight * 0.9;
+            const maxWidth = window.innerWidth * 0.722;
+            const maxHeight = window.innerHeight * 0.78;
             const x = window.innerWidth * 0.025;
             const y = window.innerHeight * 0.05;
 
-            setWindowSettings({
+            setOutputWindowSettings({
                 width: maxWidth,
                 height: maxHeight,
-                x: x,
-                y: y
+                x: x > 0 ? x : 0,
+                y: y > 0 ? y : 0
             });
 
             setIsMaximized(true);
+        }
+    };
+
+    const handleRerunSimulation = async () => {
+        const circuitJson: CircuitDataType = formatBackendJson(circuitSettings, nodes, edges, proteins, hillCoefficients);
+        const res = await fetchOutput(circuitJson);
+        if ('type' in res && res.type === 'image') {
+            setOutputData(res);
+        } else {
+            setOutputData(null);
+        }
+    };
+
+    const handleDownloadOutput = () => {
+        if (outputData && outputData.data) {
+            const a = document.createElement('a');
+            a.href = outputData.data;
+            a.download = 'simulation_output.png';
+            a.click();
         }
     };
 
@@ -46,29 +77,29 @@ export default function OutputWindow({ onClose, windowSettings, setWindowSetting
         <ReactFlowPanel>
             <Rnd
                 default={{
-                    x: windowSettings.x,
-                    y: windowSettings.y,
-                    width: windowSettings.width,
-                    height: windowSettings.height,
+                    x: outputWindowSettings.x,
+                    y: outputWindowSettings.y,
+                    width: outputWindowSettings.width,
+                    height: outputWindowSettings.height,
                 }}
                 size={{
-                    width: windowSettings.width,
-                    height: windowSettings.height
+                    width: outputWindowSettings.width,
+                    height: outputWindowSettings.height
                 }}
                 position={{
-                    x: windowSettings.x,
-                    y: windowSettings.y
+                    x: outputWindowSettings.x,
+                    y: outputWindowSettings.y
                 }}
-                minWidth={300}
-                minHeight={268 /* size of min image */ + 32 /* padding */}
+                minWidth={400}
+                minHeight={300}
                 bounds="window"
                 dragHandleClassName="drag-handle"
                 className="output-overlay"
                 onDragStop={(_, data) => {
-                    setWindowSettings((prev: any) => ({
+                    setOutputWindowSettings((prev: WindowSettingsType) => ({
                         ...prev,
-                        x: data.x,
-                        y: data.y
+                        x: data.x > 0 ? data.x : 0,
+                        y: data.y > 0 ? data.y : 0
                     }));
                 }}
                 onResize={(_, __, ref, ___, position) => {
@@ -78,57 +109,66 @@ export default function OutputWindow({ onClose, windowSettings, setWindowSetting
                         x: position.x,
                         y: position.y,
                     };
-                    setWindowSettings(newSettings);
-                    setDimensions({
-                        width: ref.offsetWidth,
-                        height: ref.offsetHeight
-                    });
+                    setOutputWindowSettings(newSettings);
                 }}
             >
-                {/* Header with drag handle */}
-                <div className="drag-handle">
-                    <div className="title-section">
-                        <Move size={16} strokeWidth={2} />
-                        <h3 className="title">Simulation Output</h3>
-                    </div>
+                <Flex direction="column" height="100%">
+                    {/* HEADER W/ DRAG HANDLE */}
+                    <Flex direction="row" align="center" justify="between" px="4" py="3" className="drag-handle">
+                        <Flex direction="row" align="center" gap="2" className="title-section">
+                            <Move size={16} strokeWidth={2} color="var(--accent-9)"/>
+                            <Text size="3" weight="bold">Simulation Output</Text>
+                        </Flex>
 
-                    <div className="button-group">
-                        <button
-                            onClick={handleMaximizeToggle}
-                            className="icon-button"
-                            title={isMaximized ? "Restore" : "Maximize"}
-                        >
-                            {isMaximized ?
-                                <Minimize2 size={16} strokeWidth={2} /> :
-                                <Maximize2 size={16} strokeWidth={2} />
-                            }
-                        </button>
+                        <Flex direction="row" justify="center" align="center" gap="3">
+                            <Tooltip content="Export Output">
+                                <IconButton variant="ghost" onClick={handleDownloadOutput}>
+                                    <Download size={16} strokeWidth={2} />
+                                </IconButton>
+                            </Tooltip>
+                            <Tooltip content="Refresh">
+                                <IconButton variant="ghost" onClick={handleRerunSimulation}>
+                                    <RefreshCw size={16} strokeWidth={2} />
+                                </IconButton>
+                            </Tooltip>
+                            <Tooltip content={isMaximized ? "Restore" : "Maximize"}>
+                                <IconButton
+                                    variant="ghost"
+                                    onClick={handleMaximizeToggle}
+                                >
+                                    {isMaximized ?
+                                        <Minimize2 size={16} strokeWidth={2} /> :
+                                        <Maximize2 size={16} strokeWidth={2} />
+                                    }
+                                </IconButton>
+                            </Tooltip>
+                            <IconButton variant="ghost" onClick={() => setShowOutputWindow(false)}>
+                                <X size={16} strokeWidth={2} />
+                            </IconButton>
+                            
+                        </Flex>
+                    </Flex>
+                
 
-                        <button
-                            onClick={onClose}
-                            className="close-button"
-                            title="Close"
-                        >
-                            <X size={16} strokeWidth={2} />
-                        </button>
-                    </div>
-                </div>
-
-                {/* Content area */}
-                <div className="content-area">
-                    {outputData ? (
+                {/* OUTPUT CONTENT */}
+                {outputData ? (
+                    <Flex direction="column" justify="center" px="4" py="3" gap="3" className="content-area" height="100%">
                         <img
                             src={outputData.data}
                             alt="Simulation Output"
                             className="output-image"
                         />
-                    ) : (
-                        <div className="no-data-message">
+                    </Flex>
+                ) : (
+                    <Flex direction="column" justify="center" align="center" p="4" className="content-area" height="100%">
+                        <div className={'no-data-message'}>
                             No simulation output available. Run a simulation to see results here.
                         </div>
-                    )}
-                </div>
+                    </Flex>
+                )}
+                </Flex>
             </Rnd>
         </ReactFlowPanel>
     );
 }
+export default OutputWindow;

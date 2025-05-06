@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, globalShortcut } from 'electron';
 import * as path from 'path';
 import { spawn, ChildProcess } from 'child_process';
 
@@ -17,6 +17,7 @@ let pythonProcess: ChildProcess | null = null;
 const pendingRequests: Map<string, { resolve: (value: any) => void, reject: (reason: any) => void }> = new Map();
 let messageBuffer: Buffer = Buffer.alloc(0);
 let expectedLength: number | null = null;
+let backendRunning = false;
 
 async function startBackend() {
   let executablePath: string;
@@ -27,7 +28,7 @@ async function startBackend() {
       executablePath += '.exe';
     }
   } else { // development
-    executablePath = path.join(__dirname, '..', '..', 'flask-backend', 'dist', 'app');
+    executablePath = path.join(__dirname, '..', '..', 'backend', 'dist', 'app');
     if (process.platform === 'win32') {
       executablePath += '.exe';
     }
@@ -65,8 +66,10 @@ async function startBackend() {
   try {
     const pingResult = await sendToPython({ command: 'ping' });
     console.log('Python IPC connection established:', pingResult);
+    return true;
   } catch (error) {
     console.error('Failed to establish Python IPC connection:', error);
+    return false;
   }
 }
 
@@ -124,7 +127,7 @@ function sendToPython(message: any): Promise<any> {
     }
     
     // Add request ID to track responses
-    const requestId = Date.now().toString() + Math.random().toString(36).substr(2, 5);
+    const requestId = Date.now().toString() + Math.random().toString(36).substring(2, 5);
     message.requestId = requestId;
     
     // Store callback in pending requests
@@ -159,10 +162,11 @@ function setupIPC() {
       };
     }
   });
+  ipcMain.handle('get-backend-status', () => backendRunning);
 }
 
 const createWindow = (): void => {
-  // Create the browser window.
+  console.log('Creating window');
   const mainWindow = new BrowserWindow({
     height: 600,
     width: 1000,
@@ -170,12 +174,12 @@ const createWindow = (): void => {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
       contextIsolation: true,
       nodeIntegration: false,
-      devTools: !app.isPackaged
+      devTools: !app.isPackaged,
+      spellcheck: false,
+
     },
     autoHideMenuBar: true
   });
-
-  // and load the index.html of the app.
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 };
 
@@ -184,17 +188,50 @@ const createWindow = (): void => {
 // Some APIs can only be used after this event occurs.
 app.on('ready', async () => {
   setupIPC();
-  await startBackend();
-  createWindow();
+  const backendStarted = await startBackend();
+  backendRunning = backendStarted !== false;
+  const allWindows = BrowserWindow.getAllWindows();
+  if (allWindows.length === 0) {
+    createWindow();
+  }
+
+  if (backendRunning !== false) {
+    // Let renderer know backend is ready
+    setTimeout(() => {
+      const win = BrowserWindow.getAllWindows()[0];
+      win?.webContents.send('backend-ready', true);
+    }, 100); // slight delay ensures renderer is listening
+  } else {
+    console.error('Python backend failed to start');
+    const win = BrowserWindow.getAllWindows()[0];
+    win?.webContents.send('backend-ready', false);
+  }
+});
+
+// Disable reloading of window with Ctrl + R when packaged
+app.on('browser-window-focus', function () {
+  if(app.isPackaged) {
+    globalShortcut.register("CommandOrControl+R", () => {
+      console.log("CommandOrControl+R is pressed: Shortcut Disabled");
+    });
+    globalShortcut.register("F5", () => {
+      console.log("F5 is pressed: Shortcut Disabled");
+    });
+
+  }
+});
+app.on('browser-window-blur', function () {
+  if(app.isPackaged) {
+    globalShortcut.unregister('CommandOrControl+R');
+    globalShortcut.unregister('F5');
+  }
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
+  app.quit();
   if (pythonProcess) {
     pythonProcess.kill();
   }

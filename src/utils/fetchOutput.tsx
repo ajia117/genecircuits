@@ -1,27 +1,29 @@
 // Add TypeScript interface for the window object
-declare global {
-  interface Window {
-    electron: {
-      runSimulation: (circuitData: any) => Promise<any>;
-    };
-  }
-}
+import CircuitDataType from "../types/CircuitDataType";
+import SimulationResponse, {SimulationErrorResponse} from "../types/SimulationResponse";
+import { FetchOutputResult } from "../types/FetchOutputReturnType";
 
 let isCancelled = false;
+function isErrorResponse(response: SimulationResponse): response is SimulationErrorResponse {
+  return response.success === false;
+}
 
-export const fetchOutput = async (circuitJson: any) => {
+// Function called when user clicks the 'Run Simulation' button. This function makes the API POST
+// request to the backend then receives and parses the response to display.
+export const fetchOutput = async (circuitJson: CircuitDataType): Promise<FetchOutputResult> => {
   try {
     isCancelled = false;
     
     // Call the IPC function exposed by preload.ts
-    const response = await window.electron.runSimulation(circuitJson);
+    console.log("calling runSimulation with circuitJson", circuitJson);
+    const response: SimulationResponse = await window.electron.runSimulation(circuitJson);
 
     if (isCancelled) {
       return { cancelled: true };
     }
     
     // Handle error responses
-    if (!response.success) {
+    if (isErrorResponse(response)) {
       console.error("Simulation error:", response.error);
       return { 
         type: "error", 

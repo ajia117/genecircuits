@@ -7,7 +7,7 @@ function SelfConnectingEdge(props: EdgeProps) {
         return <BezierEdge {...props} />;
     }
 
-    const { sourceX, sourceY, targetX, targetY, id, markerEnd } = props;
+    const { sourceX, sourceY, targetX, targetY, markerEnd } = props;
     const radiusX = (sourceX - targetX) * 0.6;
     const radiusY = 15;
     const edgePath = `M ${sourceX - 5} ${sourceY} A ${radiusX} ${radiusY} 0 1 0 ${

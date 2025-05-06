@@ -11,7 +11,7 @@ interface CustomNodeProps extends Record<string, unknown> {
 
 type CustomNodeData = Node<CustomNodeProps>;
 
-const CustomNode = memo(({ id, data }: NodeProps<CustomNodeData>) => {
+const CustomNode = memo(({ data }: NodeProps<CustomNodeData>) => {
     const nodeData = {
         label: data?.label ?? "Unnamed",
         inputs: data?.inputs ?? 1,
