@@ -12,6 +12,7 @@ import {
 } from "lucide-react"
 import { useState } from "react";
 import ProteinDataForm from "./ProteinDataForm";
+import {useAlert} from "./Alerts/AlertProvider";
 
 interface ProteinWindowProps {
     open: boolean;
@@ -39,6 +40,7 @@ export default function CreateProteinWindow({ open, onOpenChange, onCreate }: Pr
         }
     };
     const [newProteinData, setNewProteinData] = useState<ProteinData>(genericNodeData);
+    const { showAlert } = useAlert();
 
     const handleCancel = () => {
         setNewProteinData(genericNodeData)
@@ -46,12 +48,9 @@ export default function CreateProteinWindow({ open, onOpenChange, onCreate }: Pr
 
     const handleCreate = () => {
         if (!newProteinData.label || newProteinData.label.trim() === '') {
-            alert("Protein label is required");
+            showAlert("Protein label is required");
             return;
-        } 
-        else if (newProteinData.inputs === 0) { newProteinData.inputs = 1 }
-        else if (newProteinData.outputs === 0) { newProteinData.outputs = 1 }
-
+        }
       
         onCreate(newProteinData);
         setNewProteinData(genericNodeData); // reset for next time

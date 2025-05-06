@@ -21,6 +21,7 @@ import {
     Search,
     Ellipsis
 } from 'lucide-react'
+import {useAlert} from "../Alerts/AlertProvider";
 
 export const Toolbox: React.FC = () => {
     const { proteins, setProteinData, setNodes } = useCircuitContext();
@@ -30,13 +31,15 @@ export const Toolbox: React.FC = () => {
 
     const [searchTerm, setSearchTerm] = useState(''); // Stores user input from the protein search bar
     const [showCreateProteinWindow, setShowCreateProteinWindow] = useState(false);
+    const { showAlert } = useAlert();
 
     // Called when the create protein button is clicked
     const handleCreateProtein = (data: ProteinData) => {
         if (proteins[data.label]) {
-            alert("That protein already exists!");
+            showAlert("That protein already exists!");
             return;
         }
+        console.log(data)
         setProteinData(data.label, data); // adds new protein to the list
     };
 
