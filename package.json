@@ -92,7 +92,6 @@
     "react-dom": "^18.0.0",
     "react-resizable-panels": "^2.1.7",
     "react-rnd": "^10.5.2",
-    "react-select": "^5.10.1",
-    "rpmbuild": "^0.0.23"
+    "react-select": "^5.10.1"
   }
 }

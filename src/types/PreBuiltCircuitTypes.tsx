@@ -9,7 +9,7 @@ export interface CircuitTemplate {
     nodes: Node[];
     edges: Edge[];
     proteins: {[label: string]: ProteinData};
-    hillCoefficients?: HillCoefficientData[];
+    hillCoefficients: HillCoefficientData[];
 }
 
 // Input type for the function

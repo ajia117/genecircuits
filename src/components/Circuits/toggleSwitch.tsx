@@ -126,6 +126,24 @@ export const toggleSwitch: CircuitTemplate =
             }
         }
     },
+    hillCoefficients: [
+        {
+            id: "ProteinA-ProteinA",
+            value: 1
+        },
+        {
+            id: "ProteinA-ProteinB",
+            value: 3
+        },
+        {
+            id: "ProteinB-ProteinA",
+            value: 3
+        },
+        {
+            id: "ProteinB-ProteinB",
+            value: 1
+        },
+    ]
 };
 
 export default toggleSwitch;

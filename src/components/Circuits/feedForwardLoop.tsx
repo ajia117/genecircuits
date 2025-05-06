@@ -206,6 +206,44 @@ export const feedForwardLoop: CircuitTemplate =
             }
         }
     },
+    hillCoefficients: [
+        {
+            id: "Input-Input",
+            value: 1
+        },
+        {
+            id: "Input-Intermediate",
+            value: 1
+        },
+        {
+            id: "Intermediate-Input",
+            value: 1
+        },
+        {
+            id: "Intermediate-Intermediate",
+            value: 1
+        },
+        {
+            id: "Input-Output",
+            value: 1
+        },
+        {
+            id: "Intermediate-Output",
+            value: 1
+        },
+        {
+            id: "Output-Input",
+            value: 1
+        },
+        {
+            id: "Output-Intermediate",
+            value: 1
+        },
+        {
+            id: "Output-Output",
+            value: 1
+        }
+    ]
 };
 
 export default feedForwardLoop;
