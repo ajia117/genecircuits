@@ -126,7 +126,7 @@ const TopRibbon: React.FC = () => {
     }
 
     const handleSaveProject = () => {
-        if(nodes.length === 0 && edges.length === 0) { alert("Nothing to save."); return; }
+        if(nodes.length === 0 && edges.length === 0) { showAlert("Nothing to save."); return; }
         const circuitJson: ProjectDataType = formatCircuitExportJson(circuitSettings, nodes, edges, proteins, hillCoefficients);
         const blob = new Blob([JSON.stringify(circuitJson, null, 2)], {
             type: "application/json",

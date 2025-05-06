@@ -373,21 +373,35 @@ export default function CircuitBuilderFlow() {
             <div className="bottom-container">
                 <PanelGroup className="circuit-builder-container" direction="horizontal">
                     {/* Left Pane (Toolbox + Properties Window) */}
-                    <Panel className="left-pane min-w-128" defaultSize={30} minSize={23} maxSize={50}>
-                        <div className="flex flex-col h-full">
+                    <Panel className="left-pane min-w-128" defaultSize={30} minSize={27} maxSize={50}>
+                        <div className="flex flex-col h-full w-full">
                             {/* Tab Navigation */}
                             <Tabs.Root
                                 defaultValue="toolbox"
                                 value={activeTab}
                                 onValueChange={setActiveTab as (value: string) => void}
-                                className="h-full"
+                                className="h-full w-full flex flex-col"
                             >
-                                <Tabs.List>
-                                    <Tabs.Trigger value="toolbox">Toolbox</Tabs.Trigger>
-                                    <Tabs.Trigger value="properties">Properties</Tabs.Trigger>
-                                    <Tabs.Trigger value="circuits">Circuits</Tabs.Trigger>
+                                <Tabs.List style={{
+                                    width: '100%',
+                                    display: 'flex'
+                                }}>
+                                    <Tabs.Trigger
+                                        style={{
+                                            flex: '1 1 0%',
+                                            textAlign: 'center'
+                                        }}  value="toolbox">Toolbox</Tabs.Trigger>
+                                    <Tabs.Trigger
+                                        style={{
+                                            flex: '1 1 0%',
+                                            textAlign: 'center'
+                                        }} value="properties">Properties</Tabs.Trigger>
+                                    <Tabs.Trigger
+                                        style={{
+                                            flex: '1 1 0%',
+                                            textAlign: 'center'
+                                        }} value="circuits">Circuits</Tabs.Trigger>
                                 </Tabs.List>
-                            
 
                                 {/* Tab Content */}
                                 <ScrollArea
@@ -417,8 +431,6 @@ export default function CircuitBuilderFlow() {
                                 </Box>
                                 </ScrollArea>
                             </Tabs.Root>
-
-                            
                         </div>
                     </Panel>
 
