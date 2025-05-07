@@ -1,4 +1,5 @@
 ## Getting Started
+
 1. Clone repo
 2. Setup Backend
    1. Go to backend folder `cd react-flask-test/flask-backend`
