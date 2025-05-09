@@ -75,7 +75,7 @@ export default function HillCoefficientMatrix({
             <Table.Header>
                 <Table.Row>
                 <Table.ColumnHeaderCell><Flex direction='row' align="center" gap='1'>
-                    Target <CornerRightDown size={15}/> / Source <ArrowRight size={15}/>
+                    Source <CornerRightDown size={15}/> / Target <ArrowRight size={15}/>
                 </Flex></Table.ColumnHeaderCell>
                 {Array.from(usedProteins)
                     .sort((a, b) => a.localeCompare(b))
