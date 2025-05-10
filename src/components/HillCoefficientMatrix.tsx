@@ -91,7 +91,7 @@ export default function HillCoefficientMatrix({
                 .sort((a, b) => a.localeCompare(b))
                 .map((source) => (
                     <Table.Row key={source}>
-                    <Table.RowHeaderCell>{source}</Table.RowHeaderCell>
+                    <Table.RowHeaderCell><Text weight="bold">{source}</Text></Table.RowHeaderCell>
                     {Array.from(usedProteins)
                         .sort((a, b) => a.localeCompare(b))
                         .map((target) => {
@@ -106,9 +106,7 @@ export default function HillCoefficientMatrix({
                                 </Popover.Trigger>
                                 <Popover.Content>
                                 <Flex direction="column" gap="2" p="2" style={{ width: '150px' }}>
-                                    <Text size="2" weight="bold">
-                                    {source} → {target}
-                                    </Text>
+                                    <Text size="2" weight="bold">{source} → {target}</Text>
                                     <TextField.Root
                                     type="number"
                                     placeholder="Enter value"

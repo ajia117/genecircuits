@@ -124,7 +124,7 @@ def parse_circuit(json_data):
             print(target_protein_ids)
             first_target_nodeid = target_protein_ids[0] if target_protein_ids else None
             # first_target = str(id_map[first_target_nodeid])
-            hill1 = hill_table.get(f"{node_id_to_protein[first_target_nodeid].mName}-{first.mName}", 1) if first_target_nodeid else 1
+            hill1 = hill_table.get(f"{first.mName}-{node_id_to_protein[first_target_nodeid].mName}", 1) if first_target_nodeid else 1
             #print("Hill1: ", hill1)
             hill2 = hill_table.get(f"{node_id_to_protein[first_target_nodeid].mName}-{second.mName}", 1) if first_target_nodeid else 1
             #print("Hill2: ", hill2)
@@ -160,7 +160,7 @@ def parse_circuit(json_data):
             source_protein = node_id_to_protein[source]
             target_protein = node_id_to_protein[target]
             source_internal_id = id_map[source]
-            hill = hill_table.get(f"{target_protein.mName}-{source_protein.mName}", 1)
+            hill = hill_table.get(f"{source_protein.mName}-{target_protein.mName}", 1)
             
             if edge_type == "promote":
                 gate = Gate("act_hill", firstInput=int(source_internal_id), firstHill=hill)

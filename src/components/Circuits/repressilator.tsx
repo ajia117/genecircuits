@@ -192,11 +192,11 @@ export const repressilator: CircuitTemplate =
         },
         {
             id: "Gene1-Gene2",
-            value: 1
+            value: 3
         },
         {
             id: "Gene2-Gene1",
-            value: 3
+            value: 1
         },
         {
             id: "Gene2-Gene2",
@@ -204,19 +204,19 @@ export const repressilator: CircuitTemplate =
         },
         {
             id: "Gene1-Gene3",
-            value: 3
+            value: 1
         },
         {
             id: "Gene2-Gene3",
-            value: 1
+            value: 3
         },
         {
             id: "Gene3-Gene1",
-            value: 1
+            value: 3
         },
         {
             id: "Gene3-Gene2",
-            value: 3
+            value: 1
         },
         {
             id: "Gene3-Gene3",

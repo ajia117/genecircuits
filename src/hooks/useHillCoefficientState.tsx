@@ -13,25 +13,24 @@ function useHillCoefficientState(usedProteins: Set<string>) {
   const [hillCoefficients, setHillCoefficients] = useState<HillCoefficientData[]>([]);
 
   useEffect(() => {
-    const updated: HillCoefficientData[] = [];
     const labels = Array.from(usedProteins).sort();
-
-    labels.forEach((source) => {
-      labels.forEach((target) => {
+  
+    // Build a map to retain old values if available
+    const prevMap = new Map(hillCoefficients.map(h => [h.id, h.value]));
+  
+    const freshMatrix: HillCoefficientData[] = [];
+    for (const source of labels) {
+      for (const target of labels) {
         const id = `${source}-${target}`;
-        const exists = hillCoefficients.find(h => h.id === id);
-        if (!exists) {
-          updated.push({ id, value: 1 });
-        }
-      });
-    });
-
-    setHillCoefficients(prev => {
-      const map = new Map<string, HillCoefficientData>();
-      [...prev, ...updated].forEach(h => map.set(h.id, h));
-      return Array.from(map.values());
-    });
+        const value = prevMap.get(id) ?? 1;
+        freshMatrix.push({ id, value });
+      }
+    }
+  
+    setHillCoefficients(freshMatrix);
   }, [usedProteins]);
+  
+  
 
   const updateCoefficient = (id: string, value: number) => {
     setHillCoefficients(prev =>
