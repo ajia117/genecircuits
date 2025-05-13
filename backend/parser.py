@@ -126,7 +126,7 @@ def parse_circuit(json_data):
             # first_target = str(id_map[first_target_nodeid])
             hill1 = hill_table.get(f"{first.mName}-{node_id_to_protein[first_target_nodeid].mName}", 1) if first_target_nodeid else 1
             #print("Hill1: ", hill1)
-            hill2 = hill_table.get(f"{node_id_to_protein[first_target_nodeid].mName}-{second.mName}", 1) if first_target_nodeid else 1
+            hill2 = hill_table.get(f"{second.mName}-{node_id_to_protein[first_target_nodeid].mName}", 1) if first_target_nodeid else 1
             #print("Hill2: ", hill2)
 
             # Determine gate type based on edge types
