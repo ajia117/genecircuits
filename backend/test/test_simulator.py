@@ -142,54 +142,33 @@ def test_repressilator():
         np.savetxt(f, final_concentrations, comments='')
     assert np.allclose(final_concentrations, expected_concentrations, atol=1e-12)
 
-# def test_c1_ffl_or_simulation():
-#     # Specify expected results. These are based on the ../biocircuits_experimentation/ffl_biocircuit.py script
-#     expected_short_concentrations = np.loadtxt("simulation_test_data/ffl_short_results.txt")
-#     expected_long_concentrations = np.loadtxt("simulation_test_data/ffl_long_results.txt")
+def test_c1_ffl_or_simulation():
+    # Specify expected results. These are based on the ../biocircuits_experimentation/xor_circuit.py script
+    expected_concentrations = np.loadtxt("simulation_test_data/c1_or_ffl_results.txt")
+    n = 200
+    gamma = 1
+    n_xy, n_yz = 3, 3
+    n_xz = 5
+    t_stepdown = np.inf
+    duration = 10
+    x_0 = 1.0
+    t = np.linspace(0, duration, n)
+    x_args = (0.04, t_stepdown,duration, x_0, 1)
 
-#     # Start with short pulse
-#     x_args = (0, 2, 2, 1.0, 0.5)
+    proteinArray = [Protein(0, "Protein X", 0.0, 0.0, [], x_pulse, x_args), Protein(1, "Protein Y", 0.0, gamma, [Gate("act_hill", firstInput=0, firstHill=n_xy)], None, None, 3), Protein(2, "Protein Z", 0.0, gamma, [Gate("aa_or", firstInput=0, secondInput=1, firstHill=n_xz, secondHill=n_yz)], None, None)]
 
-#     # Create a list of proteins
-#     proteinArray = [Protein(0, "Protein 0", 0.0, 1, [], x_pulse, x_args), Protein(1, "Protein 1", 0.0, 1, [Gate("act_hill", firstInput=0)]), Protein(2, "Protein 2", 0.0, 1, [Gate("aa_and", firstInput=0, secondInput=1, firstHill=3, secondHill=3)])]
+    final_concentrations = run_simulation(t, proteinArray)
+    plot_results(t, final_concentrations, "C1 OR FFL Simulation Results")
 
-#     # Run the simulation
-#     duration = 20
-#     n = 1000
-#     # Time points
-#     t = np.linspace(0, duration, n)
-
-#     final_concentrations = run_simulation(t, proteinArray)
-
-#     # write results to file
-#     with open("simulation_test_data/ffl_short_actual_results.log", "w") as f:
-#         np.savetxt(f, final_concentrations, comments='')
-
-#     # compare results to expected
-#     assert np.allclose(final_concentrations, expected_short_concentrations, atol=1e-5)
-
-#     # Repeat with long pulse:
-#     # Set up parameters for the pulse
-#     x_args = (0, 15, 20, 1.0, 0.5)
-
-#     # Update input gate's args
-#     proteinArray[0].mExtConcFuncArgs = x_args
-
-#     # Reset initial concentrations in protein array:
-#     for protein in proteinArray:
-#         protein.setInternalConcentration(0.0)
-
-#     final_concentrations = run_simulation(t, proteinArray)
-#     # write results to file
-#     with open("simulation_test_data/ffl_long_actual_results.log", "w") as f:
-#         np.savetxt(f, final_concentrations, comments='')
-#      # compare results to expected
-#     assert np.allclose(final_concentrations, expected_long_concentrations, atol=1e-5)
+    # write out to file
+    with open("simulation_test_data/c1_or_ffl_actual_results.log", "w") as f:
+        np.savetxt(f, final_concentrations, comments='')
+    assert np.allclose(final_concentrations, expected_concentrations, atol=1e-1) # Tolerance is 0.1
 
 # TODO: handle command line args, to run individual tests if desired
 def main():
     print("Running all test cases...")
-    pytest.main(["-v", "test_simulator.py::test_ffl_simulation", "test_simulator.py::test_xor_simulation", "test_simulator.py::test_i1_ffl_simulation", "test_simulator.py::test_repressilator"])
+    pytest.main(["-v", "test_simulator.py::test_c1_ffl_and_simulation", "test_simulator.py::test_xor_simulation", "test_simulator.py::test_i1_ffl_simulation", "test_simulator.py::test_repressilator", "test_simulator.py::test_c1_ffl_or_simulation"])
 
 # Run the script
 if __name__ == '__main__':
