@@ -10,7 +10,7 @@ from   bokeh.io import output_file
 import bokeh.palettes
 
 def runAllTests():
-    test_ffl_simulation()
+    test_c1_ffl_and_simulation()
     test_xor_simulation()
 
 def plot_results(t, final_concentrations, title):
@@ -34,7 +34,7 @@ def plot_results(t, final_concentrations, title):
     layout = bokeh.layouts.column(p)
     bokeh.io.show(layout)
 
-def test_ffl_simulation():
+def test_c1_ffl_and_simulation():
     # Specify expected results. These are based on the ../biocircuits_experimentation/ffl_biocircuit.py script
     expected_short_concentrations = np.loadtxt("simulation_test_data/ffl_short_results.txt")
     expected_long_concentrations = np.loadtxt("simulation_test_data/ffl_long_results.txt")
@@ -141,6 +141,50 @@ def test_repressilator():
     with open("simulation_test_data/repressilator_actual_results.log", "w") as f:
         np.savetxt(f, final_concentrations, comments='')
     assert np.allclose(final_concentrations, expected_concentrations, atol=1e-12)
+
+# def test_c1_ffl_or_simulation():
+#     # Specify expected results. These are based on the ../biocircuits_experimentation/ffl_biocircuit.py script
+#     expected_short_concentrations = np.loadtxt("simulation_test_data/ffl_short_results.txt")
+#     expected_long_concentrations = np.loadtxt("simulation_test_data/ffl_long_results.txt")
+
+#     # Start with short pulse
+#     x_args = (0, 2, 2, 1.0, 0.5)
+
+#     # Create a list of proteins
+#     proteinArray = [Protein(0, "Protein 0", 0.0, 1, [], x_pulse, x_args), Protein(1, "Protein 1", 0.0, 1, [Gate("act_hill", firstInput=0)]), Protein(2, "Protein 2", 0.0, 1, [Gate("aa_and", firstInput=0, secondInput=1, firstHill=3, secondHill=3)])]
+
+#     # Run the simulation
+#     duration = 20
+#     n = 1000
+#     # Time points
+#     t = np.linspace(0, duration, n)
+
+#     final_concentrations = run_simulation(t, proteinArray)
+
+#     # write results to file
+#     with open("simulation_test_data/ffl_short_actual_results.log", "w") as f:
+#         np.savetxt(f, final_concentrations, comments='')
+
+#     # compare results to expected
+#     assert np.allclose(final_concentrations, expected_short_concentrations, atol=1e-5)
+
+#     # Repeat with long pulse:
+#     # Set up parameters for the pulse
+#     x_args = (0, 15, 20, 1.0, 0.5)
+
+#     # Update input gate's args
+#     proteinArray[0].mExtConcFuncArgs = x_args
+
+#     # Reset initial concentrations in protein array:
+#     for protein in proteinArray:
+#         protein.setInternalConcentration(0.0)
+
+#     final_concentrations = run_simulation(t, proteinArray)
+#     # write results to file
+#     with open("simulation_test_data/ffl_long_actual_results.log", "w") as f:
+#         np.savetxt(f, final_concentrations, comments='')
+#      # compare results to expected
+#     assert np.allclose(final_concentrations, expected_long_concentrations, atol=1e-5)
 
 # TODO: handle command line args, to run individual tests if desired
 def main():

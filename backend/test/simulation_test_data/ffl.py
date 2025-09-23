@@ -3,6 +3,7 @@
 import numpy as np
 import scipy.integrate
 import biocircuits
+import biocircuits.apps
 import bokeh.application
 from   bokeh.io import output_file
 import bokeh.plotting as bp
@@ -89,3 +90,56 @@ xyz_concentrations[:, 0] = x_vals
 # log concentratoins
 with open("ffl_long_results.txt", "w") as f:
     np.savetxt(f, xyz_concentrations, comments='')
+
+'''
+----- Another implementation using biocircuits.apps.plot_ffl -----
+'''
+
+# Parameters
+beta = 1      # Default value for biocircuits.apps.plot_ffl
+kappa = 1     # Scaling factor, but we don't use it here
+
+# Short pulse
+p, cds, cds_x = biocircuits.apps.plot_ffl(
+    beta,
+    gamma,
+    kappa,
+    n_xy,
+    n_xz,
+    n_yz,
+    ffl="c1",
+    logic="and",
+    t=t,
+    t_step_down=2,      # Short pulse: x turns off at t=2
+    normalized=False,
+)
+
+# Align output arrays
+y_vals = cds.data["y"][1:] if len(cds.data["y"]) == len(t)+1 else cds.data["y"]
+z_vals = cds.data["z"][1:] if len(cds.data["z"]) == len(t)+1 else cds.data["z"]
+
+# # Save results
+xyz_concentrations = np.column_stack([x_vals, y_vals, z_vals])
+np.savetxt("ffl_short_results_1.txt", xyz_concentrations, comments='')
+
+# Long pulse
+p, cds, cds_x = biocircuits.apps.plot_ffl(
+    beta,
+    gamma,
+    kappa,
+    n_xy,
+    n_xz,
+    n_yz,
+    ffl="c1",
+    logic="and",
+    t=t,
+    t_step_down=15,     # Long pulse: x turns off at t=15
+    normalized=False,
+)
+
+y_vals = cds.data["y"][1:] if len(cds.data["y"]) == len(t)+1 else cds.data["y"]
+z_vals = cds.data["z"][1:] if len(cds.data["z"]) == len(t)+1 else cds.data["z"]
+
+# # Save results
+xyz_concentrations = np.column_stack([x_vals, y_vals, z_vals])
+np.savetxt("ffl_long_results_1.txt", xyz_concentrations, comments='')
