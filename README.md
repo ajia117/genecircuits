@@ -16,3 +16,6 @@
       - To change your version, run `nvm use 18`
    3. Run: `npm i`
 4. Start app: `npm run start`
+
+## Testing
+Backend testing instructions are in backend/test
