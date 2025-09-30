@@ -10,9 +10,17 @@ from   bokeh.io import output_file
 import bokeh.palettes
 from simulation_test_data import c1_ffl
 
-def runAllTests():
-    test_c1_ffl_and_simulation()
-    test_xor_simulation()
+DEBUG=False
+
+def debug_helper(final_concentrations, expected_concentrations):
+    if DEBUG:
+        print("final vs expected shapes:", final_concentrations.shape, expected_concentrations.shape)
+        diff = np.abs(final_concentrations - expected_concentrations)
+        print("max diff:", np.max(diff))
+        tolerance = 0.1
+        bad_idx = np.where(diff > tolerance)
+        print("indices exceeding tolerance:", bad_idx)
+        print(final_concentrations[bad_idx], expected_concentrations[bad_idx])
 
 def plot_results(t, final_concentrations, title):
     # Create a plot for the results
@@ -65,14 +73,7 @@ def test_c1_ffl_and_short_simulation():
     # Plot results
     plot_results(t, final_concentrations, "C1 FFL AND Short Pulse Simulation Results")
 
-    # debug
-    # print("final vs expected shapes:", final_concentrations.shape, expected_short_concentrations.shape)
-    # diff = np.abs(final_concentrations - expected_short_concentrations)
-    # print("max diff:", np.max(diff))
-    # tolerance = 0.1
-    # bad_idx = np.where(diff > tolerance)
-    # print("indices exceeding tolerance:", bad_idx)
-    # print(final_concentrations[bad_idx], expected_short_concentrations[bad_idx])
+    debug_helper(final_concentrations, expected_short_concentrations)
 
     # Save actual results
     with open("simulation_test_data/c1_ffl_and_short_actual_results.log", "w") as f:
@@ -84,7 +85,7 @@ def test_c1_ffl_and_short_simulation():
 def test_c1_ffl_and_long_simulation():
     # Specify expected results. These are based on the ../biocircuits_experimentation/xor_circuit.py script
     c1_ffl.c1_ffl_and(output_file="simulation_test_data/c1_ffl_and_long_results.txt", t_stepdown=15.0, tau=20, x_0=1.0) # generate expected results
-    expected_short_concentrations = np.loadtxt("simulation_test_data/c1_ffl_and_long_results.txt")
+    expected_long_concentrations = np.loadtxt("simulation_test_data/c1_ffl_and_long_results.txt")
     
     # Simulation parameters
     n = 1000
@@ -111,21 +112,14 @@ def test_c1_ffl_and_long_simulation():
     # Plot results
     plot_results(t, final_concentrations, "C1 FFL AND Long Pulse Simulation Results")
 
-    # debug
-    # print("final vs expected shapes:", final_concentrations.shape, expected_short_concentrations.shape)
-    # diff = np.abs(final_concentrations - expected_short_concentrations)
-    # print("max diff:", np.max(diff))
-    # tolerance = 0.1
-    # bad_idx = np.where(diff > tolerance)
-    # print("indices exceeding tolerance:", bad_idx)
-    # print(final_concentrations[bad_idx], expected_short_concentrations[bad_idx])
+    debug_helper(final_concentrations, expected_long_concentrations)
 
     # Save actual results
     with open("simulation_test_data/c1_ffl_and_long_actual_results.log", "w") as f:
         np.savetxt(f, final_concentrations, comments='')
 
     # Check against expected results
-    assert np.allclose(final_concentrations, expected_short_concentrations, atol=0.1)
+    assert np.allclose(final_concentrations, expected_long_concentrations, atol=0.1)
 
 def test_xor_simulation():
     # Specify expected results. These are based on the ../biocircuits_experimentation/xor_circuit.py script
@@ -236,14 +230,7 @@ def test_c1_ffl_and_or_simulation():
     final_concentrations = run_simulation(t, proteinArray)
     plot_results(t, final_concentrations, "C1 FFL AND OR Simulation Results")
     
-    # debug
-    print("final vs expected shapes:", final_concentrations.shape, expected_concentrations.shape)
-    diff = np.abs(final_concentrations - expected_concentrations)
-    print("max diff:", np.max(diff))
-    tolerance = 0.1
-    bad_idx = np.where(diff > tolerance)
-    print("indices exceeding tolerance:", bad_idx)
-    print(final_concentrations[bad_idx], expected_concentrations[bad_idx])
+    debug_helper(final_concentrations, expected_concentrations)
 
     # write out to file
     with open("simulation_test_data/c1_ffl_and_or_actual_results.log", "w") as f:
