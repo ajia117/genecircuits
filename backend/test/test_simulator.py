@@ -184,6 +184,35 @@ def test_repressilator():
         np.savetxt(f, final_concentrations, comments='')
     assert np.allclose(final_concentrations, expected_concentrations, atol=1e-12)
 
+
+def test_repressilator_self_repress():
+    expected = np.loadtxt("simulation_test_data/repressilator_self_repress_results.txt")
+
+    n = 1000
+    gamma = 1
+    n_all = 3
+    beta_all = 5
+    duration = 10
+    t = np.linspace(0, duration, n)
+    x0 = np.array([1, 1, 1.2])
+
+    # Protein array with self-repression on Protein 2
+    proteinArray = [
+        Protein(0, "Protein 1", x0[0], gamma, [Gate("rep_hill", firstInput=2, firstHill=n_all)], None, None, beta_all),
+        Protein(1, "Protein 2", x0[1], gamma, [
+            Gate("rep_hill_mult", firstInput=0, secondInput=1, firstHill=n_all, secondHill=2)
+        ], None, None, beta_all),
+        Protein(2, "Protein 3", x0[2], gamma, [Gate("rep_hill", firstInput=1, firstHill=n_all)], None, None, beta_all)
+    ]
+
+    final_concentrations = run_simulation(t, proteinArray)
+    plot_results(t, final_concentrations, "Repressilator with Self-Repression")
+
+    with open("simulation_test_data/repressilator_self_repress_actual_results.log", "w") as f:
+        np.savetxt(f, final_concentrations, comments='')
+    assert np.allclose(final_concentrations, expected, atol=1e-12)
+
+
 def test_c1_ffl_or_simulation():
     # Specify expected results. These are based on the ../biocircuits_experimentation/xor_circuit.py script
     c1_ffl.c1_ffl_or(output_file="simulation_test_data/c1_ffl_or_results.txt") # generate expected data
