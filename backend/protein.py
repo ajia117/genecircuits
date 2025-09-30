@@ -69,10 +69,22 @@ class Gate:
         self.regFuncLambda = self.getRegFunc() 
 
     def getRegFunc(self):
+        # additive, use for independent promoters
         if self.mType == "act_hill":
             return lambda p: biocircuits.act_hill(p[self.mFirstInput].getConcentration(), self.mFirstHill)
+        # multiplicative, use for combinatorial regulation
+        elif self.mType == "act_hill_mult":
+            return lambda p: (
+                biocircuits.act_hill(p[self.mFirstInput].getConcentration(), self.mFirstHill) * 
+                biocircuits.act_hill(p[self.mSecondInput].getConcentration(), self.mSecondHill)
+            )
         elif self.mType == "rep_hill":
             return lambda p: biocircuits.rep_hill(p[self.mFirstInput].getConcentration(), self.mFirstHill)
+        elif self.mType == "rep_hill_mult":
+            return lambda p: (
+                biocircuits.rep_hill(p[self.mFirstInput].getConcentration(), self.mFirstHill) * 
+                biocircuits.rep_hill(p[self.mSecondInput].getConcentration(), self.mSecondHill)
+            )
         elif self.mType == "aa_and":
             return lambda p: biocircuits.aa_and(p[self.mFirstInput].getConcentration(), p[self.mSecondInput].getConcentration(), self.mFirstHill, self.mSecondHill)
         elif self.mType == "aa_or":
