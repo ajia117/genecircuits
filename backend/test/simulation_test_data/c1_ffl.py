@@ -60,7 +60,7 @@ def c1_ffl_and(output_file, n_xy=3, n_yz=3, n_xz=3, gamma=1, beta=1, kappa=1, n=
     # Save to file as text
     np.savetxt(output_file, xyz_concentrations, comments='')
 
-def c1_ffl_or():  
+def c1_ffl_or(output_file):  
     # Parameter values
     beta = 3
     gamma = 1
@@ -111,20 +111,22 @@ def c1_ffl_or():
     combined = list(zip(x_on_uniform_t, y, z))
 
     # Save to file as text
-    with open("c1_ffl_or_results.txt", "w") as f:
+    with open(output_file, "w") as f:
         np.savetxt(f, combined, delimiter="\t", comments='')
         
-def c1_ffl_and_or():
+def c1_ffl_and_or(output_file):
     # Parameters
-    n = 1000
-    t_stepdown = 2.0
+    gamma = 1
+    n_xy, n_yz, n_xz = 4, 4, 4
+    t_stepdown = 0.5
     x_0 = 1.0
     duration = 20
+    n = 1000
     t = np.linspace(0, duration, n)
-    n_xy, n_xz, n_yz = 3, 3, 3
-    gamma, beta, kappa = 1, 1, 1
 
-    x_args = (0, t_stepdown, t_stepdown, x_0, 1)  # matches your test setup
+    # Arguments for x_pulse: (t_0, t_f, tau, x_0, duty_cycle)
+    x_args = (0, t_stepdown, t_stepdown, x_0, 1)
+    gamma, beta, kappa = 1, 1, 1
 
     # Run biocircuits FFL plot for AND
     p_and, cds_and, _ = biocircuits.apps.plot_ffl(
@@ -158,21 +160,23 @@ def c1_ffl_and_or():
 
     # Compute concentrations
     x_vals = x_pulse(t, *x_args)
-    y_vals = cds_and.data["y"][1:]
+    y_and_vals = cds_and.data["y"][1:]
+    y_or_vals = cds_or.data["y"][1:]
     z_and_vals = cds_and.data["z"][1:]
     z_or_vals = cds_or.data["z"][1:]
 
-    # Merge Z as sum of AND + OR (matches Protein.calcProdRate)
+    # Merge as sum of AND + OR (matches Protein.calcProdRate)
+    y_vals = y_and_vals + y_or_vals
     z_vals = z_and_vals + z_or_vals
 
     # Save to file for use as expected data
     xyz_concentrations = np.stack([x_vals, y_vals, z_vals], axis=1)
-    np.savetxt("c1_ffl_and_or_results.txt", xyz_concentrations, comments='')
+    np.savetxt(output_file, xyz_concentrations, comments='')
 
 
 # Run the script
 if __name__ == '__main__':
-    c1_ffl_and(output_file="c1_ffl_and_short_results.txt") # Short pulse
-    c1_ffl_and(output_file="c1_ffl_and_long_results.txt", t_stepdown=15.0, tau=20, x_0=1.0) # Long pulse
-    c1_ffl_or()
-    c1_ffl_and_or()
+    # c1_ffl_and(output_file="c1_ffl_and_short_results.txt") # Short pulse
+    # c1_ffl_and(output_file="c1_ffl_and_long_results.txt", t_stepdown=15.0, tau=20, x_0=1.0) # Long pulse
+    # c1_ffl_or(output_file="c1_ffl_or_results.txt")
+    c1_ffl_and_or(output_file="c1_ffl_and_or_results.txt")
