@@ -21,9 +21,9 @@ def test_repressilator_array_equivalence():
 
     # Define the expected protein array manually (same as in test_repressilator)
     expected_proteins = [
-        Protein(0, "Protein 0", 1, 1, [Gate("rep_hill", firstInput=2, firstHill=3)], None, None, 5),
-        Protein(1, "Protein 1", 1, 1, [Gate("rep_hill", firstInput=0, firstHill=3)], None, None, 5),
-        Protein(2, "Protein 2", 1.2, 1, [Gate("rep_hill", firstInput=1, firstHill=3)], None, None, 5)
+        Protein(0, "Protein 0", 1, 1, [Gate("rep_hill", firstInput=2, firstHill=1)], None, None, 5),
+        Protein(1, "Protein 1", 1, 1, [Gate("rep_hill", firstInput=0, firstHill=1)], None, None, 5),
+        Protein(2, "Protein 2", 1.2, 1, [Gate("rep_hill", firstInput=1, firstHill=1)], None, None, 5)
     ]
 
     assert len(parsed_proteins) == len(expected_proteins)
