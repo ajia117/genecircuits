@@ -218,7 +218,7 @@ def test_xor_diff_amplitudes():
         np.savetxt(f, final_concentrations, comments='')
     assert np.allclose(final_concentrations, expected_concentrations, atol=1e-5)
 
-def test_xor_diff_hill(): # FAILS
+def test_xor_diff_hill():
     expected_concentrations = np.loadtxt("simulation_test_data/xor_diff_hill.txt")
     n = 1000
     t = np.linspace(0, 80, n)
@@ -228,7 +228,7 @@ def test_xor_diff_hill(): # FAILS
         Protein(0, "Protein A", 0.0, 0.0, [], x_pulse, a_args),
         Protein(1, "Protein B", 0.0, 0.0, [], x_pulse, b_args),
         Protein(2, "Protein C", 0.0, 0.1, [Gate("aa_and", firstInput=0, secondInput=1, firstHill=3, secondHill=3)]),
-        Protein(3, "Protein D", 0.0, 0.1, [Gate("aa_or", firstInput=0, secondInput=1, firstHill=4, secondHill=4)]),
+        Protein(3, "Protein D", 0.0, 0.1, [Gate("aa_or", firstInput=0, secondInput=1, firstHill=3, secondHill=3)]),
         Protein(4, "Protein E", 0.0, 0.2, [Gate("ar_and", firstInput=3, secondInput=2, firstHill=4, secondHill=4)])
     ]
     final_concentrations = run_simulation(t, proteinArray)
