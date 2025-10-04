@@ -188,10 +188,31 @@ def test_toggle_switch_opposite_concentrations():
     assert conc.min() > -1e-9
     assert conc[-1, 0] > conc[-1, 1]
 
+def test_toggle_switch_equal_concentrations():
+    n = 600
+    duration = 30
+    t = np.linspace(0, duration, n)
+
+    gamma = 1.0
+    hill_n = 3
+    beta = 1.5  
+
+    proteins = [
+        Protein(0, "A", 1.2, gamma, [Gate("rep_hill", firstInput=1, firstHill=hill_n)], None, None, beta),
+        Protein(1, "B", 1.2, gamma, [Gate("rep_hill", firstInput=0, firstHill=hill_n)], None, None, beta),
+    ]
+
+    conc = run_simulation(t, proteins)
+    plot_results(t, conc, "Toggle Switch Simulation Results")
+    assert conc.shape == (n, 2)
+    assert np.all(np.isfinite(conc))
+    assert conc.min() > -1e-9
+    assert abs(conc[-1, 0] - conc[-1, 1]) < 1e-3
+
 # TODO: handle command line args, to run individual tests if desired
 def main():
     print("Running all test cases...")
-    pytest.main(["-v", "test_simulator.py::test_ffl_simulation", "test_simulator.py::test_xor_simulation", "test_simulator.py::test_i1_ffl_simulation", "test_simulator.py::test_repressilator", "test_simulator.py::test_toggle_switch", "test_simulator.py::test_toggle_switch_opposite_concentrations"])
+    pytest.main(["-v", "test_simulator.py::test_ffl_simulation", "test_simulator.py::test_xor_simulation", "test_simulator.py::test_i1_ffl_simulation", "test_simulator.py::test_repressilator", "test_simulator.py::test_toggle_switch", "test_simulator.py::test_toggle_switch_opposite_concentrations", "test_simulator.py::test_toggle_switch_equal_concentrations"])
 
 # Run the script
 if __name__ == '__main__':
