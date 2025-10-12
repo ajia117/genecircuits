@@ -33,7 +33,10 @@ def plot_results(t, final_concentrations, title):
     # Populate glyphs
     colors = bokeh.palettes.d3['Category10'][10]
     for i in range(final_concentrations.shape[1]):
-        p.line(t, final_concentrations[:, i], line_width=2, color=colors[i], legend_label=f'Protein {i}')
+        p.line(t, final_concentrations[:, i],
+               line_width=2,
+               color=colors[i],
+               legend_label=f'Protein {i}')
 
     # Place the legend
     p.legend.location = 'bottom_right'
@@ -202,7 +205,7 @@ def test_repressilator():
     with open("simulation_test_data/repressilator_actual_results.log", "w") as f:
         np.savetxt(f, final_concentrations, comments='')
     assert np.allclose(final_concentrations, expected_concentrations, atol=1e-12)
-
+    
 def test_repressilator_self_repress():
     expected = np.loadtxt("simulation_test_data/repressilator_self_repress_results.txt")
 
@@ -230,6 +233,69 @@ def test_repressilator_self_repress():
         np.savetxt(f, final_concentrations, comments='')
     assert np.allclose(final_concentrations, expected, atol=1e-12)
 
+def test_toggle_switch():
+    n = 600
+    duration = 30
+    t = np.linspace(0, duration, n)
+
+    gamma = 1.0
+    hill_n = 3
+    beta = 1.5  
+
+    proteins = [
+        Protein(0, "A", 1.0, gamma, [Gate("rep_hill", firstInput=1, firstHill=hill_n)], None, None, beta),
+        Protein(1, "B", 1.2, gamma, [Gate("rep_hill", firstInput=0, firstHill=hill_n)], None, None, beta),
+    ]
+
+    conc = run_simulation(t, proteins)
+    plot_results(t, conc, "Toggle Switch Simulation Results")
+    assert conc.shape == (n, 2)
+    assert np.all(np.isfinite(conc))
+    assert conc.min() > -1e-9
+    assert conc[-1, 1] > conc[-1, 0]  # Protein B > Protein A at the end
+
+
+def test_toggle_switch_opposite_concentrations():
+    n = 600
+    duration = 30
+    t = np.linspace(0, duration, n)
+
+    gamma = 1.0
+    hill_n = 3
+    beta = 1.5  
+
+    proteins = [
+        Protein(0, "A", 1.2, gamma, [Gate("rep_hill", firstInput=1, firstHill=hill_n)], None, None, beta),
+        Protein(1, "B", 1.0, gamma, [Gate("rep_hill", firstInput=0, firstHill=hill_n)], None, None, beta),
+    ]
+
+    conc = run_simulation(t, proteins)
+    plot_results(t, conc, "Toggle Switch Simulation Results")
+    assert conc.shape == (n, 2)
+    assert np.all(np.isfinite(conc))
+    assert conc.min() > -1e-9
+    assert conc[-1, 0] > conc[-1, 1]
+
+def test_toggle_switch_equal_concentrations():
+    n = 600
+    duration = 30
+    t = np.linspace(0, duration, n)
+
+    gamma = 1.0
+    hill_n = 3
+    beta = 1.5  
+
+    proteins = [
+        Protein(0, "A", 1.2, gamma, [Gate("rep_hill", firstInput=1, firstHill=hill_n)], None, None, beta),
+        Protein(1, "B", 1.2, gamma, [Gate("rep_hill", firstInput=0, firstHill=hill_n)], None, None, beta),
+    ]
+
+    conc = run_simulation(t, proteins)
+    plot_results(t, conc, "Toggle Switch Simulation Results")
+    assert conc.shape == (n, 2)
+    assert np.all(np.isfinite(conc))
+    assert conc.min() > -1e-9
+    assert abs(conc[-1, 0] - conc[-1, 1]) < 1e-3
 
 def test_c1_ffl_or_simulation():
     # Specify expected results. These are based on the ../biocircuits_experimentation/xor_circuit.py script
@@ -283,3 +349,8 @@ def test_c1_ffl_and_or_simulation():
     with open("simulation_test_data/c1_ffl_and_or_actual_results.log", "w") as f:
         np.savetxt(f, final_concentrations, comments='')
     assert np.allclose(final_concentrations, expected_concentrations, atol=2e-1) # Tolerance is 0.2 since harder to exactly simulate using ffl_plot
+    
+# TODO: handle command line args, to run individual tests if desired
+def main():
+    print("Running all test cases...")
+    pytest.main(["-v", "test_simulator.py::test_ffl_simulation", "test_simulator.py::test_xor_simulation", "test_simulator.py::test_i1_ffl_simulation", "test_simulator.py::test_repressilator", "test_simulator.py::test_toggle_switch", "test_simulator.py::test_toggle_switch_opposite_concentrations", "test_simulator.py::test_toggle_switch_equal_concentrations"])
