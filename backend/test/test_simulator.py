@@ -41,10 +41,11 @@ def plot_results(t, final_concentrations, title):
     # Place the legend
     p.legend.location = 'bottom_right'
 
-    # Show plot
+    
     output_file(f"{title}.html")
     layout = bokeh.layouts.column(p)
     bokeh.io.show(layout)
+
 
 def test_c1_ffl_and_short_simulation():
     # Specify expected results. These are based on the ../biocircuits_experimentation/xor_circuit.py script
@@ -224,7 +225,7 @@ def test_toggle_switch_opposite_concentrations():
     ]
 
     conc = run_simulation(t, proteins)
-    plot_results(t, conc, "Toggle Switch Simulation Results")
+    plot_results(t, conc, "Toggle Switch Simulation Results for Opposite Concentrations")
     assert conc.shape == (n, 2)
     assert np.all(np.isfinite(conc))
     assert conc.min() > -1e-9
@@ -245,16 +246,80 @@ def test_toggle_switch_equal_concentrations():
     ]
 
     conc = run_simulation(t, proteins)
-    plot_results(t, conc, "Toggle Switch Simulation Results")
+    plot_results(t, conc, "Toggle Switch Simulation Results for Equal Concentrations")
     assert conc.shape == (n, 2)
     assert np.all(np.isfinite(conc))
     assert conc.min() > -1e-9
     assert abs(conc[-1, 0] - conc[-1, 1]) < 1e-3
 
-# TODO: handle command line args, to run individual tests if desired
-def main():
-    print("Running all test cases...")
-    pytest.main(["-v", "test_simulator.py::test_ffl_simulation", "test_simulator.py::test_xor_simulation", "test_simulator.py::test_i1_ffl_simulation", "test_simulator.py::test_repressilator", "test_simulator.py::test_toggle_switch", "test_simulator.py::test_toggle_switch_opposite_concentrations", "test_simulator.py::test_toggle_switch_equal_concentrations"])
+
+def test_toggle_switch_small_hill_coefficient():
+    n = 600
+    duration = 30
+    t = np.linspace(0, duration, n)
+
+    gamma = 1.0
+    hill_n = 0.5
+    beta = 1.5  
+
+    proteins = [
+        Protein(0, "A", 1.2, gamma, [Gate("rep_hill", firstInput=1, firstHill=hill_n)], None, None, beta),
+        Protein(1, "B", 1.0, gamma, [Gate("rep_hill", firstInput=0, firstHill=hill_n)], None, None, beta),
+    ]
+
+    conc = run_simulation(t, proteins)
+    plot_results(t, conc, "Toggle Switch Simulation Results for Small Hill Coefficient")
+    assert conc.shape == (n, 2)
+    assert np.all(np.isfinite(conc))
+    assert conc.min() > -1e-9
+    assert abs(conc[-1, 0] - conc[-1, 1]) < 1
+
+def test_toggle_switch_unequal_degradation_rates():
+    n = 600
+    duration = 30
+    t = np.linspace(0, duration, n)
+
+    gamma = 1.0
+    hill_n = 0.5
+    beta = 1.5  
+
+    proteins = [
+        Protein(0, "A", 1.2, 0.5, [Gate("rep_hill", firstInput=1, firstHill=hill_n)], None, None, beta),
+        Protein(1, "B", 1.0, 1.0, [Gate("rep_hill", firstInput=0, firstHill=hill_n)], None, None, beta),
+    ]
+
+    conc = run_simulation(t, proteins)
+    plot_results(t, conc, "Toggle Switch Simulation Results for Unequal Degradation Rates")
+    assert conc.shape == (n, 2)
+    assert np.all(np.isfinite(conc))
+    assert conc.min() > -1e-9
+    assert conc[-1, 0] > conc[-1, 1]
+
+
+def test_toggle_switch_unequal_production_rates():
+    n = 600
+    duration = 30
+    t = np.linspace(0, duration, n)
+
+    gamma = 1.0
+    hill_n = 0.5
+    beta = 1.5  
+
+    proteins = [
+        Protein(0, "A", 1.2, gamma, [Gate("rep_hill", firstInput=1, firstHill=hill_n)], None, None, beta=3.0),
+        Protein(1, "B", 1.0, gamma, [Gate("rep_hill", firstInput=0, firstHill=hill_n)], None, None, beta=1.0),
+    ]
+
+    conc = run_simulation(t, proteins)
+    plot_results(t, conc, "Toggle Switch Simulation Results for Unequal Production Rates")
+    assert conc.shape == (n, 2)
+    assert np.all(np.isfinite(conc))
+    assert conc.min() > -1e-9
+    assert conc[-1, 0] > conc[-1, 1]
+
+
+
+
 
 def test_repressilator_self_repress():
     expected = np.loadtxt("simulation_test_data/repressilator_self_repress_results.txt")
@@ -336,3 +401,27 @@ def test_c1_ffl_and_or_simulation():
     with open("simulation_test_data/c1_ffl_and_or_actual_results.log", "w") as f:
         np.savetxt(f, final_concentrations, comments='')
     assert np.allclose(final_concentrations, expected_concentrations, atol=2e-1) # Tolerance is 0.2 since harder to exactly simulate using ffl_plot
+
+
+# TODO: handle command line args, to run individual tests if desired
+def main():
+    print("Running all test cases...")
+    pytest.main(["-v", 
+                  "test_simulator.py::test_c1_ffl_and_short_simulation",
+                  "test_simulator.py::test_c1_ffl_and_long_simulation", 
+                  "test_simulator.py::test_xor_simulation",
+                  "test_simulator.py::test_i1_ffl_simulation",
+                  "test_simulator.py::test_repressilator", 
+                  "test_simulator.py::test_toggle_switch",
+                  "test_simulator.py::test_toggle_switch_opposite_concentrations",
+                  "test_simulator.py::test_toggle_switch_equal_concentrations",
+                  "test_simulator.py::test_toggle_switch_small_hill_coefficient",
+                  "test_simulator.py::test_toggle_switch_unequal_degradation_rates",
+                  "test_simulator.py::test_toggle_switch_unequal_production_rates",
+                  "test_simulator.py::test_repressilator_self_repress",
+                  "test_simulator.py::test_c1_ffl_or_simulation",
+                  "test_simulator.py::test_c1_ffl_and_or_simulation"])
+
+# Run the script
+if __name__ == '__main__':
+    main()
