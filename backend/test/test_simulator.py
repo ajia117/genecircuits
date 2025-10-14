@@ -10,6 +10,10 @@ from   bokeh.io import output_file
 import bokeh.palettes
 from simulation_test_data import c1_ffl
 
+# Get the absolute path to this file's directory
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(BASE_DIR, "simulation_test_data")
+
 DEBUG=False
 
 def debug_helper(final_concentrations, expected_concentrations):
@@ -49,8 +53,9 @@ def plot_results(t, final_concentrations, title):
 
 def test_c1_ffl_and_short_simulation():
     # Specify expected results. These are based on the ../biocircuits_experimentation/xor_circuit.py script
-    c1_ffl.c1_ffl_and(output_file="simulation_test_data/c1_ffl_and_short_results.txt") # generate expected results
-    expected_short_concentrations = np.loadtxt("simulation_test_data/c1_ffl_and_short_results.txt")
+    output_path = os.path.join(DATA_DIR, "c1_ffl_and_short_results.txt")
+    c1_ffl.c1_ffl_and(output_file=output_path) # generate expected results
+    expected_short_concentrations = np.loadtxt(os.path.join(DATA_DIR, "c1_ffl_and_short_results.txt"))
     
     # Simulation parameters
     n = 1000
@@ -80,7 +85,7 @@ def test_c1_ffl_and_short_simulation():
     debug_helper(final_concentrations, expected_short_concentrations)
 
     # Save actual results
-    with open("simulation_test_data/c1_ffl_and_short_actual_results.log", "w") as f:
+    with open(os.path.join(DATA_DIR, "c1_ffl_and_short_results.txt"), "w") as f:
         np.savetxt(f, final_concentrations, comments='')
 
     # Check against expected results
@@ -88,8 +93,8 @@ def test_c1_ffl_and_short_simulation():
     
 def test_c1_ffl_and_long_simulation():
     # Specify expected results. These are based on the ../biocircuits_experimentation/xor_circuit.py script
-    c1_ffl.c1_ffl_and(output_file="simulation_test_data/c1_ffl_and_long_results.txt", t_stepdown=15.0, tau=20, x_0=1.0) # generate expected results
-    expected_long_concentrations = np.loadtxt("simulation_test_data/c1_ffl_and_long_results.txt")
+    c1_ffl.c1_ffl_and(output_file=os.path.join(DATA_DIR, "c1_ffl_and_long_results.txt"), t_stepdown=15.0, tau=20, x_0=1.0) # generate expected results
+    expected_long_concentrations = np.loadtxt(os.path.join(DATA_DIR, "c1_ffl_and_long_results.txt"))
     
     # Simulation parameters
     n = 1000
@@ -119,7 +124,7 @@ def test_c1_ffl_and_long_simulation():
     debug_helper(final_concentrations, expected_long_concentrations)
 
     # Save actual results
-    with open("simulation_test_data/c1_ffl_and_long_actual_results.log", "w") as f:
+    with open(os.path.join(DATA_DIR, "c1_ffl_and_long_actual_results.log"), "w") as f:
         np.savetxt(f, final_concentrations, comments='')
 
     # Check against expected results
@@ -127,7 +132,7 @@ def test_c1_ffl_and_long_simulation():
 
 def test_xor_simulation():
     # Specify expected results. These are based on the ../biocircuits_experimentation/xor_circuit.py script
-    expected_concentrations = np.loadtxt("simulation_test_data/xor_results.txt")
+    expected_concentrations = np.loadtxt(os.path.join(DATA_DIR, "xor_results.txt"))
     n = 1000
     # Time points
     t = np.linspace(0, 80, n)
@@ -139,14 +144,15 @@ def test_xor_simulation():
     final_concentrations = run_simulation(t, proteinArray)
     
     # write results to file
-    with open("simulation_test_data/xor_actual_results.log", "w") as f:
+    with open(os.path.join(DATA_DIR, "xor_actual_results.log"), "w") as f:
         np.savetxt(f, final_concentrations, comments='')
     
     assert np.allclose(final_concentrations, expected_concentrations, atol=1e-5)
 
 def test_i1_ffl_simulation():
     # Specify expected results. These are based on the ../biocircuits_experimentation/xor_circuit.py script
-    expected_concentrations = np.loadtxt("simulation_test_data/i1_ffl_results.txt")
+    expected_path = os.path.join(DATA_DIR, "i1_ffl_results.txt")
+    expected_concentrations = np.loadtxt(expected_path)
     n = 200
     gamma = 1
     n_xy, n_yz = 3, 3
@@ -163,13 +169,15 @@ def test_i1_ffl_simulation():
     plot_results(t, final_concentrations, "I1 FFL AND Simulation Results")
 
     # write out to file
-    with open("simulation_test_data/i1_ffl_actual_results.log", "w") as f:
+    actual_path = os.path.join(DATA_DIR, "i1_ffl_actual_results.log")
+    with open(actual_path, "w") as f:
         np.savetxt(f, final_concentrations, comments='')
     assert np.allclose(final_concentrations, expected_concentrations, atol=1e-1) # Tolerance is 0.1
 
 def test_repressilator():
     # Specify expected results. These are based on the ../biocircuits_experimentation/xor_circuit.py script
-    expected_concentrations = np.loadtxt("simulation_test_data/repressilator_results.txt")
+    expected_path = os.path.join(DATA_DIR, "repressilator_results.txt")
+    expected_concentrations = np.loadtxt(expected_path)
     n = 1000
     gamma = 1
     n_all = 3
@@ -184,7 +192,8 @@ def test_repressilator():
     plot_results(t, final_concentrations, "Repressilator Simulation Results")
 
     # write out to file
-    with open("simulation_test_data/repressilator_actual_results.log", "w") as f:
+    actual_path = os.path.join(DATA_DIR, "repressilator_actual_results.log")
+    with open(actual_path, "w") as f:
         np.savetxt(f, final_concentrations, comments='')
     assert np.allclose(final_concentrations, expected_concentrations, atol=1e-12)
 
@@ -322,7 +331,8 @@ def test_toggle_switch_unequal_production_rates():
 
 
 def test_repressilator_self_repress():
-    expected = np.loadtxt("simulation_test_data/repressilator_self_repress_results.txt")
+    expected_path = os.path.join(DATA_DIR, "repressilator_self_repress_results.txt")
+    expected = np.loadtxt(expected_path)
 
     n = 1000
     gamma = 1
@@ -344,15 +354,17 @@ def test_repressilator_self_repress():
     final_concentrations = run_simulation(t, proteinArray)
     plot_results(t, final_concentrations, "Repressilator with Self-Repression")
 
-    with open("simulation_test_data/repressilator_self_repress_actual_results.log", "w") as f:
+    actual_path = os.path.join(DATA_DIR, "repressilator_self_repress_actual_results.log")
+    with open(actual_path, "w") as f:
         np.savetxt(f, final_concentrations, comments='')
     assert np.allclose(final_concentrations, expected, atol=1e-12)
 
 
 def test_c1_ffl_or_simulation():
     # Specify expected results. These are based on the ../biocircuits_experimentation/xor_circuit.py script
-    c1_ffl.c1_ffl_or(output_file="simulation_test_data/c1_ffl_or_results.txt") # generate expected data
-    expected_concentrations = np.loadtxt("simulation_test_data/c1_ffl_or_results.txt")
+    expected_path = os.path.join(DATA_DIR, "c1_ffl_or_results.txt")
+    c1_ffl.c1_ffl_or(output_file=expected_path)
+    expected_concentrations = np.loadtxt(expected_path)
     n = 200
     gamma = 1
     n_xy, n_yz = 3, 3
@@ -369,14 +381,16 @@ def test_c1_ffl_or_simulation():
     plot_results(t, final_concentrations, "C1 FFL OR Simulation Results")
 
     # write out to file
-    with open("simulation_test_data/c1_ffl_or_actual_results.log", "w") as f:
+    actual_path = os.path.join(DATA_DIR, "c1_ffl_or_actual_results.log")
+    with open(actual_path, "w") as f:
         np.savetxt(f, final_concentrations, comments='')
     assert np.allclose(final_concentrations, expected_concentrations, atol=1e-1) # Tolerance is 0.1
 
 def test_c1_ffl_and_or_simulation():
     # Specify expected results. These are based on the ../biocircuits_experimentation/xor_circuit.py script
-    c1_ffl.c1_ffl_and_or(output_file="simulation_test_data/c1_ffl_and_or_results.txt") # generate expected data
-    expected_concentrations = np.loadtxt("simulation_test_data/c1_ffl_and_or_results.txt")
+    expected_path = os.path.join(DATA_DIR, "c1_ffl_and_or_results.txt")
+    c1_ffl.c1_ffl_and_or(output_file=expected_path)
+    expected_concentrations = np.loadtxt(expected_path)
     
     # Simulation parameters
     n = 1000
@@ -398,7 +412,8 @@ def test_c1_ffl_and_or_simulation():
     debug_helper(final_concentrations, expected_concentrations)
 
     # write out to file
-    with open("simulation_test_data/c1_ffl_and_or_actual_results.log", "w") as f:
+    actual_path = os.path.join(DATA_DIR, "c1_ffl_and_or_actual_results.log")
+    with open(actual_path, "w") as f:
         np.savetxt(f, final_concentrations, comments='')
     assert np.allclose(final_concentrations, expected_concentrations, atol=2e-1) # Tolerance is 0.2 since harder to exactly simulate using ffl_plot
 
