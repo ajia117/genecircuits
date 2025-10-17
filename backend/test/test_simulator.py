@@ -174,6 +174,25 @@ def test_i1_ffl_simulation():
         np.savetxt(f, final_concentrations, comments='')
     assert np.allclose(final_concentrations, expected_concentrations, atol=1e-1) # Tolerance is 0.1
 
+def test_repressilator_no_repression():
+    n = 500
+    gamma = 1
+    beta_all = 5
+    duration = 10
+    t = np.linspace(0, duration, n)
+    x0 = np.array([2, 2, 2])
+
+    proteinArray = [
+        Protein(0, "Protein 1", x0[0], gamma, [], None, None, beta_all),
+        Protein(1, "Protein 2", x0[1], gamma, [], None, None, beta_all),
+        Protein(2, "Protein 3", x0[2], gamma, [], None, None, beta_all),
+    ]
+
+    final_concentrations = run_simulation(t, proteinArray)
+
+    # All proteins should decay toward ~0
+    assert np.all(final_concentrations[-1] < 1e-3)
+
 def test_repressilator():
     # Specify expected results. These are based on the ../biocircuits_experimentation/xor_circuit.py script
     expected_path = os.path.join(DATA_DIR, "repressilator_results.txt")
@@ -196,6 +215,33 @@ def test_repressilator():
     with open(actual_path, "w") as f:
         np.savetxt(f, final_concentrations, comments='')
     assert np.allclose(final_concentrations, expected_concentrations, atol=1e-12)
+    
+def test_repressilator_self_repress():
+    expected = np.loadtxt("simulation_test_data/repressilator_self_repress_results.txt")
+
+    n = 1000
+    gamma = 1
+    n_all = 3
+    beta_all = 5
+    duration = 10
+    t = np.linspace(0, duration, n)
+    x0 = np.array([1, 1, 1.2])
+
+    # Protein array with self-repression on Protein 2
+    proteinArray = [
+        Protein(0, "Protein 1", x0[0], gamma, [Gate("rep_hill", firstInput=2, firstHill=n_all)], None, None, beta_all),
+        Protein(1, "Protein 2", x0[1], gamma, [
+            Gate("rep_hill_mult", firstInput=0, secondInput=1, firstHill=n_all, secondHill=2)
+        ], None, None, beta_all),
+        Protein(2, "Protein 3", x0[2], gamma, [Gate("rep_hill", firstInput=1, firstHill=n_all)], None, None, beta_all)
+    ]
+
+    final_concentrations = run_simulation(t, proteinArray)
+    plot_results(t, final_concentrations, "Repressilator with Self-Repression")
+
+    with open("simulation_test_data/repressilator_self_repress_actual_results.log", "w") as f:
+        np.savetxt(f, final_concentrations, comments='')
+    assert np.allclose(final_concentrations, expected, atol=1e-12)
 
 def test_toggle_switch():
     n = 600

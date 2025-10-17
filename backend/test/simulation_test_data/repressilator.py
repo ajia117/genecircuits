@@ -13,15 +13,26 @@ def repressilator_rhs(x, t, beta, n):
     """
     Returns 3-array of (dx_1/dt, dx_2/dt, dx_3/dt)
     """
-    x_1, x_2, x_3 = x
+    x1, x2, x3 = x
 
-    return np.array(
-        [
-            beta / (1 + x_3 ** n) - x_1,
-            beta / (1 + x_1 ** n) - x_2,
-            beta / (1 + x_2 ** n) - x_3,
-        ]
-    )
+    # x_1, x_2, x_3 = x
+    # return np.array(
+    #     [
+    #         beta / (1 + x_3 ** n) - x_1,
+    #         beta / (1 + x_1 ** n) - x_2,
+    #         beta / (1 + x_2 ** n) - x_3,
+    #     ]
+    # )
+
+    prod1 = beta * biocircuits.rep_hill(x3, n)  # repressed by protein 3
+    prod2 = beta * biocircuits.rep_hill(x1, n)  # repressed by protein 1
+    prod3 = beta * biocircuits.rep_hill(x2, n)  # repressed by protein 2
+
+    dx1 = prod1 - x1
+    dx2 = prod2 - x2
+    dx3 = prod3 - x3
+
+    return np.array([dx1, dx2, dx3])
 
 # Self-repressing repressilator
 def repressilator_rhs_self(x, t, beta, n, self_coeff=2):
