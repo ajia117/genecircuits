@@ -10,6 +10,10 @@ from   bokeh.io import output_file
 import bokeh.palettes
 from simulation_test_data import c1_ffl
 
+# Get the absolute path to this file's directory
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(BASE_DIR, "simulation_test_data")
+
 DEBUG=False
 
 def debug_helper(final_concentrations, expected_concentrations):
@@ -41,15 +45,17 @@ def plot_results(t, final_concentrations, title):
     # Place the legend
     p.legend.location = 'bottom_right'
 
-    # Show plot
+    
     output_file(f"{title}.html")
     layout = bokeh.layouts.column(p)
     bokeh.io.show(layout)
 
+
 def test_c1_ffl_and_short_simulation():
     # Specify expected results. These are based on the ../biocircuits_experimentation/xor_circuit.py script
-    c1_ffl.c1_ffl_and(output_file="simulation_test_data/c1_ffl_and_short_results.txt") # generate expected results
-    expected_short_concentrations = np.loadtxt("simulation_test_data/c1_ffl_and_short_results.txt")
+    output_path = os.path.join(DATA_DIR, "c1_ffl_and_short_results.txt")
+    c1_ffl.c1_ffl_and(output_file=output_path) # generate expected results
+    expected_short_concentrations = np.loadtxt(os.path.join(DATA_DIR, "c1_ffl_and_short_results.txt"))
     
     # Simulation parameters
     n = 1000
@@ -79,7 +85,7 @@ def test_c1_ffl_and_short_simulation():
     debug_helper(final_concentrations, expected_short_concentrations)
 
     # Save actual results
-    with open("simulation_test_data/c1_ffl_and_short_actual_results.log", "w") as f:
+    with open(os.path.join(DATA_DIR, "c1_ffl_and_short_results.txt"), "w") as f:
         np.savetxt(f, final_concentrations, comments='')
 
     # Check against expected results
@@ -87,8 +93,8 @@ def test_c1_ffl_and_short_simulation():
     
 def test_c1_ffl_and_long_simulation():
     # Specify expected results. These are based on the ../biocircuits_experimentation/xor_circuit.py script
-    c1_ffl.c1_ffl_and(output_file="simulation_test_data/c1_ffl_and_long_results.txt", t_stepdown=15.0, tau=20, x_0=1.0) # generate expected results
-    expected_long_concentrations = np.loadtxt("simulation_test_data/c1_ffl_and_long_results.txt")
+    c1_ffl.c1_ffl_and(output_file=os.path.join(DATA_DIR, "c1_ffl_and_long_results.txt"), t_stepdown=15.0, tau=20, x_0=1.0) # generate expected results
+    expected_long_concentrations = np.loadtxt(os.path.join(DATA_DIR, "c1_ffl_and_long_results.txt"))
     
     # Simulation parameters
     n = 1000
@@ -118,7 +124,7 @@ def test_c1_ffl_and_long_simulation():
     debug_helper(final_concentrations, expected_long_concentrations)
 
     # Save actual results
-    with open("simulation_test_data/c1_ffl_and_long_actual_results.log", "w") as f:
+    with open(os.path.join(DATA_DIR, "c1_ffl_and_long_actual_results.log"), "w") as f:
         np.savetxt(f, final_concentrations, comments='')
 
     # Check against expected results
@@ -126,7 +132,7 @@ def test_c1_ffl_and_long_simulation():
 
 def test_xor_simulation():
     # Specify expected results. These are based on the ../biocircuits_experimentation/xor_circuit.py script
-    expected_concentrations = np.loadtxt("simulation_test_data/xor_results.txt")
+    expected_concentrations = np.loadtxt(os.path.join(DATA_DIR, "xor_results.txt"))
     n = 1000
     # Time points
     t = np.linspace(0, 80, n)
@@ -138,14 +144,15 @@ def test_xor_simulation():
     final_concentrations = run_simulation(t, proteinArray)
     
     # write results to file
-    with open("simulation_test_data/xor_actual_results.log", "w") as f:
+    with open(os.path.join(DATA_DIR, "xor_actual_results.log"), "w") as f:
         np.savetxt(f, final_concentrations, comments='')
     
     assert np.allclose(final_concentrations, expected_concentrations, atol=1e-5)
 
 def test_i1_ffl_simulation():
     # Specify expected results. These are based on the ../biocircuits_experimentation/xor_circuit.py script
-    expected_concentrations = np.loadtxt("simulation_test_data/i1_ffl_results.txt")
+    expected_path = os.path.join(DATA_DIR, "i1_ffl_results.txt")
+    expected_concentrations = np.loadtxt(expected_path)
     n = 200
     gamma = 1
     n_xy, n_yz = 3, 3
@@ -162,7 +169,8 @@ def test_i1_ffl_simulation():
     plot_results(t, final_concentrations, "I1 FFL AND Simulation Results")
 
     # write out to file
-    with open("simulation_test_data/i1_ffl_actual_results.log", "w") as f:
+    actual_path = os.path.join(DATA_DIR, "i1_ffl_actual_results.log")
+    with open(actual_path, "w") as f:
         np.savetxt(f, final_concentrations, comments='')
     assert np.allclose(final_concentrations, expected_concentrations, atol=1e-1) # Tolerance is 0.1
 
@@ -187,7 +195,8 @@ def test_repressilator_no_repression():
 
 def test_repressilator():
     # Specify expected results. These are based on the ../biocircuits_experimentation/xor_circuit.py script
-    expected_concentrations = np.loadtxt("simulation_test_data/repressilator_results.txt")
+    expected_path = os.path.join(DATA_DIR, "repressilator_results.txt")
+    expected_concentrations = np.loadtxt(expected_path)
     n = 1000
     gamma = 1
     n_all = 3
@@ -202,7 +211,8 @@ def test_repressilator():
     plot_results(t, final_concentrations, "Repressilator Simulation Results")
 
     # write out to file
-    with open("simulation_test_data/repressilator_actual_results.log", "w") as f:
+    actual_path = os.path.join(DATA_DIR, "repressilator_actual_results.log")
+    with open(actual_path, "w") as f:
         np.savetxt(f, final_concentrations, comments='')
     assert np.allclose(final_concentrations, expected_concentrations, atol=1e-12)
     
@@ -270,7 +280,7 @@ def test_toggle_switch_opposite_concentrations():
     ]
 
     conc = run_simulation(t, proteins)
-    plot_results(t, conc, "Toggle Switch Simulation Results")
+    plot_results(t, conc, "Toggle Switch Simulation Results for Opposite Concentrations")
     assert conc.shape == (n, 2)
     assert np.all(np.isfinite(conc))
     assert conc.min() > -1e-9
@@ -291,16 +301,116 @@ def test_toggle_switch_equal_concentrations():
     ]
 
     conc = run_simulation(t, proteins)
-    plot_results(t, conc, "Toggle Switch Simulation Results")
+    plot_results(t, conc, "Toggle Switch Simulation Results for Equal Concentrations")
     assert conc.shape == (n, 2)
     assert np.all(np.isfinite(conc))
     assert conc.min() > -1e-9
     assert abs(conc[-1, 0] - conc[-1, 1]) < 1e-3
 
+
+def test_toggle_switch_small_hill_coefficient():
+    n = 600
+    duration = 30
+    t = np.linspace(0, duration, n)
+
+    gamma = 1.0
+    hill_n = 0.5
+    beta = 1.5  
+
+    proteins = [
+        Protein(0, "A", 1.2, gamma, [Gate("rep_hill", firstInput=1, firstHill=hill_n)], None, None, beta),
+        Protein(1, "B", 1.0, gamma, [Gate("rep_hill", firstInput=0, firstHill=hill_n)], None, None, beta),
+    ]
+
+    conc = run_simulation(t, proteins)
+    plot_results(t, conc, "Toggle Switch Simulation Results for Small Hill Coefficient")
+    assert conc.shape == (n, 2)
+    assert np.all(np.isfinite(conc))
+    assert conc.min() > -1e-9
+    assert abs(conc[-1, 0] - conc[-1, 1]) < 1
+
+def test_toggle_switch_unequal_degradation_rates():
+    n = 600
+    duration = 30
+    t = np.linspace(0, duration, n)
+
+    gamma = 1.0
+    hill_n = 0.5
+    beta = 1.5  
+
+    proteins = [
+        Protein(0, "A", 1.2, 0.5, [Gate("rep_hill", firstInput=1, firstHill=hill_n)], None, None, beta),
+        Protein(1, "B", 1.0, 1.0, [Gate("rep_hill", firstInput=0, firstHill=hill_n)], None, None, beta),
+    ]
+
+    conc = run_simulation(t, proteins)
+    plot_results(t, conc, "Toggle Switch Simulation Results for Unequal Degradation Rates")
+    assert conc.shape == (n, 2)
+    assert np.all(np.isfinite(conc))
+    assert conc.min() > -1e-9
+    assert conc[-1, 0] > conc[-1, 1]
+
+
+def test_toggle_switch_unequal_production_rates():
+    n = 600
+    duration = 30
+    t = np.linspace(0, duration, n)
+
+    gamma = 1.0
+    hill_n = 0.5
+    beta = 1.5  
+
+    proteins = [
+        Protein(0, "A", 1.2, gamma, [Gate("rep_hill", firstInput=1, firstHill=hill_n)], None, None, beta=3.0),
+        Protein(1, "B", 1.0, gamma, [Gate("rep_hill", firstInput=0, firstHill=hill_n)], None, None, beta=1.0),
+    ]
+
+    conc = run_simulation(t, proteins)
+    plot_results(t, conc, "Toggle Switch Simulation Results for Unequal Production Rates")
+    assert conc.shape == (n, 2)
+    assert np.all(np.isfinite(conc))
+    assert conc.min() > -1e-9
+    assert conc[-1, 0] > conc[-1, 1]
+
+
+
+
+
+def test_repressilator_self_repress():
+    expected_path = os.path.join(DATA_DIR, "repressilator_self_repress_results.txt")
+    expected = np.loadtxt(expected_path)
+
+    n = 1000
+    gamma = 1
+    n_all = 3
+    beta_all = 5
+    duration = 10
+    t = np.linspace(0, duration, n)
+    x0 = np.array([1, 1, 1.2])
+
+    # Protein array with self-repression on Protein 2
+    proteinArray = [
+        Protein(0, "Protein 1", x0[0], gamma, [Gate("rep_hill", firstInput=2, firstHill=n_all)], None, None, beta_all),
+        Protein(1, "Protein 2", x0[1], gamma, [
+            Gate("rep_hill_mult", firstInput=0, secondInput=1, firstHill=n_all, secondHill=2)
+        ], None, None, beta_all),
+        Protein(2, "Protein 3", x0[2], gamma, [Gate("rep_hill", firstInput=1, firstHill=n_all)], None, None, beta_all)
+    ]
+
+    final_concentrations = run_simulation(t, proteinArray)
+    plot_results(t, final_concentrations, "Repressilator with Self-Repression")
+
+    actual_path = os.path.join(DATA_DIR, "repressilator_self_repress_actual_results.log")
+    with open(actual_path, "w") as f:
+        np.savetxt(f, final_concentrations, comments='')
+    assert np.allclose(final_concentrations, expected, atol=1e-12)
+
+
 def test_c1_ffl_or_simulation():
     # Specify expected results. These are based on the ../biocircuits_experimentation/xor_circuit.py script
-    c1_ffl.c1_ffl_or(output_file="simulation_test_data/c1_ffl_or_results.txt") # generate expected data
-    expected_concentrations = np.loadtxt("simulation_test_data/c1_ffl_or_results.txt")
+    expected_path = os.path.join(DATA_DIR, "c1_ffl_or_results.txt")
+    c1_ffl.c1_ffl_or(output_file=expected_path)
+    expected_concentrations = np.loadtxt(expected_path)
     n = 200
     gamma = 1
     n_xy, n_yz = 3, 3
@@ -317,14 +427,16 @@ def test_c1_ffl_or_simulation():
     plot_results(t, final_concentrations, "C1 FFL OR Simulation Results")
 
     # write out to file
-    with open("simulation_test_data/c1_ffl_or_actual_results.log", "w") as f:
+    actual_path = os.path.join(DATA_DIR, "c1_ffl_or_actual_results.log")
+    with open(actual_path, "w") as f:
         np.savetxt(f, final_concentrations, comments='')
     assert np.allclose(final_concentrations, expected_concentrations, atol=1e-1) # Tolerance is 0.1
 
 def test_c1_ffl_and_or_simulation():
     # Specify expected results. These are based on the ../biocircuits_experimentation/xor_circuit.py script
-    c1_ffl.c1_ffl_and_or(output_file="simulation_test_data/c1_ffl_and_or_results.txt") # generate expected data
-    expected_concentrations = np.loadtxt("simulation_test_data/c1_ffl_and_or_results.txt")
+    expected_path = os.path.join(DATA_DIR, "c1_ffl_and_or_results.txt")
+    c1_ffl.c1_ffl_and_or(output_file=expected_path)
+    expected_concentrations = np.loadtxt(expected_path)
     
     # Simulation parameters
     n = 1000
@@ -346,11 +458,31 @@ def test_c1_ffl_and_or_simulation():
     debug_helper(final_concentrations, expected_concentrations)
 
     # write out to file
-    with open("simulation_test_data/c1_ffl_and_or_actual_results.log", "w") as f:
+    actual_path = os.path.join(DATA_DIR, "c1_ffl_and_or_actual_results.log")
+    with open(actual_path, "w") as f:
         np.savetxt(f, final_concentrations, comments='')
     assert np.allclose(final_concentrations, expected_concentrations, atol=2e-1) # Tolerance is 0.2 since harder to exactly simulate using ffl_plot
-    
+
+
 # TODO: handle command line args, to run individual tests if desired
 def main():
     print("Running all test cases...")
-    pytest.main(["-v", "test_simulator.py::test_ffl_simulation", "test_simulator.py::test_xor_simulation", "test_simulator.py::test_i1_ffl_simulation", "test_simulator.py::test_repressilator", "test_simulator.py::test_toggle_switch", "test_simulator.py::test_toggle_switch_opposite_concentrations", "test_simulator.py::test_toggle_switch_equal_concentrations"])
+    pytest.main(["-v", 
+                  "test_simulator.py::test_c1_ffl_and_short_simulation",
+                  "test_simulator.py::test_c1_ffl_and_long_simulation", 
+                  "test_simulator.py::test_xor_simulation",
+                  "test_simulator.py::test_i1_ffl_simulation",
+                  "test_simulator.py::test_repressilator", 
+                  "test_simulator.py::test_toggle_switch",
+                  "test_simulator.py::test_toggle_switch_opposite_concentrations",
+                  "test_simulator.py::test_toggle_switch_equal_concentrations",
+                  "test_simulator.py::test_toggle_switch_small_hill_coefficient",
+                  "test_simulator.py::test_toggle_switch_unequal_degradation_rates",
+                  "test_simulator.py::test_toggle_switch_unequal_production_rates",
+                  "test_simulator.py::test_repressilator_self_repress",
+                  "test_simulator.py::test_c1_ffl_or_simulation",
+                  "test_simulator.py::test_c1_ffl_and_or_simulation"])
+
+# Run the script
+if __name__ == '__main__':
+    main()
