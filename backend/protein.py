@@ -22,9 +22,19 @@ class Protein:
     def getExternalConcentration(self):
         return self.mExternalConc
         
+    # def setExternalConcentration(self, t):
+    #     if self.mExtConcFunc is not None:
+    #         self.mExternalConc = self.mExtConcFunc(t, *self.mExtConcFuncArgs)
+    #     else:
+    #         self.mExternalConc = 0
+    #     return
+
     def setExternalConcentration(self, t):
         if self.mExtConcFunc is not None:
-            self.mExternalConc = self.mExtConcFunc(t, *self.mExtConcFuncArgs)
+            if self.mExtConcFuncArgs is not None:
+                self.mExternalConc = self.mExtConcFunc(t, *self.mExtConcFuncArgs)
+            else:
+                self.mExternalConc = self.mExtConcFunc(t)
         else:
             self.mExternalConc = 0
         return

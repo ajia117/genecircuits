@@ -6,9 +6,12 @@ import json
 from parser import parse_circuit
 from protein import Protein, Gate
 
+DATA_DIR = os.path.join(os.path.dirname(__file__), "parser_test_data")
+
+
 def test_toggle_switch_array_equivalence():
     # Inline JSON-like dict representing a toggle switch
-    with open("parser_test_data/toggle_switch_input.json") as f:
+    with open(os.path.join(DATA_DIR, "toggle_switch_input.json")) as f:
         json_data = json.load(f)
 
 

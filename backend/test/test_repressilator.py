@@ -7,9 +7,12 @@ import json
 from parser import parse_circuit
 from protein import Protein, Gate
 
+DATA_DIR = os.path.join(os.path.dirname(__file__), "parser_test_data")
+
+
 def test_repressilator_array_equivalence():
     # Load JSON input matching the known-good test configuration
-    with open("parser_test_data/repressilator_input.json") as f:
+    with open(os.path.join(DATA_DIR, "repressilator_input.json")) as f:
         json_data = json.load(f)
     
     print("Raw JSON hillCoefficients:")
