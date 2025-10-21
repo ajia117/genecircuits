@@ -335,6 +335,29 @@ def test_toggle_switch():
     assert conc[-1, 1] > conc[-1, 0]  # Protein B > Protein A at the end
 
 
+def test_toggle_switch_reference():
+    """Test toggle switch against generated reference data"""
+    expected_path = os.path.join(DATA_DIR, "toggle_switch_results.txt")
+    expected_concentrations = np.loadtxt(expected_path)
+    
+    # Same parameters as in toggle_switch.py
+    n = 1000
+    duration = 10
+    t = np.linspace(0, duration, n)
+    
+    gamma = 1.0
+    hill_n = 3
+    beta = 1.0  # Match toggle_switch.py parameters
+    
+    proteins = [
+        Protein(0, "A", 1.0, gamma, [Gate("rep_hill", firstInput=1, firstHill=hill_n)], None, None, beta),
+        Protein(1, "B", 1.2, gamma, [Gate("rep_hill", firstInput=0, firstHill=hill_n)], None, None, beta),
+    ]
+    
+    conc = run_simulation(t, proteins)
+    assert np.allclose(conc, expected_concentrations, atol=1e-6)
+
+
 def test_toggle_switch_opposite_concentrations():
     n = 600
     duration = 30
