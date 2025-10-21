@@ -26,6 +26,8 @@ To run the backend tests, follow these steps:
 4. Run `pip install -r requirements.txt`
 5. Navigate to backend/test/simulation_test_data and run `./generate.sh`
 6. Navigate back to backend/test and run `pytest -v <test_file>`. Available test files are:
+   - test_gate.py
+   - test_ipc_server.py
    - test_parser.py
    - test_protein.py
    - test_repressilator.py
