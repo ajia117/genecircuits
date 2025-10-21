@@ -9,12 +9,82 @@ import bokeh.plotting as bp
 from   bokeh.io import output_file
 import bokeh.palettes
 from simulation_test_data import c1_ffl
+from ipc_server import run_simulation_handler
+
 
 # Get the absolute path to this file's directory
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "simulation_test_data")
 
 DEBUG=False
+
+
+def test_run_simulation_handler_one_node_input():
+    data = {
+        "nodes": [{"id": "p1", "label": "A", "type": "protein"}],
+        "edges": [],
+        "proteins": [
+            {"name": "A", "type": "protein", "parameters": {"k": 1.0}}
+        ],
+        "circuitSettings": {"simulationDuration": 5, "numTimePoints": 100}
+    }
+    result = run_simulation_handler(data)
+    assert "success" in result
+    assert result["success"] in (True, "No circuit provided")
+
+def test_run_simulation_handler_two_node_input():
+    data = {
+    "nodes": [
+        {"id": "p1", "type": "custom", "proteinName": "A"},
+        {"id": "p2", "type": "custom", "proteinName": "B"}
+    ],
+    "edges": [
+        {"id": "edge-0-1", "type": "promote", "source": "p1", "target": "p2"}
+    ],
+    "proteins": {
+        "A": {
+            "label": "A",
+            "initialConcentration": 1.0,
+            "lossRate": 1,
+            "beta": 1,
+            "inputs": 1,
+            "outputs": 1,
+            "inputFunctionType": "steady-state",
+            "inputFunctionData": {
+                "steadyStateValue": 0,
+                "timeStart": 0,
+                "timeEnd": 1,
+                "pulsePeriod": 1,
+                "amplitude": 1,
+                "dutyCycle": 0.5
+            }
+        },
+        "B": {
+            "label": "B",
+            "initialConcentration": 1.2,
+            "lossRate": 1,
+            "beta": 1,
+            "inputs": 1,
+            "outputs": 1,
+            "inputFunctionType": "steady-state",
+            "inputFunctionData": {
+                "steadyStateValue": 0,
+                "timeStart": 0,
+                "timeEnd": 1,
+                "pulsePeriod": 1,
+                "amplitude": 1,
+                "dutyCycle": 0.5
+            }
+        }
+    },
+    "circuitSettings": {"simulationDuration": 5, "numTimePoints": 100}
+}
+
+
+    result = run_simulation_handler(data)
+    assert "success" in result
+    assert result["success"] is True
+
 
 def debug_helper(final_concentrations, expected_concentrations):
     if DEBUG:
@@ -481,8 +551,9 @@ def main():
                   "test_simulator.py::test_toggle_switch_unequal_production_rates",
                   "test_simulator.py::test_repressilator_self_repress",
                   "test_simulator.py::test_c1_ffl_or_simulation",
-                  "test_simulator.py::test_c1_ffl_and_or_simulation"])
-
+                  "test_simulator.py::test_c1_ffl_and_or_simulation",
+                  "test_simulator.py::test_run_simulation_handler_one_node_input",
+                  "test_simulator.py::test_run_simulation_handler_two_nodes_input"])
 # Run the script
 if __name__ == '__main__':
     main()
