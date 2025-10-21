@@ -1,7 +1,7 @@
 
-from protein import Protein, Gate
-from simulate import x_pulse
-from simulate import steady_state
+from .protein import Protein, Gate
+from .simulate import x_pulse
+from .simulate import steady_state
 import json
 from collections import defaultdict
 

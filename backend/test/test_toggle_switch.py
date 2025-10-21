@@ -1,10 +1,9 @@
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import pytest
 import json
-from parser import parse_circuit
-from protein import Protein, Gate
+from backend.parser import parse_circuit
+from backend.protein import Protein, Gate
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "parser_test_data")
 

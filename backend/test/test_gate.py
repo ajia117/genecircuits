@@ -1,10 +1,9 @@
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import pytest
 import numpy as np
 import biocircuits
-from protein import Gate, Protein
+from backend.protein import Gate, Protein
 
 class TestGate:
     """Unit tests for the Gate class"""
