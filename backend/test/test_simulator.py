@@ -8,6 +8,7 @@ import bokeh.plotting as bp
 from   bokeh.io import output_file
 import bokeh.palettes
 from .simulation_test_data import c1_ffl
+from backend.ipc_server import run_simulation_handler
 
 # Get the absolute path to this file's directory
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
