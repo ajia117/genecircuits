@@ -139,7 +139,13 @@ def test_xor_simulation():
 
     a_args = (0, 40, 30, 2, 0.5)
     b_args = (15, 50, 20, 2, 1)
-    proteinArray = [Protein(0, "Protein A", 0.0, 0.0, [], x_pulse, a_args), Protein(1, "Protein B", 0.0, 0.00, [],  x_pulse, b_args), Protein(2, "Protein C", 0.0, 0.1, [Gate("aa_and", firstInput=0, secondInput=1)]), Protein(3, "Protein D", 0.0, 0.1, [Gate("aa_or", firstInput=0, secondInput=1)]), Protein(4, "Protein E", 0.0, 0.2, [Gate("ar_and", firstInput=3, secondInput=2, firstHill=2, secondHill=2)])]
+    proteinArray = [
+        Protein(0, "Protein A", 0.0, 0.0, [], x_pulse, a_args), 
+        Protein(1, "Protein B", 0.0, 0.00, [],  x_pulse, b_args), 
+        Protein(2, "Protein C", 0.0, 0.1, [Gate("aa_and", firstInput=0, secondInput=1)]), 
+        Protein(3, "Protein D", 0.0, 0.1, [Gate("aa_or", firstInput=0, secondInput=1)]), 
+        Protein(4, "Protein E", 0.0, 0.2, [Gate("ar_and", firstInput=3, secondInput=2, firstHill=2, secondHill=2)])
+    ]
 
     final_concentrations = run_simulation(t, proteinArray)
     
@@ -147,6 +153,114 @@ def test_xor_simulation():
     with open(os.path.join(DATA_DIR, "xor_actual_results.log"), "w") as f:
         np.savetxt(f, final_concentrations, comments='')
     
+    assert np.allclose(final_concentrations, expected_concentrations, atol=1e-5)
+
+def test_xor_shortA_alwaysB():
+    expected_concentrations = np.loadtxt("simulation_test_data/xor_shortA_alwaysB.txt")
+    n = 1000
+    t = np.linspace(0, 80, n)
+    a_args = (10, 20, 10, 2, 1) # Short pulse from t=10 to t=20
+    b_args = (0, 80, 80, 2, 1)  # Always on
+    proteinArray = [
+        Protein(0, "Protein A", 0.0, 0.0, [], x_pulse, a_args),
+        Protein(1, "Protein B", 0.0, 0.0, [], x_pulse, b_args),
+        Protein(2, "Protein C", 0.0, 0.1, [Gate("aa_and", firstInput=0, secondInput=1)]),
+        Protein(3, "Protein D", 0.0, 0.1, [Gate("aa_or", firstInput=0, secondInput=1)]),
+        Protein(4, "Protein E", 0.0, 0.2, [Gate("ar_and", firstInput=3, secondInput=2, firstHill=2, secondHill=2)])
+    ]
+    final_concentrations = run_simulation(t, proteinArray)
+    with open("simulation_test_data/xor_shortA_alwaysB_actual.log", "w") as f:
+        np.savetxt(f, final_concentrations, comments='')
+    assert np.allclose(final_concentrations, expected_concentrations, atol=1e-5)
+
+def test_xor_no_overlap():
+    expected_concentrations = np.loadtxt("simulation_test_data/xor_no_overlap.txt")
+    n = 1000
+    t = np.linspace(0, 80, n)
+    a_args = (0, 20, 20, 2, 1)   # Pulse from t=0 to t=20
+    b_args = (30, 50, 20, 2, 1)  # Pulse from t=30 to t=50
+    proteinArray = [
+        Protein(0, "Protein A", 0.0, 0.0, [], x_pulse, a_args),
+        Protein(1, "Protein B", 0.0, 0.0, [], x_pulse, b_args),
+        Protein(2, "Protein C", 0.0, 0.1, [Gate("aa_and", firstInput=0, secondInput=1)]),
+        Protein(3, "Protein D", 0.0, 0.1, [Gate("aa_or", firstInput=0, secondInput=1)]),
+        Protein(4, "Protein E", 0.0, 0.2, [Gate("ar_and", firstInput=3, secondInput=2, firstHill=2, secondHill=2)])
+    ]
+    final_concentrations = run_simulation(t, proteinArray)
+    with open("simulation_test_data/xor_no_overlap_actual.log", "w") as f:
+        np.savetxt(f, final_concentrations, comments='')
+    assert np.allclose(final_concentrations, expected_concentrations, atol=1e-5)
+
+def test_xor_both_off():
+    expected_concentrations = np.loadtxt("simulation_test_data/xor_both_off.txt")
+    n = 1000
+    t = np.linspace(0, 80, n)
+    a_args = (0, 0, 1, 2, 0)     # Always off
+    b_args = (0, 0, 1, 2, 0)     # Always off
+    proteinArray = [
+        Protein(0, "Protein A", 0.0, 0.0, [], x_pulse, a_args),
+        Protein(1, "Protein B", 0.0, 0.0, [], x_pulse, b_args),
+        Protein(2, "Protein C", 0.0, 0.1, [Gate("aa_and", firstInput=0, secondInput=1)]),
+        Protein(3, "Protein D", 0.0, 0.1, [Gate("aa_or", firstInput=0, secondInput=1)]),
+        Protein(4, "Protein E", 0.0, 0.2, [Gate("ar_and", firstInput=3, secondInput=2, firstHill=2, secondHill=2)])
+    ]
+    final_concentrations = run_simulation(t, proteinArray)
+    with open("simulation_test_data/xor_both_off_actual.log", "w") as f:
+        np.savetxt(f, final_concentrations, comments='')
+    assert np.allclose(final_concentrations, expected_concentrations, atol=1e-5)
+
+def test_xor_diff_amplitudes():
+    expected_concentrations = np.loadtxt("simulation_test_data/xor_diff_amplitudes.txt")
+    n = 1000
+    t = np.linspace(0, 80, n)
+    a_args = (0, 40, 30, 4, 0.5)  # Amplitude 4
+    b_args = (15, 50, 20, 1, 1)   # Amplitude 1
+    proteinArray = [
+        Protein(0, "Protein A", 0.0, 0.0, [], x_pulse, a_args),
+        Protein(1, "Protein B", 0.0, 0.0, [], x_pulse, b_args),
+        Protein(2, "Protein C", 0.0, 0.1, [Gate("aa_and", firstInput=0, secondInput=1)]),
+        Protein(3, "Protein D", 0.0, 0.1, [Gate("aa_or", firstInput=0, secondInput=1)]),
+        Protein(4, "Protein E", 0.0, 0.2, [Gate("ar_and", firstInput=3, secondInput=2, firstHill=2, secondHill=2)])
+    ]
+    final_concentrations = run_simulation(t, proteinArray)
+    with open("simulation_test_data/xor_diff_amplitudes_actual.log", "w") as f:
+        np.savetxt(f, final_concentrations, comments='')
+    assert np.allclose(final_concentrations, expected_concentrations, atol=1e-5)
+
+def test_xor_diff_hill():
+    expected_concentrations = np.loadtxt("simulation_test_data/xor_diff_hill.txt")
+    n = 1000
+    t = np.linspace(0, 80, n)
+    a_args = (0, 40, 30, 2, 0.5)
+    b_args = (15, 50, 20, 2, 1)
+    proteinArray = [
+        Protein(0, "Protein A", 0.0, 0.0, [], x_pulse, a_args),
+        Protein(1, "Protein B", 0.0, 0.0, [], x_pulse, b_args),
+        Protein(2, "Protein C", 0.0, 0.1, [Gate("aa_and", firstInput=0, secondInput=1, firstHill=3, secondHill=3)]),
+        Protein(3, "Protein D", 0.0, 0.1, [Gate("aa_or", firstInput=0, secondInput=1, firstHill=3, secondHill=3)]),
+        Protein(4, "Protein E", 0.0, 0.2, [Gate("ar_and", firstInput=3, secondInput=2, firstHill=4, secondHill=4)])
+    ]
+    final_concentrations = run_simulation(t, proteinArray)
+    with open("simulation_test_data/xor_diff_hill_actual.log", "w") as f:
+        np.savetxt(f, final_concentrations, comments='')
+    assert np.allclose(final_concentrations, expected_concentrations, atol=1e-5)
+
+def test_xor_diff_degradation():
+    expected_concentrations = np.loadtxt("simulation_test_data/xor_diff_degradation.txt")
+    n = 1000
+    t = np.linspace(0, 80, n)
+    a_args = (0, 40, 30, 2, 0.5)
+    b_args = (15, 50, 20, 2, 1)
+    proteinArray = [
+        Protein(0, "Protein A", 0.0, 0.0, [], x_pulse, a_args),
+        Protein(1, "Protein B", 0.0, 0.0, [], x_pulse, b_args),
+        Protein(2, "Protein C", 0.0, 0.5, [Gate("aa_and", firstInput=0, secondInput=1)]),
+        Protein(3, "Protein D", 0.0, 0.5, [Gate("aa_or", firstInput=0, secondInput=1)]),
+        Protein(4, "Protein E", 0.0, 1.0, [Gate("ar_and", firstInput=3, secondInput=2, firstHill=2, secondHill=2)])
+    ]
+    final_concentrations = run_simulation(t, proteinArray)
+    with open("simulation_test_data/xor_diff_degradation_actual.log", "w") as f:
+        np.savetxt(f, final_concentrations, comments='')
     assert np.allclose(final_concentrations, expected_concentrations, atol=1e-5)
 
 def test_i1_ffl_simulation():
