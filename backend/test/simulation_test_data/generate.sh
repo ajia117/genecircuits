@@ -12,3 +12,6 @@ python i1_ffl.py
 
 echo "Running repressilator.py..."
 python repressilator.py
+
+echo "Running toggle_switch.py..."
+python toggle_switch.py

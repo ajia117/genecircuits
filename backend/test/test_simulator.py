@@ -15,6 +15,74 @@ DATA_DIR = os.path.join(BASE_DIR, "simulation_test_data")
 
 DEBUG=False
 
+
+def test_run_simulation_handler_one_node_input():
+    data = {
+        "nodes": [{"id": "p1", "label": "A", "type": "protein"}],
+        "edges": [],
+        "proteins": [
+            {"name": "A", "type": "protein", "parameters": {"k": 1.0}}
+        ],
+        "circuitSettings": {"simulationDuration": 5, "numTimePoints": 100}
+    }
+    result = run_simulation_handler(data)
+    assert "success" in result
+    assert result["success"] in (True, "No circuit provided")
+
+def test_run_simulation_handler_two_node_input():
+    data = {
+    "nodes": [
+        {"id": "p1", "type": "custom", "proteinName": "A"},
+        {"id": "p2", "type": "custom", "proteinName": "B"}
+    ],
+    "edges": [
+        {"id": "edge-0-1", "type": "promote", "source": "p1", "target": "p2"}
+    ],
+    "proteins": {
+        "A": {
+            "label": "A",
+            "initialConcentration": 1.0,
+            "lossRate": 1,
+            "beta": 1,
+            "inputs": 1,
+            "outputs": 1,
+            "inputFunctionType": "steady-state",
+            "inputFunctionData": {
+                "steadyStateValue": 0,
+                "timeStart": 0,
+                "timeEnd": 1,
+                "pulsePeriod": 1,
+                "amplitude": 1,
+                "dutyCycle": 0.5
+            }
+        },
+        "B": {
+            "label": "B",
+            "initialConcentration": 1.2,
+            "lossRate": 1,
+            "beta": 1,
+            "inputs": 1,
+            "outputs": 1,
+            "inputFunctionType": "steady-state",
+            "inputFunctionData": {
+                "steadyStateValue": 0,
+                "timeStart": 0,
+                "timeEnd": 1,
+                "pulsePeriod": 1,
+                "amplitude": 1,
+                "dutyCycle": 0.5
+            }
+        }
+    },
+    "circuitSettings": {"simulationDuration": 5, "numTimePoints": 100}
+}
+
+
+    result = run_simulation_handler(data)
+    assert "success" in result
+    assert result["success"] in (True, "No circuit provided")
+
+
 def debug_helper(final_concentrations, expected_concentrations):
     if DEBUG:
         print("final vs expected shapes:", final_concentrations.shape, expected_concentrations.shape)
@@ -390,6 +458,29 @@ def test_toggle_switch():
     assert conc[-1, 1] > conc[-1, 0]  # Protein B > Protein A at the end
 
 
+def test_toggle_switch_reference():
+    """Test toggle switch against generated reference data"""
+    expected_path = os.path.join(DATA_DIR, "toggle_switch_results.txt")
+    expected_concentrations = np.loadtxt(expected_path)
+    
+    # Same parameters as in toggle_switch.py
+    n = 1000
+    duration = 10
+    t = np.linspace(0, duration, n)
+    
+    gamma = 1.0
+    hill_n = 3
+    beta = 1.0  # Match toggle_switch.py parameters
+    
+    proteins = [
+        Protein(0, "A", 1.0, gamma, [Gate("rep_hill", firstInput=1, firstHill=hill_n)], None, None, beta),
+        Protein(1, "B", 1.2, gamma, [Gate("rep_hill", firstInput=0, firstHill=hill_n)], None, None, beta),
+    ]
+    
+    conc = run_simulation(t, proteins)
+    assert np.allclose(conc, expected_concentrations, atol=1e-6)
+
+
 def test_toggle_switch_opposite_concentrations():
     n = 600
     duration = 30
@@ -603,8 +694,9 @@ def main():
                   "test_simulator.py::test_toggle_switch_unequal_production_rates",
                   "test_simulator.py::test_repressilator_self_repress",
                   "test_simulator.py::test_c1_ffl_or_simulation",
-                  "test_simulator.py::test_c1_ffl_and_or_simulation"])
-
+                  "test_simulator.py::test_c1_ffl_and_or_simulation",
+                  "test_simulator.py::test_run_simulation_handler_one_node_input",
+                  "test_simulator.py::test_run_simulation_handler_two_nodes_input"])
 # Run the script
 if __name__ == '__main__':
     main()
