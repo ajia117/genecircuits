@@ -105,3 +105,7 @@ backend/.coverage
 
 # Ignore all generated HTML files in backend
 backend/*.html
+
+#Ignore all text files in simulation test data
+
+backend/test/simulation_test_data/*.txt
