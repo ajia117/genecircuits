@@ -182,12 +182,11 @@ def parse_circuit(json_data):
         print("Error during parsing:", str(e), flush=True)
         raise
 
-#Example usage
-if __name__ == "__main__":
-    with open("test/parser_test_data/new_format.json") as f:
-        data = json.load(f)
+# #Example usage
+# if __name__ == "__main__":
+#     with open("test/parser_test_data/new_format.json") as f:
+#         data = json.load(f)
 
-    proteins = parse_circuit(data)
-    for p in proteins:
-        print(f"Protein ID: {p.mID}, Name: {p.mName}, {(p.mInternalConc, p.mDegradation)}, Gates: {[ (g.mType, g.mFirstInput, g.mSecondInput if g.mSecondInput else None) for g in p.mGates ]}")
-
+#     proteins = parse_circuit(data)
+#     for p in proteins:
+#         print(f"Protein ID: {p.mID}, Name: {p.mName}, {(p.mInternalConc, p.mDegradation)}, Gates: {[ (g.mType, g.mFirstInput, g.mSecondInput if g.mSecondInput else None) for g in p.mGates ]}")

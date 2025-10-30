@@ -20,7 +20,7 @@ def test_parse_complex_circuit():
     proteins = parse_circuit(circuit)
 
     # 1. Check number of unique protein objects
-    assert len(proteins) == 4  # Orange, Strawberry, Grape, Banana
+    assert len(proteins) == 6  # Orange, Strawberry, Grape, Banana, TestAA, TestRR
 
     # 2. Map protein names
     protein_map = {p.mName: p for p in proteins}
@@ -30,6 +30,8 @@ def test_parse_complex_circuit():
     assert protein_map["Strawberry"].mExtConcFunc == x_pulse
     assert protein_map["Banana"].mExtConcFunc == x_pulse
     assert protein_map["Grape"].mExtConcFunc == steady_state
+    assert protein_map["TestAA"].mExtConcFunc == steady_state
+    assert protein_map["TestRR"].mExtConcFunc == steady_state
 
     # 4. Check gates attached to Banana
     banana_gates = protein_map["Banana"].mGates
@@ -39,7 +41,15 @@ def test_parse_complex_circuit():
     grape_gates = protein_map["Grape"].mGates
     assert any(g.mType == "ar_or" for g in grape_gates)
 
-    # 6. Check hill coefficients for a gate
+    # 6. Check the promote-promote (aa_and) gate
+    testaa_gates = protein_map["TestAA"].mGates
+    assert any(g.mType == "aa_and" for g in testaa_gates)
+
+    # 7. Check the repress-repress (rr_or) gate  
+    testrr_gates = protein_map["TestRR"].mGates
+    assert any(g.mType == "rr_or" for g in testrr_gates)
+
+    # 8. Check hill coefficients for a gate
     for g in banana_gates:
         if g.mType.startswith("aa_and"):
             assert g.mFirstHill == 1
@@ -79,7 +89,7 @@ def test_custom_protein_parsing():
     proteins = parse_circuit(circuit)
 
     protein_names = [p.mName for p in proteins]
-    assert sorted(protein_names) == sorted(["Orange", "Strawberry", "Grape", "Banana"])
+    assert sorted(protein_names) == sorted(["Orange", "Strawberry", "Grape", "Banana", "TestAA", "TestRR"])
 
     # Check uniqueness
     protein_map = {p.mName: p for p in proteins}
