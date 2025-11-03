@@ -298,7 +298,9 @@ export default function CircuitBuilderFlow() {
                 position: {
                     x: node.position.x + xOffset,
                     y: node.position.y + yOffset
-                }
+                },
+                // Fix sticky protein: ensure no selected state carries over
+                selected: false
             };
         });
 
@@ -343,6 +345,7 @@ export default function CircuitBuilderFlow() {
             setProteins,
             setHillCoefficients
         });
+        resetSelectedStateData();
     }, [nodes, edges, proteins, nodeIdRef, gateIdRef, setNodes, setEdges, setProteins]);
 
     // Display output window
