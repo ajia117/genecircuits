@@ -356,6 +356,14 @@ export default function CircuitBuilderFlow() {
     // Handle Delete / Backspace key to remove selected node or edge
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
+            const target = event.target as HTMLElement;
+            const isTyping =
+                target.tagName === "INPUT" ||
+                target.tagName === "TEXTAREA" ||
+                target.isContentEditable;
+
+            if (isTyping) return;
+
             if (event.key !== "Backspace" && event.key !== "Delete") return;
 
             // Prevent browser navigation
