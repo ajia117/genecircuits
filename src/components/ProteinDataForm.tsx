@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction } from "react";
+import React, { Dispatch, SetStateAction, useEffect } from "react";
 import { ProteinData } from "../types";
 import {
     Flex,
@@ -12,13 +12,19 @@ interface ProteinDataProps {
     mode: 'edit' | 'create'
     proteinData: ProteinData | null,
     setProteinData: Dispatch<SetStateAction<ProteinData>>;
+    onValidityChange?: (isValid: boolean) => void;
+    onNegativeFieldsChange?: (negativeFields: string[]) => void;
 }
 
 const ProteinDataForm: React.FC<ProteinDataProps> = ({
     mode,
     proteinData,
     setProteinData,
+    onValidityChange,
+    onNegativeFieldsChange,
 }: ProteinDataProps) => {
+
+    if (!proteinData) return null;
 
     const proteinDataProps: { key: keyof ProteinData; label: string; min: number; max: number; step: number }[] = [
         { key: 'initialConcentration', label: 'Initial Concentration', min: 0, max: 100, step: 1 },
@@ -34,6 +40,40 @@ const ProteinDataForm: React.FC<ProteinDataProps> = ({
         { key: 'dutyCycle', label: 'Duty Cycle', min: 0, max: 1, step: 0.01 },
     ];
 
+    // Validate numeric fields for negative values
+    const negativeFields: string[] = [];
+    const checkNumber = (value: any, label: string) => {
+        if (typeof value === 'number' && !isNaN(value) && value < 0) {
+            negativeFields.push(label);
+        }
+    };
+
+    // top-level counts
+    checkNumber(proteinData.inputs, 'Inputs');
+    checkNumber(proteinData.outputs, 'Outputs');
+
+    // main numeric props
+    proteinDataProps.forEach(({ key, label }) => checkNumber(proteinData[key], label));
+
+    // input function specific values
+    if (proteinData.inputFunctionType === 'steady-state') {
+        checkNumber(proteinData.inputFunctionData?.steadyStateValue, 'Steady State Value');
+    } else if (proteinData.inputFunctionType === 'pulse') {
+        pulseFunctionDataProps.forEach(({ key, label }) => checkNumber(proteinData.inputFunctionData?.[key], label));
+    }
+
+    // Inform parent about validity (optional) and send negative fields list
+    useEffect(() => {
+        if (onValidityChange) {
+            onValidityChange(negativeFields.length === 0);
+        }
+        if (onNegativeFieldsChange) {
+            onNegativeFieldsChange(negativeFields);
+        }
+    }, [negativeFields, onValidityChange, onNegativeFieldsChange]);
+
+    const isFieldNegative = (label: string) => negativeFields.includes(label);
+
     // Display the input function type fields based on user selected type
     const renderInputFunctionTypeFields = () => {
         if (proteinData.inputFunctionType === "steady-state") {
@@ -45,7 +85,7 @@ const ProteinDataForm: React.FC<ProteinDataProps> = ({
                         <Text as="div" weight="bold">Steady State Value</Text>
                         <TextField.Root
                             type="number"
-                            style={{ maxWidth: '100px' }}
+                            style={{ maxWidth: '100px', border: isFieldNegative('Steady State Value') ? '1px solid red' : undefined }}
                             value={numericValue}
                             onChange={(e) => {
                                 const val = e.target.value;
@@ -87,7 +127,7 @@ const ProteinDataForm: React.FC<ProteinDataProps> = ({
                             <Text as="div" weight="bold">{label}</Text>
                             <TextField.Root
                                 type="number"
-                                style={{ maxWidth: '100px' }}
+                                style={{ maxWidth: '100px', border: isFieldNegative(label) ? '1px solid red' : undefined }}
                                 value={numericValue}
                                 onChange={(e) => {
                                     const val = e.target.value;
@@ -149,11 +189,13 @@ const ProteinDataForm: React.FC<ProteinDataProps> = ({
             }
 
              {/* Num inputs/outputs */}
+            {/* Parent will render validation errors; this component only highlights invalid fields */}
              <Flex direction="row" gap="2">
                 <Flex direction="column" gap="2">
                     <Text as="div" weight="bold">Inputs</Text>
                     <TextField.Root
                         type="number"
+                        style={{ maxWidth: '100px', border: isFieldNegative('Inputs') ? '1px solid red' : undefined }}
                         value={
                             typeof proteinData.inputs === 'number' && !isNaN(proteinData.inputs)
                                 ? proteinData.inputs
@@ -172,6 +214,7 @@ const ProteinDataForm: React.FC<ProteinDataProps> = ({
                     <Text as="div" weight="bold">Outputs</Text>
                     <TextField.Root
                         type="number"
+                        style={{ maxWidth: '100px', border: isFieldNegative('Outputs') ? '1px solid red' : undefined }}
                         value={
                             typeof proteinData.outputs === 'number' && !isNaN(proteinData.outputs)
                                 ? proteinData.outputs
@@ -199,7 +242,7 @@ const ProteinDataForm: React.FC<ProteinDataProps> = ({
                             <Text as="div" weight="bold">{label}</Text>
                             <TextField.Root
                                 type="number"
-                                style={{ maxWidth: '100px' }}
+                                style={{ maxWidth: '100px', border: isFieldNegative(label) ? '1px solid red' : undefined }}
                                 value={numericValue}
                                 onChange={(e) => {
                                     const val = e.target.value;

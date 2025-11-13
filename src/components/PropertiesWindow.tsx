@@ -66,6 +66,7 @@ const PropertiesWindow: React.FC = () => {
     })();
     const [localProteinData, setLocalProteinData] = useState<ProteinData | null>(null);
     const [showProteinEditor, setShowProteinEditor] = useState(false);
+    const [isFormValid, setIsFormValid] = useState<boolean>(true);
     const [localEdgeData, setLocalEdgeData] = useState<EdgeData | null>(null);
     
     // Reset proteinData when new node clicked
@@ -92,6 +93,7 @@ const PropertiesWindow: React.FC = () => {
     
     // Called when user submits the updated protein data
     const handleUpdate = () => {
+        if (!isFormValid) return; // prevent update when form invalid
         if (localProteinData) {
             setProteinData(localProteinData.label, localProteinData);
 
@@ -232,8 +234,9 @@ const PropertiesWindow: React.FC = () => {
                     mode="edit"
                     proteinData={editingProtein}
                     setProteinData={setEditingProtein}
+                    onValidityChange={setIsFormValid}
                 />
-                <Button onClick={handleUpdate}><Text>Update Protein</Text></Button>
+                <Button onClick={handleUpdate} disabled={!isFormValid}><Text>Update Protein</Text></Button>
             </Flex>
         </ScrollArea>
     )
@@ -274,8 +277,9 @@ const PropertiesWindow: React.FC = () => {
                                 mode="edit"
                                 proteinData={localProteinData}
                                 setProteinData={setLocalProteinData}
+                                onValidityChange={setIsFormValid}
                             />
-                            <Button onClick={handleUpdate}><Text>Update Protein</Text></Button>
+                            <Button onClick={handleUpdate} disabled={!isFormValid}><Text>Update Protein</Text></Button>
                         </Flex>
                     </ScrollArea>
                 )}
