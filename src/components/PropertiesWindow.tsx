@@ -220,7 +220,7 @@ const PropertiesWindow: React.FC = () => {
             type="auto"
             scrollbars="vertical"
             style={{
-                maxHeight: '400px',
+                maxHeight: 'calc(100vh - 200px)',
                 border: '1px solid var(--gray-a6)',
                 borderRadius: 'var(--radius-3)',
                 padding: '1rem',
@@ -262,7 +262,7 @@ const PropertiesWindow: React.FC = () => {
                 { showProteinEditor && ( 
                     <ScrollArea type="auto" scrollbars="vertical"
                         style={{
-                            maxHeight: '400px',
+                            maxHeight: 'calc(100vh - 200px)',
                             border: '1px solid var(--gray-a6)',
                             borderRadius: 'var(--radius-3)',
                             padding: '1rem',

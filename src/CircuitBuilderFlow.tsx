@@ -298,7 +298,9 @@ export default function CircuitBuilderFlow() {
                 position: {
                     x: node.position.x + xOffset,
                     y: node.position.y + yOffset
-                }
+                },
+                // Fix sticky protein: ensure no selected state carries over
+                selected: false
             };
         });
 
@@ -343,12 +345,50 @@ export default function CircuitBuilderFlow() {
             setProteins,
             setHillCoefficients
         });
+        resetSelectedStateData();
     }, [nodes, edges, proteins, nodeIdRef, gateIdRef, setNodes, setEdges, setProteins]);
 
     // Display output window
     const renderOutputWindow = () => {
         return <OutputWindow/>;
     };
+
+    // Handle Delete / Backspace key to remove selected node or edge
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            const target = event.target as HTMLElement;
+            const isTyping =
+                target.tagName === "INPUT" ||
+                target.tagName === "TEXTAREA" ||
+                target.isContentEditable;
+
+            if (isTyping) return;
+
+            if (event.key !== "Backspace" && event.key !== "Delete") return;
+
+            // Prevent browser navigation
+            event.preventDefault();
+
+            // Access current selection
+            const { selectedNodeId, selectedEdgeId } = selection;
+
+            if (selectedNodeId) {
+                setNodes((prev) => prev.filter((n) => n.id !== selectedNodeId));
+                setEdges((prev) =>
+                    prev.filter((e) => e.source !== selectedNodeId && e.target !== selectedNodeId)
+                );
+                resetSelectedStateData();
+                setActiveTab("properties");
+            } else if (selectedEdgeId) {
+                setEdges((prev) => prev.filter((e) => e.id !== selectedEdgeId));
+                resetSelectedStateData();
+                setActiveTab("properties");
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [selection, setNodes, setEdges, resetSelectedStateData, setActiveTab]);
 
     return (
         <>
