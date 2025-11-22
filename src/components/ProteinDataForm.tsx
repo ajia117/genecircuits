@@ -1,24 +1,44 @@
 import React, { Dispatch, SetStateAction } from "react";
-import { ProteinData } from "../types";
+import { ProteinData, EdgeData } from "../types";
 import {
     Flex,
     TextField,
     Text,
     SegmentedControl, 
-    Slider, 
+    Slider,
+    Callout,
 } from "@radix-ui/themes"
+import { CircleAlert } from "lucide-react";
+import { useAlert } from "./Alerts/AlertProvider";
 
 interface ProteinDataProps {
     mode: 'edit' | 'create'
     proteinData: ProteinData | null,
     setProteinData: Dispatch<SetStateAction<ProteinData>>;
+    edges?: EdgeData[];
 }
 
 const ProteinDataForm: React.FC<ProteinDataProps> = ({
     mode,
     proteinData,
     setProteinData,
+    edges = [],
 }: ProteinDataProps) => {
+    const { showAlert } = useAlert();
+
+    // Check if circuit uses inhibitors (has edges with markerEnd: "repress")
+    const circuitUsesInhibitors = edges.some(edge => {
+        const markerEnd = (edge as any)?.markerEnd;
+        return markerEnd === 'repress';
+    });
+    
+    // Check if current initial concentration is less than 1
+    const initialConcentration = typeof proteinData?.initialConcentration === 'number' 
+        ? proteinData.initialConcentration 
+        : undefined;
+    const showInhibitorWarning = circuitUsesInhibitors && 
+        initialConcentration !== undefined && 
+        initialConcentration < 1;
 
     const proteinDataProps: { key: keyof ProteinData; label: string; min: number; max: number; step: number }[] = [
         { key: 'initialConcentration', label: 'Initial Concentration', min: 0, max: 100, step: 1 },
@@ -192,6 +212,7 @@ const ProteinDataForm: React.FC<ProteinDataProps> = ({
             {proteinDataProps.map(({ key, label, min, max, step }) => {
                 const rawValue = proteinData[key];
                 const numericValue = typeof rawValue === 'number' && !isNaN(rawValue) ? rawValue : "";
+                const isInitialConcentration = key === 'initialConcentration';
 
                 return (
                     <Flex direction="column" gap="2" key={key}>
@@ -203,9 +224,17 @@ const ProteinDataForm: React.FC<ProteinDataProps> = ({
                                 value={numericValue}
                                 onChange={(e) => {
                                     const val = e.target.value;
+                                    const numVal = val === "" ? undefined : parseFloat(val);
+                                    
+                                    // Show alert if setting initial concentration < 1 in circuit with inhibitors
+                                    if (isInitialConcentration && circuitUsesInhibitors && 
+                                        numVal !== undefined && numVal < 1) {
+                                        showAlert("Warning: This circuit uses inhibitors. Initial concentrations less than 1 may cause unexpected outputs.");
+                                    }
+                                    
                                     setProteinData({
                                         ...proteinData,
-                                        [key]: val === "" ? undefined : parseFloat(val)
+                                        [key]: numVal
                                     });
                                 }}
                             />
@@ -215,13 +244,31 @@ const ProteinDataForm: React.FC<ProteinDataProps> = ({
                             max={max}
                             step={step}
                             value={[typeof numericValue === "number" ? numericValue : 0]}
-                            onValueChange={(value) =>
+                            onValueChange={(value) => {
+                                const newValue = value[0];
+                                
+                                // Show alert if setting initial concentration < 1 in circuit with inhibitors
+                                if (isInitialConcentration && circuitUsesInhibitors && newValue < 1) {
+                                    showAlert("Warning: This circuit uses inhibitors. Initial concentrations less than 1 may cause simulation issues.");
+                                }
+                                
                                 setProteinData({
                                     ...proteinData,
-                                    [key]: value[0]
-                                })
-                            }
+                                    [key]: newValue
+                                });
+                            }}
                         />
+                        {/* Show warning callout for initial concentration < 1 in circuits with inhibitors */}
+                        {isInitialConcentration && showInhibitorWarning && (
+                            <Callout.Root color="amber">
+                                <Callout.Icon>
+                                    <CircleAlert size={16} />
+                                </Callout.Icon>
+                                <Callout.Text>
+                                    This circuit uses inhibitors. Initial concentrations less than 1 may cause unexpected outputs. Consider using a value of 1 or greater.
+                                </Callout.Text>
+                            </Callout.Root>
+                        )}
                     </Flex>
                 );
             })}
