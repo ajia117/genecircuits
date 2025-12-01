@@ -232,6 +232,7 @@ const PropertiesWindow: React.FC = () => {
                     mode="edit"
                     proteinData={editingProtein}
                     setProteinData={setEditingProtein}
+                    edges={edges}
                 />
                 <Button onClick={handleUpdate}><Text>Update Protein</Text></Button>
             </Flex>
@@ -274,6 +275,7 @@ const PropertiesWindow: React.FC = () => {
                                 mode="edit"
                                 proteinData={localProteinData}
                                 setProteinData={setLocalProteinData}
+                                edges={edges}
                             />
                             <Button onClick={handleUpdate}><Text>Update Protein</Text></Button>
                         </Flex>
