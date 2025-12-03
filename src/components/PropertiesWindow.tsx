@@ -222,7 +222,7 @@ const PropertiesWindow: React.FC = () => {
             type="auto"
             scrollbars="vertical"
             style={{
-                maxHeight: '400px',
+                maxHeight: 'calc(100vh - 200px)',
                 border: '1px solid var(--gray-a6)',
                 borderRadius: 'var(--radius-3)',
                 padding: '1rem',
@@ -234,6 +234,7 @@ const PropertiesWindow: React.FC = () => {
                     mode="edit"
                     proteinData={editingProtein}
                     setProteinData={setEditingProtein}
+                    edges={edges}
                     onValidityChange={setIsFormValid}
                 />
                 <Button onClick={handleUpdate} disabled={!isFormValid}><Text>Update Protein</Text></Button>
@@ -265,7 +266,7 @@ const PropertiesWindow: React.FC = () => {
                 { showProteinEditor && ( 
                     <ScrollArea type="auto" scrollbars="vertical"
                         style={{
-                            maxHeight: '400px',
+                            maxHeight: 'calc(100vh - 200px)',
                             border: '1px solid var(--gray-a6)',
                             borderRadius: 'var(--radius-3)',
                             padding: '1rem',
@@ -277,6 +278,7 @@ const PropertiesWindow: React.FC = () => {
                                 mode="edit"
                                 proteinData={localProteinData}
                                 setProteinData={setLocalProteinData}
+                                edges={edges}
                                 onValidityChange={setIsFormValid}
                             />
                             <Button onClick={handleUpdate} disabled={!isFormValid}><Text>Update Protein</Text></Button>
