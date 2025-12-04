@@ -84,13 +84,46 @@ const ProteinDataForm: React.FC<ProteinDataProps> = ({
 
     // Inform parent about validity (optional) and send negative fields list
     useEffect(() => {
-        if (onValidityChange) {
-            onValidityChange(negativeFields.length === 0);
-        }
         if (onNegativeFieldsChange) {
             onNegativeFieldsChange(negativeFields);
         }
-    }, [negativeFields, onValidityChange, onNegativeFieldsChange]);
+
+        if (onValidityChange) {
+            // additional required-field checks
+            const requiredMissing: string[] = [];
+
+            // label required
+            if (!proteinData?.label || String(proteinData.label).trim() === "") {
+                requiredMissing.push('label');
+            }
+
+            // numeric required fields
+            ['initialConcentration', 'lossRate', 'beta', 'inputs', 'outputs'].forEach((field) => {
+                const v = (proteinData as any)?.[field];
+                if (v === undefined || v === null || Number.isNaN(Number(v))) {
+                    requiredMissing.push(field);
+                }
+            });
+
+            // input function type required
+            if (!proteinData?.inputFunctionType || String(proteinData.inputFunctionType).trim() === '') {
+                requiredMissing.push('inputFunctionType');
+            } else if (proteinData.inputFunctionType === 'steady-state') {
+                const v = proteinData.inputFunctionData?.steadyStateValue;
+                if (v === undefined || v === null || Number.isNaN(Number(v))) requiredMissing.push('steadyStateValue');
+            } else if (proteinData.inputFunctionType === 'pulse') {
+                pulseFunctionDataProps.forEach(({ key }) => {
+                    const v = proteinData.inputFunctionData?.[key];
+                    if (v === undefined || v === null || Number.isNaN(Number(v))) {
+                        requiredMissing.push(String(key));
+                    }
+                });
+            }
+
+            const isValid = negativeFields.length === 0 && requiredMissing.length === 0;
+            onValidityChange(isValid);
+        }
+    }, [negativeFields, onValidityChange, onNegativeFieldsChange, proteinData]);
 
     const isFieldNegative = (label: string) => negativeFields.includes(label);
 
